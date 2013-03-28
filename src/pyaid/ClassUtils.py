@@ -16,6 +16,9 @@ class ClassUtils(object):
     def getAttrFromClass(cls, targetClass, attr, defaultValue =None):
         """Search through class and its parent classes if necessary to find the attr value."""
 
+        if not inspect.isclass(targetClass):
+            targetClass = targetClass.__class__
+
         out = defaultValue
         if hasattr(targetClass, attr):
             out = getattr(targetClass, attr, defaultValue)

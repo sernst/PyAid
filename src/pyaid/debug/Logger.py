@@ -72,7 +72,11 @@ class Logger(object):
         else:
             self._name = 'General'
 
-        self._logFile  = self.getLogFolder() + self._name + '_' + self._timeCode + '.log'
+        logFolder = self.getLogFolder()
+        if logFolder:
+            self._logFile = logFolder + self._name + '_' + self._timeCode + '.log'
+        else:
+            self._logFile = None
 
 #===================================================================================================
 #                                                                                   G E T / S E T
@@ -298,7 +302,7 @@ class Logger(object):
         if sys.platform.startswith('win') and not self._logFolder:
             self.clear()
             return
-        else:
+        elif self._logFile:
             try:
                 exists = os.path.exists(self._logFile)
                 with FileLock(self._logFile, 'a+') as lock:
