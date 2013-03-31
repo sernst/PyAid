@@ -22,9 +22,12 @@ class TextAnalyzer(object):
 #___________________________________________________________________________________________________ __init__
     def __init__(self, src ='', debug =False, blockDefs =None, debugData =None, **kwargs):
         """Creates a new instance of ClassTemplate."""
-        self._log           = Logger(self)
-        self._debugData     = debugData
-        self._debug         = debug
+        self._log = ArgsUtils.get('logger', None, kwargs)
+        if not self._log:
+            self._log = Logger(self)
+
+        self._debugData = debugData
+        self._debug     = debug
 
         if not isinstance(src, unicode):
             src = src.decode('utf8', 'ignore')
