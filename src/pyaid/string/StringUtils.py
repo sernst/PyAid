@@ -1,10 +1,12 @@
 # StringUtils.py
-# (C)2011-2012
+# (C)2011-2013
 # Scott Ernst and Eric David Wills
 
+import os
 import re
 import string
 import random
+import math
 
 #___________________________________________________________________________________________________ StringUtils
 class StringUtils:
@@ -156,20 +158,82 @@ class StringUtils:
         out = re.compile('[^A-Za-z0-9_]').sub(u'', source)
         return unicode(out if preserveCase else out.lower())
 
-#___________________________________________________________________________________________________ abbreviates
+#___________________________________________________________________________________________________ abbreviate
     @staticmethod
-    def abbreviate(text, length):
+    def abbreviate(text, length, truncation =u'...', sepChar =u' '):
         if len(text) <= length:
             return text
 
-        parts  = text.split()
+        if not truncation:
+            truncation = u''
+
+        parts  = text.split(sepChar)
         output = parts[0]
-        for i in range(1, len(parts)):
-            if len(output) + len(parts[i]) < length - 3:
-                output += ' ' + parts[i]
+        index  = 1
+        while len(output) < length:
+            lenOut   = len(output)
+            lenPart  = len(parts[index])
+            nextLen  = lenOut + lenPart
+            nowFill  = abs(length - lenOut)
+            nextFill = abs(length - lenOut - lenPart)
+            if nextLen > length and nowFill < 2*len(truncation):
+                break
+            if nextFill < nowFill:
+                output += sepChar + parts[index]
+                index  += 1
             else:
                 break
-        return (output[:length - 3] if len(output) == len(parts[0]) else output) + u'...'
+
+        end = int(max(length - len(truncation), 0))
+        return output[:end] + truncation
+
+#___________________________________________________________________________________________________ abbreviateRight
+    @classmethod
+    def abbreviateRight(cls, text, length, truncation =u'...', sepChar =u' '):
+        if len(text) <= length:
+            return text
+
+        if not truncation:
+            truncation = u''
+
+        parts  = text.split(sepChar)
+        output = parts[-1]
+        index  = -2
+        while len(output) < length:
+            lenOut   = len(output)
+            lenPart  = len(parts[index])
+            nextLen  = lenOut + lenPart
+            nowFill  = abs(length - lenOut)
+            nextFill = abs(length - lenOut - lenPart)
+            if nextLen > length and nowFill < 2*len(truncation):
+                break
+            if nextFill < nowFill:
+                output = parts[index] + sepChar + output
+                index  -= 1
+            else:
+                break
+        start = int(max(0, len(output) - length - len(truncation)))
+        return truncation + output[start:]
+
+#___________________________________________________________________________________________________ abbreviateCenter
+    @classmethod
+    def abbreviateCenter(cls, text, length, truncation =u'...', sepChar =u' '):
+        if len(text) <= length:
+            return text
+
+        halfLength = math.floor(0.5*float(length))
+        left  = cls.abbreviate(text, halfLength, None, sepChar=sepChar)
+        right = cls.abbreviateRight(text, length - halfLength, None, sepChar=sepChar)
+
+        return left + truncation + right
+
+#___________________________________________________________________________________________________ abbreviatePath
+    @classmethod
+    def abbreviatePath(cls, path, length, truncation =u'...'):
+        if len(path) <= length:
+            return path
+        p = path.replace(u'\\', u'/')
+        return cls.abbreviateCenter(p, length, truncation, sepChar=u'/').replace(u'/', os.sep)
 
 #___________________________________________________________________________________________________ camelCapsToWords
     @staticmethod

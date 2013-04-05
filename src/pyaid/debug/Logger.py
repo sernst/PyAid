@@ -53,7 +53,7 @@ class Logger(object):
             self._printCallbacks = []
 
         self._locationPrefix = kwargs.get('locationPrefix', False)
-        self._print          = kwargs.get('print', False)
+        self._print          = kwargs.get('printOut', False)
         self._buffer         = []
         self._hasError       = False
 
