@@ -30,3 +30,20 @@ class ClassUtils(object):
                     break
 
         return out
+
+#___________________________________________________________________________________________________ dynamicImport
+    @classmethod
+    def dynamicImport(cls, package, target =None):
+        if isinstance(target, basestring):
+            singular = True
+            target   = [target]
+        elif not target:
+            target   = [package.split(u'.')[-1]]
+            singular = True
+        else:
+            singular = False
+
+        result = __import__(package, globals(), locals(), target)
+        if singular:
+            return getattr(result, target[0], None)
+        return result

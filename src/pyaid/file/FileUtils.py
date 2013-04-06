@@ -185,7 +185,7 @@ class FileUtils(object):
         elif src[-1].find('.') == -1:
             out += os.sep
 
-        return out
+        return os.path.abspath(out)
 
 #___________________________________________________________________________________________________ cleanupPath
     @classmethod
@@ -208,7 +208,7 @@ class FileUtils(object):
             if extIndex < sepIndex and not path.endswith(os.sep):
                 path += os.sep
 
-        return path
+        return os.path.abspath(path)
 
 #===================================================================================================
 #                                                                               P R O T E C T E D
