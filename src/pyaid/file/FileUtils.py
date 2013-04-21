@@ -169,14 +169,14 @@ class FileUtils(object):
         out = os.path.join(*src)
 
         if out.endswith(os.sep) or ArgsUtils.get('isFile', False, kwargs):
-            return out
+            return os.path.abspath(out)
 
         if ArgsUtils.get('isDir', False, kwargs):
-            return out + os.sep
+            return os.path.abspath(out) + os.sep
 
         if os.path.exists(out):
             if os.path.isfile(out):
-                return out
+                return os.path.abspath(out)
 
             if os.path.isdir(out) and not out.endswith(os.sep):
                 out += os.sep
