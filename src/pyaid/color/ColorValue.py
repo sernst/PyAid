@@ -41,6 +41,14 @@ class ColorValue(object):
 #===================================================================================================
 #                                                                                   G E T / S E T
 
+#___________________________________________________________________________________________________ GS: opacity
+    @property
+    def opacity(self):
+        return self._opacity
+    @opacity.setter
+    def opacity(self, value):
+        self._opacity = float(value)
+
 #___________________________________________________________________________________________________ GS: bareHex
     @property
     def bareHex(self):
