@@ -16,8 +16,50 @@ class ListUtils(object):
 
 #___________________________________________________________________________________________________ addIfMissing
     @classmethod
-    def addIfMissing(cls):
-        pass
+    def addIfMissing(cls, value, targetList, reorder =False, frontOrdering =False):
+        """ Adds the specified value to the target list if and only if the value is not already in
+            the target list.
+
+            @@@param value:*
+                The value you want added to the list if it is not in the list already.
+
+            @@@param targetList:list
+                The list on which you want the value added.
+
+            @@@param reorder:bool
+                If True the order of the list will change so that the value appears at the end of
+                the list. If the value wasn't there all ready it will be added. If the value was
+                in the list it will be moved to the end.
+
+            @@@param frontOrdering:bool
+                If True, the value will be added at the beginning of the list instead of the end.
+                This is true if reordering is used as well.
+
+            @@@return bool
+                Whether or not the value was added to the list (ignores reordering).
+        """
+
+        if not targetList:
+            targetList.append(value)
+            return True
+
+        if value not in targetList:
+            if frontOrdering:
+                targetList.insert(0, value)
+            else:
+                targetList.append(value)
+            return True
+
+        if not reorder:
+            return False
+
+        targetList.remove(value)
+        if frontOrdering:
+            targetList.insert(0, value)
+        else:
+            targetList.append(value)
+
+        return False
 
 #___________________________________________________________________________________________________ clone
     @classmethod
