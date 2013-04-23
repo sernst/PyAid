@@ -54,6 +54,11 @@ class ColorValue(object):
     def bareHex(self):
         return self._getWebValue(False).replace('#','')
 
+#___________________________________________________________________________________________________ GS: webRgbOpacity
+    @property
+    def webRgbOpacity(self):
+        return self.asWebRgbOpacity()
+
 #___________________________________________________________________________________________________ GS: webRGBA
     @property
     def webRGBA(self):
@@ -327,6 +332,16 @@ class ColorValue(object):
             unicode(c[1]),
             unicode(c[2]),
             unicode(self._opacity if opacity is None else opacity)
+        )
+
+#___________________________________________________________________________________________________ asWebRgbOpacity
+    def asWebRgbOpacity(self, opacity =None):
+        c = self.asRgb(output=tuple)
+        return u'rgba(%s, %s, %s, %s)' % (
+            unicode(c[0]),
+            unicode(c[1]),
+            unicode(c[2]),
+            unicode(100.0*(self._opacity if opacity is None else opacity)) + u'%'
         )
 
 #___________________________________________________________________________________________________ asRgb
