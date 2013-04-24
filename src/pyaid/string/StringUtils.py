@@ -25,6 +25,8 @@ class StringUtils:
         ("'", '&#39;'),
     ]
 
+    _SOLO_BACKSLASH_PATTERN = re.compile('(?<!\\\)\\\(?!\\\)')
+
 #___________________________________________________________________________________________________ contains
     @staticmethod
     def contains(source, test, offset =0):
@@ -277,6 +279,13 @@ class StringUtils:
             source = source.replace(esc[0], esc[1])
 
         return source
+
+#___________________________________________________________________________________________________ escapeBackSlashes
+    @classmethod
+    def escapeBackSlashes(cls, source, soloOnly =True):
+        if soloOnly:
+            return cls._SOLO_BACKSLASH_PATTERN.sub('\\\\\\\\', source)
+        return source.replace('\\', '\\\\')
 
 #___________________________________________________________________________________________________ getCompleteFragment
     @staticmethod
