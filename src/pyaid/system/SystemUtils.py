@@ -1,5 +1,5 @@
 # SystemUtils.py
-# (C)2012
+# (C)2012-2013
 # Scott Ernst
 
 import subprocess
@@ -13,26 +13,31 @@ class SystemUtils(object):
 
 #___________________________________________________________________________________________________ executeCommand
     @classmethod
-    def executeCommand(cls, cmd, remote =False):
-        if isinstance(cmd, list):
+    def executeCommand(cls, cmd, remote =False, shell =True, wait =False):
+        if shell and isinstance(cmd, list):
             cmd = ' '.join(cmd)
 
         if remote:
-            subprocess.Popen(
+            pipe = subprocess.Popen(
                 cmd,
-                shell=True,
+                shell=shell,
                 stdout=None,
                 stderr=None,
                 stdin=None,
                 close_fds=False
             )
-            return {'error':'', 'out':'', 'code':0}
+            if wait:
+                pipe.wait()
+            return {'error':'', 'out':'', 'code':0, 'command':cmd}
 
         pipe = subprocess.Popen(
             cmd,
-            shell=True,
+            shell=shell,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
+        if wait:
+            pipe.wait()
         out, error = pipe.communicate()
-        return {'error':error, 'out':out, 'code':pipe.returncode}
+        result = {'error':error, 'out':out, 'code':pipe.returncode, 'command':cmd}
+        return result
