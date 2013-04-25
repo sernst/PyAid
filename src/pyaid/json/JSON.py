@@ -21,3 +21,28 @@ class JSON(object):
     @staticmethod
     def fromString(src):
         return json.loads(src)
+
+#___________________________________________________________________________________________________ fromFile
+    @classmethod
+    def fromFile(cls, path):
+        try:
+            f   = open(path, 'r+')
+            res = f.read()
+            f.close()
+            return cls.fromString(res.encode('utf-8', 'ignore'))
+        except Exception, err:
+            print err
+            return None
+
+#___________________________________________________________________________________________________ toFile
+    @classmethod
+    def toFile(cls, path, value):
+        try:
+            res = cls.asString(value).decode('utf-8', 'ignore')
+            f   = open(path, 'w+')
+            f.write(res)
+            f.close()
+            return True
+        except Exception, err:
+            print err
+            return False

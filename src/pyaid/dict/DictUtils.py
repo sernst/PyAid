@@ -13,6 +13,29 @@ class DictUtils(object):
 #===================================================================================================
 #                                                                                       C L A S S
 
+#___________________________________________________________________________________________________ merge
+    @classmethod
+    def merge(cls, a, b):
+        if a and not b:
+            return a
+        elif b and not a:
+            return b
+        elif not a and not b:
+            return None
+
+        keys = tuple(set(a.keys() + b.keys()))
+        out  = dict()
+        for k in keys:
+            if k not in b:
+                out[k] = a[k]
+                continue
+            if k not in a:
+                out[k] = b[k]
+                continue
+            out[k] = cls._mergeValues(a[k], b[k])
+
+        return out
+
 #___________________________________________________________________________________________________ clone
     @classmethod
     def clone(cls, item):
@@ -80,3 +103,32 @@ class DictUtils(object):
 
         return True
 
+#===================================================================================================
+#                                                                               P R O T E C T E D
+
+#___________________________________________________________________________________________________ _mergeValues
+    @classmethod
+    def _mergeValues(cls, a, b):
+        if a and not b:
+            return a
+        elif b and not a:
+            return b
+
+        if isinstance(a, list):
+            if isinstance(b, list):
+                return a + b
+            return a + [b]
+        elif isinstance(a, tuple):
+            if isinstance(b, tuple):
+                return a + b
+            return a + (b,)
+        elif isinstance(b, list):
+            return [a] + b
+        elif isinstance(b, tuple):
+            return (a,) + b
+        elif isinstance(a, dict):
+            if isinstance(b, dict):
+                return cls.merge(a, b)
+            return a
+
+        return b
