@@ -46,6 +46,11 @@ class FileUtils(object):
 
         return True
 
+#___________________________________________________________________________________________________ getDirectoryOf
+    @classmethod
+    def getDirectoryOf(cls, path):
+        return os.path.dirname(os.path.abspath(path))
+
 #___________________________________________________________________________________________________ getFilesOnPath
     @classmethod
     def getFilesOnPath(cls, rootPath, recursive =True, **kwargs):
