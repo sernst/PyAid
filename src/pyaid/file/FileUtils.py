@@ -48,8 +48,11 @@ class FileUtils(object):
 
 #___________________________________________________________________________________________________ getDirectoryOf
     @classmethod
-    def getDirectoryOf(cls, path):
-        return os.path.dirname(os.path.abspath(path))
+    def getDirectoryOf(cls, path, createIfMissing =False):
+        path = os.path.dirname(os.path.abspath(path))
+        if createIfMissing and not os.path.exists(path):
+            os.makedirs(path)
+        return path
 
 #___________________________________________________________________________________________________ getFilesOnPath
     @classmethod
@@ -214,6 +217,21 @@ class FileUtils(object):
                 path += os.sep
 
         return cls._getAbsolutePath(path)
+
+#___________________________________________________________________________________________________ changePathRoot
+    @classmethod
+    def changePathRoot(cls, path, oldRootPath, newRootPath):
+        path = cls.cleanupPath(path)
+        oldRootPath = cls.cleanupPath(oldRootPath, isDir=True)
+        newRootPath = cls.cleanupPath(newRootPath, isDir=True)
+
+        if path == oldRootPath:
+            return newRootPath
+
+        if not path.startswith(oldRootPath):
+            return None
+
+        return newRootPath + path[len(oldRootPath):]
 
 #===================================================================================================
 #                                                                               P R O T E C T E D
