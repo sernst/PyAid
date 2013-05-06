@@ -91,6 +91,14 @@ class Logger(object):
     def hasError(self):
         return self._hasError
 
+#___________________________________________________________________________________________________ GS: trace
+    @property
+    def trace(self):
+        return self._print
+    @trace.setter
+    def trace(self, value):
+        self._print = bool(value)
+
 #===================================================================================================
 #                                                                                     P U B L I C
 

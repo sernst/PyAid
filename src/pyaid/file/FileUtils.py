@@ -20,6 +20,48 @@ class FileUtils(object):
 #===================================================================================================
 #                                                                                     P U B L I C
 
+#___________________________________________________________________________________________________ getContents
+    @classmethod
+    def getContents(cls, path, raiseErrors =False):
+        if not os.path.exists(path):
+            return None
+        try:
+            f = open(path, 'r+')
+            source = f.read()
+            f.close()
+            return source.decode('utf-8', 'ignore')
+        except Exception, err:
+            if raiseErrors:
+                raise
+            print err
+            return None
+
+#___________________________________________________________________________________________________ putContents
+    @classmethod
+    def putContents(cls, content, path, append =False, raiseErrors =False):
+        if not isinstance(content, basestring):
+            content = u''
+        elif isinstance(content, unicode):
+            try:
+                content = content.encode('utf-8', 'ignore')
+            except Exception, err:
+                if raiseErrors:
+                    raise
+                print err
+                return False
+
+        try:
+            f = open(path, 'a+' if append and os.path.exists(path) else 'w+')
+            f.write(content)
+            f.close()
+        except Exception, err:
+            if raiseErrors:
+                raise
+            print err
+            return False
+
+        return True
+
 #___________________________________________________________________________________________________ getUTCModifiedTime
     @classmethod
     def getUTCModifiedDatetime(cls, path):
