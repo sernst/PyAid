@@ -240,6 +240,9 @@ class FileUtils(object):
 #___________________________________________________________________________________________________ cleanupPath
     @classmethod
     def cleanupPath(cls, path, **kwargs):
+        if not path:
+            return path
+
         if os.path.exists(path):
             if os.path.isdir(path) and not path.endswith(os.sep):
                 return cls._getAbsolutePath(path) + os.sep

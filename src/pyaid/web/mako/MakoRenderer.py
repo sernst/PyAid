@@ -112,7 +112,7 @@ class MakoRenderer(object):
             d = []
             if data:
                 for n,v in data.iteritems():
-                    d.append(str(n) + ': ' + str(v))
+                    d.append(unicode(n) + u': ' + unicode(v))
 
             try:
                 stack = exceptions.text_error_template().render().replace('%','%%')
