@@ -369,7 +369,7 @@ class ColorValue(object):
                 blue  = self._rgbColor[2]
 
         if output is tuple:
-            return (red, green, blue)
+            return red, green, blue
         elif output is list:
             return [red, green, blue]
 
@@ -424,16 +424,14 @@ class ColorValue(object):
             out = self._hsvColor
 
         if out is None:
-            rgb = self.asRgb()
-            r   = float(rgb['r'])
-            g   = float(rgb['g'])
-            b   = float(rgb['b'])
+            rgb = self.asRgb(output=tuple)
+            r   = float(rgb[0])
+            g   = float(rgb[1])
+            b   = float(rgb[2])
 
             maxRGB     = max(r, g, b)
             minRGB     = min(r, g, b)
             hue        = 0
-            saturation = 0
-            value      = 0
 
             #--- Hue ---#
             if maxRGB == minRGB:
@@ -906,4 +904,8 @@ class ColorValue(object):
 
 #___________________________________________________________________________________________________ _parseUnknownColorString
     def _parseUnknownColorString(self, value):
+        from pyaid.color.ColorNames import ColorNames
+        value = value.strip().lower().replace(u' ', u'')
+        if value in ColorNames.NAMES:
+            return ColorNames.NAMES[value]
         return None
