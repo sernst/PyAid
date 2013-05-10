@@ -80,7 +80,7 @@ class MakoRenderer(object):
         else:
             data = self._data
 
-        td = [self._rootDir]
+        td = [self._rootDir] if isinstance(self._rootDir, basestring) else self._rootDir
 
         lookup = TemplateLookup(
             directories=td,
@@ -107,7 +107,7 @@ class MakoRenderer(object):
 
         mr = MakoDataTransporter(data=data, logger=self._log)
         try:
-            self._result = target.render_unicode(mr=mr)
+            self._result = target.render_unicode(mr=mr).replace('\r', '')
         except Exception, err:
             d = []
             if data:
