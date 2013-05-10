@@ -1,5 +1,5 @@
 # Reflection.py
-# (C)2011-2012
+# (C)2011-2013
 # Scott Ernst
 
 #___________________________________________________________________________________________________ Reflection
@@ -9,15 +9,33 @@ class Reflection(object):
 #===================================================================================================
 #                                                                                     P U B L I C
 
+#___________________________________________________________________________________________________ getEnumerationReflectionDict
+    @classmethod
+    def getEnumerationReflectionDict(cls, source):
+        """ Creates a dictionary from a multi-value enumeration class in the format:
+            (enumerationValue, (possible, matching, values))
+        """
+        res = dict()
+
+        for attr in dir(source):
+            if attr.startswith('_'):
+                continue
+
+            a = getattr(source, attr)
+            for enum in a[1]:
+                res[enum] = a[0]
+
+        return res
+
 #___________________________________________________________________________________________________ getReflectionDict
     @staticmethod
-    def getReflectionDict(source):
+    def getReflectionDict(source, lowerKeys =False):
         """ Uses reflection to get the attributes of source and returns the results as a dictionary
             with the keys being the names of the source attributes. Attributes that begin with an
             underscore are considered private and ignored.
         """
 
-        res = {}
+        res = dict()
 
         for attr in dir(source):
             if attr.startswith('_'):
@@ -27,7 +45,10 @@ class Reflection(object):
             if not a:
                 continue
 
-            res[attr] = a
+            if lowerKeys:
+                res[attr.lower()] = a
+            else:
+                res[attr] = a
 
         return res
 
@@ -81,7 +102,7 @@ class Reflection(object):
             two lists. Attributes that begin with an underscore are considered private and ignored.
         """
 
-        names = []
+        names  = []
         values = []
 
         for attr in dir(source):

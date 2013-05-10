@@ -70,6 +70,14 @@ class DictUtils(object):
 
         return out
 
+#___________________________________________________________________________________________________ lowerDictKeys
+    @classmethod
+    def lowerDictKeys(cls, source):
+        out = dict()
+        for key, value in source.iteritems():
+            out[key.lower()] = value
+        return out
+
 #___________________________________________________________________________________________________ compare
     @classmethod
     def compare(cls, a, b):
