@@ -62,6 +62,14 @@ class FileUtils(object):
 
         return True
 
+#___________________________________________________________________________________________________ getModifiedDatetime
+    @classmethod
+    def getModifiedDatetime(cls, path):
+        if not os.path.exists(path):
+            return None
+
+        return datetime.fromtimestamp(os.path.getmtime(path))
+
 #___________________________________________________________________________________________________ getUTCModifiedTime
     @classmethod
     def getUTCModifiedDatetime(cls, path):
