@@ -29,7 +29,7 @@ class JSON(object):
             f   = open(path, 'r+')
             res = f.read()
             f.close()
-            return cls.fromString(res.encode('utf-8', 'ignore'))
+            return cls.fromString(res.decode('utf-8', 'ignore'))
         except Exception, err:
             print err
             return None
@@ -38,7 +38,7 @@ class JSON(object):
     @classmethod
     def toFile(cls, path, value):
         try:
-            res = cls.asString(value).decode('utf-8', 'ignore')
+            res = cls.asString(value).encode('utf-8', 'ignore')
             f   = open(path, 'w+')
             f.write(res)
             f.close()

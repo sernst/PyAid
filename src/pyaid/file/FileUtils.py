@@ -147,7 +147,7 @@ class FileUtils(object):
             Either the file name, full path, or at least a file extension.
         """
 
-        value = mimetypes.guess_type(mimeType)[0] if mimeType else None
+        value = mimetypes.guess_type(mimeType, strict=False)[0] if mimeType else None
         if value:
             return value.lower()
 

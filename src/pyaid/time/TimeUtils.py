@@ -169,7 +169,17 @@ class TimeUtils(object):
     def cfAccessToDateTime(s):
         return datetime.strptime(s, '%Y-%m-%d %H:%M:%S')
 
-#___________________________________________________________________________________________________
+#___________________________________________________________________________________________________ dateTimeToRssTimestamp
     @staticmethod
     def dateTimeToRssTimestamp(dt):
         return dt.strftime('%a, %d %b %Y %H:%M:%S GMT')
+
+#___________________________________________________________________________________________________ dateTimeToWebTimestamp
+    @staticmethod
+    def dateTimeToWebTimestamp(dt):
+        return dt.strftime('%a, %d %b %Y %H:%M:%S GMT')
+
+#___________________________________________________________________________________________________ webTimestampToDateTime
+    @staticmethod
+    def webTimestampToDateTime(ts):
+        return datetime.strptime(ts, '%a, %d %b %Y %H:%M:%S GMT')
