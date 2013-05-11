@@ -183,3 +183,10 @@ class TimeUtils(object):
     @staticmethod
     def webTimestampToDateTime(ts):
         return datetime.strptime(ts, '%a, %d %b %Y %H:%M:%S GMT')
+
+#___________________________________________________________________________________________________ getUtcTagTimestamp
+    @staticmethod
+    def getUtcTagTimestamp(dt =None):
+        if not dt:
+            dt = datetime.utcnow()
+        return dt.strftime('%Y%m%d%H%M%S')
