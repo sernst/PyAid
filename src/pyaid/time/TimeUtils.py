@@ -139,6 +139,14 @@ class TimeUtils(object):
         """
         return cls.secondsToDatetime(Base64.from64(timeCode) + baseTime)
 
+#___________________________________________________________________________________________________ datetimeToTimecode
+    @classmethod
+    def datetimeToTimecode(cls, dt, baseTime =0):
+        """ Returns a timecode (base64 encoded seconds string) for the given datetime object and
+            offset by the baseTime number of seconds.
+        """
+        return Base64.to64(cls.datetimeToSeconds(dt) - baseTime)
+
 #___________________________________________________________________________________________________ timecodeToFriendlyTimestamp
     @classmethod
     def timecodeToFriendlyTimestamp(cls, timeCode, baseTime =0):

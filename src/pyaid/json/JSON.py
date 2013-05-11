@@ -1,5 +1,5 @@
 # JSON.py
-# (C)2011
+# (C)2011-2013
 # Scott Ernst
 
 import json
@@ -12,14 +12,16 @@ class JSON(object):
 #                                                                                       C L A S S
 
 #___________________________________________________________________________________________________ asString
-    @staticmethod
-    def asString(src):
+    @classmethod
+    def asString(cls, src, pretty =False):
         """Doc..."""
-        return json.dumps(src, separators=(',', ':'))
+        if pretty:
+            return cls._dumpsPretty(src)
+        return cls._dumpsCompact(src)
 
 #___________________________________________________________________________________________________ fromString
-    @staticmethod
-    def fromString(src):
+    @classmethod
+    def fromString(cls, src):
         return json.loads(src)
 
 #___________________________________________________________________________________________________ fromFile
@@ -36,9 +38,9 @@ class JSON(object):
 
 #___________________________________________________________________________________________________ toFile
     @classmethod
-    def toFile(cls, path, value):
+    def toFile(cls, path, value, pretty =False):
         try:
-            res = cls.asString(value).encode('utf-8', 'ignore')
+            res = cls.asString(value, pretty=pretty).encode('utf-8', 'ignore')
             f   = open(path, 'w+')
             f.write(res)
             f.close()
@@ -46,3 +48,16 @@ class JSON(object):
         except Exception, err:
             print err
             return False
+
+#===================================================================================================
+#                                                                               P R O T E C T E D
+
+#___________________________________________________________________________________________________ _dumpsCompact
+    @classmethod
+    def _dumpsCompact(cls, src):
+        return json.dumps(src, separators=(',', ':'))
+
+#___________________________________________________________________________________________________ _dumpsPretty
+    @classmethod
+    def _dumpsPretty(cls, src):
+        return json.dumps(src, separators=(',', ': '), indent=4, sort_keys=True)
