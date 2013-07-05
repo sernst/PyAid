@@ -2,6 +2,7 @@
 # (C)2012-2013
 # Scott Ernst
 
+import os
 import inspect
 
 #___________________________________________________________________________________________________ ClassUtils
@@ -10,6 +11,17 @@ class ClassUtils(object):
 #===================================================================================================
 #                                                                                       C L A S S
 
+#___________________________________________________________________________________________________ getClassDirectoryPath
+    @classmethod
+    def getClassDirectoryPath(cls, targetClass):
+        """Returns the absolute path to the directory that contains the specified class."""
+        return os.path.abspath(os.path.dirname(inspect.getfile(targetClass)))
+
+#___________________________________________________________________________________________________ getClassPath
+    @classmethod
+    def getClassPath(cls, targetClass):
+        """Returns the absolute path to the file that contains the specified class."""
+        return os.path.abspath(inspect.getfile(targetClass))
 
 #___________________________________________________________________________________________________ getAttrFromClass
     @classmethod
