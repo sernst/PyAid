@@ -17,6 +17,9 @@ class Base36(object):
 # __________________________________________________________________________________________________ to64
     @staticmethod
     def to36(n):
+        if n == 0:
+            return '0'
+
         out     = ''
         while n != 0:
             n, m = divmod(long(n), 36)

@@ -23,19 +23,15 @@ class Logger(object):
 #===================================================================================================
 #                                                                                       C L A S S
 
-    _LOG_FOLDER  = None
-    _INITIALS_RX = re.compile('[^A-Z]+')
-    _appEnvirons = dict()
-
 #___________________________________________________________________________________________________ __init__
     def __init__(self, name=None, **kwargs):
         """Initializes settings."""
         self._time       = self._getTime()
         self._timeCode   = self._time.strftime('%y-%U')
         self._timestamp  = self._time.strftime('%Y|%m|%d|%H|%M|%S')
-        self._request    = kwargs.get('request', None)
-        self._logFolder  = kwargs.get('logFolder', self._LOG_FOLDER)
-        self._htmlEscape = kwargs.get('htmlEscape', False)
+
+        self._logPath       = kwargs.get('logFolder', None)
+        self._htmlEscape    = kwargs.get('htmlEscape', False)
         self._storageBuffer = [] if kwargs.get('useStorageBuffer', False) else None
 
         writeCallbacks = kwargs.get('writeCallbacks', None)
@@ -53,7 +49,7 @@ class Logger(object):
             self._printCallbacks = []
 
         self._locationPrefix = kwargs.get('locationPrefix', False)
-        self._print          = kwargs.get('printOut', False)
+        self._traceLogs      = kwargs.get('printOut', False)
         self._buffer         = []
         self._hasError       = False
 
@@ -81,6 +77,14 @@ class Logger(object):
 #===================================================================================================
 #                                                                                   G E T / S E T
 
+#___________________________________________________________________________________________________ GS: loggingPath
+    @property
+    def loggingPath(self):
+        return self._logPath
+    @loggingPath.setter
+    def loggingPath(self, value):
+        self._logPath = value
+
 #___________________________________________________________________________________________________ GS: storageBuffer
     @property
     def storageBuffer(self):
@@ -94,10 +98,10 @@ class Logger(object):
 #___________________________________________________________________________________________________ GS: trace
     @property
     def trace(self):
-        return self._print
+        return self._traceLogs
     @trace.setter
     def trace(self, value):
-        self._print = bool(value)
+        self._traceLogs = bool(value)
 
 #===================================================================================================
 #                                                                                     P U B L I C
@@ -136,10 +140,10 @@ class Logger(object):
 
 #___________________________________________________________________________________________________ getLogFolder
     def getLogFolder(self):
-        if not self._logFolder:
+        if not self._logPath:
             return None
 
-        logs = self._logFolder
+        logs = self._logPath
         if not os.path.exists(logs):
             os.makedirs(logs)
         return logs
@@ -152,23 +156,7 @@ class Logger(object):
         else:
             loc = u']'
 
-        threadID    = ThreadUtils.getCurrentID()
-        requestInfo = ''
-
-        if threadID in Logger._appEnvirons:
-            wsgi     = self._appEnvirons[threadID]
-            initials = self._INITIALS_RX.sub('', wsgi.get('REMOTE_USER', ''))
-            if initials:
-                initials = '%s | ' % initials
-
-            domainName  = wsgi.get('SERVER_NAME', '')
-            uriPath     = wsgi.get('REQUEST_URI', wsgi.get('HTTP_REQUEST_URI', ''))
-            requestInfo = '<%s%s%s>' % (initials, domainName, uriPath)
-
-        res = self._getTime().strftime('[%a %H:%M <%S.%f>') \
-              + (' <%s> %s %s' % (threadID, requestInfo, loc))
-
-        return unicode(res)
+        return unicode(self._getTime().strftime(u'[%a %H:%M <%S.%f>') + loc)
 
 #___________________________________________________________________________________________________ clear
     def clear(self, storage =False):
@@ -188,7 +176,7 @@ class Logger(object):
         if self._htmlEscape or htmlEscape:
             s = StringUtils.htmlEscape(s)
 
-        if self._print:
+        if self._traceLogs:
             out = self._asASCII(s)
             print out
             for cb in self._printCallbacks:
@@ -307,7 +295,7 @@ class Logger(object):
             except Exception, err:
                 pass
 
-        if sys.platform.startswith('win') and not self._logFolder:
+        if sys.platform.startswith('win') and not self._logPath:
             self.clear()
             return
         elif self._logFile:
@@ -343,8 +331,8 @@ class Logger(object):
                   % (unicode(index), item['file'], item['function'], unicode(item['line']),
                      item['code'][:100])
             else:
-                s += u'\n\t[%s] EXT: %s {line: %s}' % (unicode(index), item['file'],
-                                                              unicode(item['line']))
+                s += u'\n\t[%s] EXT: %s {line: %s}' % (
+                    unicode(index), item['file'], unicode(item['line']))
 
         return s
 
@@ -417,18 +405,6 @@ class Logger(object):
                 v = u'<UNPRINTABLE>'
             s += u'%s%s: %s' % (indent, n, v)
         return s
-
-#___________________________________________________________________________________________________ registerRequest
-    @staticmethod
-    def registerWSGIEnviron(environ):
-        Logger._appEnvirons[ThreadUtils.getCurrentID()] = environ
-
-#___________________________________________________________________________________________________ clearThreadData
-    @staticmethod
-    def clearThreadData():
-        threadID = ThreadUtils.getCurrentID()
-        if threadID in Logger._appEnvirons:
-            del(Logger._appEnvirons[threadID])
 
 #===================================================================================================
 #                                                                               P R O T E C T E D

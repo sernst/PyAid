@@ -77,14 +77,8 @@ class TimeUtils(object):
     @staticmethod
     def parseSerialList(timeList):
         return datetime(
-            year=timeList[0],
-            month=timeList[1],
-            day=timeList[2],
-            hour=timeList[3],
-            minute=timeList[4],
-            second=timeList[5],
-            microsecond=timeList[6]
-        )
+            year=timeList[0], month=timeList[1], day=timeList[2],
+            hour=timeList[3], minute=timeList[4], second=timeList[5], microsecond=timeList[6])
 
 #___________________________________________________________________________________________________ getSolrTimestamp
     @staticmethod
@@ -146,6 +140,11 @@ class TimeUtils(object):
             offset by the baseTime number of seconds.
         """
         return Base64.to64(cls.datetimeToSeconds(dt) - baseTime)
+
+#___________________________________________________________________________________________________ getNowTimecode
+    @classmethod
+    def getNowTimecode(cls, baseTime =0):
+        return Base64.to64(cls.getNowSeconds() - baseTime)
 
 #___________________________________________________________________________________________________ timecodeToFriendlyTimestamp
     @classmethod

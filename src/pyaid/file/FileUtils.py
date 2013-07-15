@@ -4,6 +4,7 @@
 
 import os
 import sys
+import gzip
 import subprocess
 import shutil
 import mimetypes
@@ -22,11 +23,14 @@ class FileUtils(object):
 
 #___________________________________________________________________________________________________ getContents
     @classmethod
-    def getContents(cls, path, raiseErrors =False):
+    def getContents(cls, path, raiseErrors =False, gzipped =False):
         if not os.path.exists(path):
             return None
         try:
-            f = open(path, 'r+')
+            if gzipped:
+                f = gzip.open(path, 'r+')
+            else:
+                f = open(path, 'r+')
             source = f.read()
             f.close()
             return source.decode('utf-8', 'ignore')
@@ -38,7 +42,7 @@ class FileUtils(object):
 
 #___________________________________________________________________________________________________ putContents
     @classmethod
-    def putContents(cls, content, path, append =False, raiseErrors =False):
+    def putContents(cls, content, path, append =False, raiseErrors =False, gzipped =False):
         if not isinstance(content, basestring):
             content = u''
         elif isinstance(content, unicode):
@@ -51,7 +55,11 @@ class FileUtils(object):
                 return False
 
         try:
-            f = open(path, 'a+' if append and os.path.exists(path) else 'w+')
+            mode = 'a+' if append and os.path.exists(path) else 'w+'
+            if gzipped:
+                f = open(path, mode)
+            else:
+                f = open(path, mode)
             f.write(content)
             f.close()
         except Exception, err:
