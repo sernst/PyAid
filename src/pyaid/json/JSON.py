@@ -3,6 +3,7 @@
 # Scott Ernst
 
 import json
+import gzip
 
 #___________________________________________________________________________________________________ JSON
 class JSON(object):
@@ -26,9 +27,12 @@ class JSON(object):
 
 #___________________________________________________________________________________________________ fromFile
     @classmethod
-    def fromFile(cls, path):
+    def fromFile(cls, path, gzipped =False):
         try:
-            f   = open(path, 'r+')
+            if gzipped:
+                f = gzip.open(path, 'r+')
+            else:
+                f = open(path, 'r+')
             res = f.read()
             f.close()
             return cls.fromString(res.decode('utf-8', 'ignore'))
@@ -38,10 +42,13 @@ class JSON(object):
 
 #___________________________________________________________________________________________________ toFile
     @classmethod
-    def toFile(cls, path, value, pretty =False):
+    def toFile(cls, path, value, pretty =False, gzipped =False):
         try:
             res = cls.asString(value, pretty=pretty).encode('utf-8', 'ignore')
-            f   = open(path, 'w+')
+            if gzipped:
+                f = gzip.open(path, 'w+')
+            else:
+                f = open(path, 'w+')
             f.write(res)
             f.close()
             return True

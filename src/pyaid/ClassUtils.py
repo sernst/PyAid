@@ -11,6 +11,29 @@ class ClassUtils(object):
 #===================================================================================================
 #                                                                                       C L A S S
 
+#___________________________________________________________________________________________________ getModulePackage
+    @classmethod
+    def getModulePackage(cls, targetClass, shave =0):
+        """ Returns a string containing the full package to the module where the target class
+            resides. If the shave value is non-zero, the result will return the package to the
+            ancestor package. If the shave value exceeds the length of the package, an empty string
+            will be returned instead.
+        """
+        try:
+            out = targetClass.__module__
+        except Exception, err:
+            out = inspect.getmodule(targetClass).__name__
+
+        if shave == 0:
+            return out
+
+        shave = abs(shave)
+        parts = out.split(u'.')
+        if len(parts) <= shave:
+            return ''
+
+        return u'.'.join(parts[:-shave])
+
 #___________________________________________________________________________________________________ getClassDirectoryPath
     @classmethod
     def getClassDirectoryPath(cls, targetClass):
