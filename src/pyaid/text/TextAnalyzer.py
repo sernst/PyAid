@@ -1,5 +1,5 @@
 # TextAnalyzer.py
-# (C)2012
+# (C)2012-2013
 # Scott Ernst
 
 import re
@@ -22,9 +22,7 @@ class TextAnalyzer(object):
 #___________________________________________________________________________________________________ __init__
     def __init__(self, src ='', debug =False, blockDefs =None, debugData =None, **kwargs):
         """Creates a new instance of ClassTemplate."""
-        self._log = ArgsUtils.get('logger', None, kwargs)
-        if not self._log:
-            self._log = Logger(self)
+        self._log = ArgsUtils.getLogger(self, kwargs)
 
         self._debugData = debugData
         self._debug     = debug

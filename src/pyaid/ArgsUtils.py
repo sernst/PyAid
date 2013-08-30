@@ -91,7 +91,10 @@ class ArgsUtils(object):
 
 #___________________________________________________________________________________________________ getLogger
     @staticmethod
-    def getLogger(logIdentifier, kwargs =None, args =None, index =None, name ='logger', extract =False):
+    def getLogger(
+            logIdentifier, kwargs =None, args =None, index =None, name ='logger', extract =False,
+            trace =None
+    ):
         if extract:
             res = ArgsUtils.extract(name, None, kwargs, args, index)
         else:
@@ -99,7 +102,10 @@ class ArgsUtils(object):
 
         if res is None:
             from pyaid.debug.Logger import Logger
-            return Logger(logIdentifier)
+            res = Logger(logIdentifier)
+
+        if trace is not None:
+            res.trace = trace
 
         return res
 
