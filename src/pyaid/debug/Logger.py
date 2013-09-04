@@ -4,7 +4,6 @@
 
 import sys
 import os
-import re
 import datetime
 import traceback
 import unicodedata
@@ -13,8 +12,8 @@ import unicodedata
 
 from pyaid.ArgsUtils import ArgsUtils
 from pyaid.file.FileLock import FileLock
+from pyaid.file.FileUtils import FileUtils
 from pyaid.string.StringUtils import StringUtils
-from pyaid.threading.ThreadUtils import ThreadUtils
 
 #___________________________________________________________________________________________________ Logger
 class Logger(object):
@@ -30,7 +29,10 @@ class Logger(object):
         self._timeCode   = self._time.strftime('%y-%U')
         self._timestamp  = self._time.strftime('%Y|%m|%d|%H|%M|%S')
 
-        self._logPath       = kwargs.get('logFolder', None)
+        self._logPath    = kwargs.get('logFolder', None)
+        if self._logPath:
+            self._logPath = FileUtils.cleanupPath(self._logPath)
+
         self._htmlEscape    = kwargs.get('htmlEscape', False)
         self._storageBuffer = [] if kwargs.get('useStorageBuffer', False) else None
 
@@ -70,7 +72,8 @@ class Logger(object):
 
         logFolder = self.getLogFolder()
         if logFolder:
-            self._logFile = logFolder + self._name + '_' + self._timeCode + '.log'
+            self._logFile = FileUtils.createPath(
+                logFolder, self._name + '_' + self._timeCode + '.log')
         else:
             self._logFile = None
 
@@ -136,7 +139,7 @@ class Logger(object):
 
 #___________________________________________________________________________________________________ getLog
     def getLog(self):
-        return "".join(self._buffer)
+        return ''.join(self._buffer)
 
 #___________________________________________________________________________________________________ getLogFolder
     def getLogFolder(self):
@@ -165,6 +168,11 @@ class Logger(object):
         self._hasError  = False
         if storage and self._storageBuffer is not None:
             self._storageBuffer = []
+
+#___________________________________________________________________________________________________ clearLogFile
+    def clearLogFile(self):
+        if self._logFile and os.path.exists(self._logFile):
+            os.remove(self._logFile)
 
 #___________________________________________________________________________________________________ add
     def add(self, s, traceStack =False, shaveStackTrace =0, request =None, htmlEscape =False):

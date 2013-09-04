@@ -47,8 +47,44 @@ class S3Bucket(object):
 #                                                                                     P U B L I C
 
 #___________________________________________________________________________________________________ listKeys
-    def listKeys(self, namePrefix):
-        pass
+    def listKeys(self, path, pathFilter =None, includeDirs =True, includeFiles =True):
+        if len(path) > 0 and path[0] == '/':
+            path = path[1:]
+
+        objs = self._bucket.list(path)
+        out  = []
+        for obj in objs:
+            isDir = obj.name[-1] == '/' and obj.size == 0
+            if isDir and not includeDirs:
+                continue
+            if not isDir and not includeFiles:
+                continue
+
+            if pathFilter is None or obj.name.find(pathFilter) != -1:
+                out.append(obj)
+
+        return out
+
+#___________________________________________________________________________________________________ printBucketContents
+    def printBucketContents(self, path, fileFilter, logger =None):
+        out = self.listKeys(path, fileFilter)
+        s = u'Displaying %s results for %s/%s.' % (
+            unicode(len(out)),
+            self._bucketName,
+            unicode(path))
+        if logger:
+            logger.write(s)
+        else:
+            print s
+
+        index = 0
+        for obj in out:
+            s = u'  ' + unicode(index) + u' - ' + obj.name
+            if logger:
+                logger.write(s)
+            else:
+                print s
+            index += 1
 
 #___________________________________________________________________________________________________ getKey
     def getKey(self, key, createIfMissing =True):
@@ -61,7 +97,8 @@ class S3Bucket(object):
         return key
 
 #___________________________________________________________________________________________________ put
-    def put(self, key, contents, zipContents =False, maxAge =-1, eTag =None, expires =None,
+    def put(
+            self, key, contents, zipContents =False, maxAge =-1, eTag =None, expires =None,
             newerThanDate =None, policy =None
     ):
         """Doc..."""
@@ -93,7 +130,8 @@ class S3Bucket(object):
         return True
 
 #___________________________________________________________________________________________________ putFile
-    def putFile(self, key, filename, maxAge =-1, eTag =None, expires =None, newerThanDate =None,
+    def putFile(
+            self, key, filename, maxAge =-1, eTag =None, expires =None, newerThanDate =None,
             policy =None
     ):
         k = self.getKey(key)
