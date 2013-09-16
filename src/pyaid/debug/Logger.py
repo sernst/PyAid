@@ -25,6 +25,7 @@ class Logger(object):
 #___________________________________________________________________________________________________ __init__
     def __init__(self, name=None, **kwargs):
         """Initializes settings."""
+        self.headerless  = kwargs.get('headerless', False)
         self._time       = self._getTime()
         self._timeCode   = self._time.strftime('%y-%U')
         self._timestamp  = self._time.strftime('%Y|%m|%d|%H|%M|%S')
@@ -196,7 +197,7 @@ class Logger(object):
         if len(self._name) < 1:
             return
 
-        tp = self.getPrefix() + ':\n\t'
+        tp = '' if self.headerless else self.getPrefix() + ':\n\t'
         s  = s.replace('\n', '\n\t')
         try:
             logValue = (tp + s + "\n").encode('utf-8')
