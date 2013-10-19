@@ -294,6 +294,14 @@ class FileUtils(object):
 
         return newRootPath + path[len(oldRootPath):]
 
+#___________________________________________________________________________________________________ generatePath
+    @classmethod
+    def generatePath(cls, *args, **kwargs):
+        path = cls.createPath(*args, **kwargs)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        return path
+
 #===================================================================================================
 #                                                                               P R O T E C T E D
 
