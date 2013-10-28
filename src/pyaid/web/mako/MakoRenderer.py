@@ -86,8 +86,7 @@ class MakoRenderer(object):
             directories=td,
             input_encoding='utf-8',
             output_encoding='utf-8',
-            encoding_errors='replace'
-        )
+            encoding_errors='replace')
 
         template = self._template
         if not template.startswith('/'):

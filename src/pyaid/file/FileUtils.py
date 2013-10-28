@@ -9,6 +9,7 @@ import subprocess
 import shutil
 import mimetypes
 from datetime import datetime
+from collections import namedtuple
 
 from pyaid.ArgsUtils import ArgsUtils
 from pyaid.file.FileList import FileList
@@ -17,6 +18,8 @@ from pyaid.string.StringUtils import StringUtils
 #___________________________________________________________________________________________________ FileUtils
 class FileUtils(object):
     """A class for..."""
+
+    WALK_DATA_NT = namedtuple('WALK_DATA_NT', ['rootPath', 'folder', 'names', 'data'])
 
 #===================================================================================================
 #                                                                                     P U B L I C
@@ -237,14 +240,15 @@ class FileUtils(object):
         if out.endswith(os.sep) or ArgsUtils.get('isFile', False, kwargs):
             return cls._getAbsolutePath(out)
 
+        noTail = ArgsUtils.get('noTail', False, kwargs)
         if ArgsUtils.get('isDir', False, kwargs):
-            return cls._getAbsolutePath(out) + os.sep
+            return cls._getAbsolutePath(out) if noTail else (cls._getAbsolutePath(out) + os.sep)
 
         if os.path.exists(out):
             if os.path.isfile(out):
                 return cls._getAbsolutePath(out)
 
-            if os.path.isdir(out) and not out.endswith(os.sep):
+            if os.path.isdir(out) and not noTail and not out.endswith(os.sep):
                 out += os.sep
         elif out.endswith('..'):
             out += os.sep
@@ -301,6 +305,19 @@ class FileUtils(object):
         if not os.path.exists(path):
             os.makedirs(path)
         return path
+
+#___________________________________________________________________________________________________ walkPath
+    @classmethod
+    def walkPath(cls, rootPath, callback, data =None):
+        os.path.walk(rootPath, cls._handleWalkPath, {
+            'rootPath':rootPath,
+            'callback':callback,
+            'data':data })
+
+#___________________________________________________________________________________________________ createWalkData
+    @classmethod
+    def createWalkData(cls, rootPath =None, folder =None, names =None, data =None):
+        return cls.WALK_DATA_NT(rootPath, folder, names, data)
 
 #===================================================================================================
 #                                                                               P R O T E C T E D
@@ -386,3 +403,15 @@ class FileUtils(object):
                 out.append(absItem)
 
         return out
+
+#===================================================================================================
+#                                                                                 H A N D L E R S
+
+#___________________________________________________________________________________________________ _handleWalkPath
+    @classmethod
+    def _handleWalkPath(cls, args, dirname, names):
+            args['callback'](cls.createWalkData(
+                rootPath=['rootPath'],
+                folder=dirname,
+                names=names,
+                data=args['data'] ))

@@ -449,12 +449,13 @@ class Logger(object):
 #___________________________________________________________________________________________________ _formatAsString
     @staticmethod
     def _formatAsString(src, indentLevel =0):
-        indents = u'\t'*indentLevel
-        if isinstance(src, list):
-            s        = indents + unicode(src[0]) + (u'' if src[0].endswith(u':') else u':')
-            indents  = u'\n' + indents + u'\t'
+        indents = u'    '*indentLevel
+        if isinstance(src, list) or isinstance(src, tuple):
+            out      = [indents + unicode(src[0]) + (u'' if src[0].endswith(u':') else u':')]
+            indents  = indents + u'    '
             lines    = []
             maxIndex = 0
+
             for item in src[1:]:
                 if not isinstance(item, basestring):
                     item = unicode(item)
@@ -467,8 +468,12 @@ class Logger(object):
                 lines.append([index, item])
 
             for item in lines:
-                s += indents + (u' '*max(0, maxIndex - item[0])) + item[1]
-            return s
+                if item[0] > 0:
+                    out.append(indents + (u' '*max(0, maxIndex - item[0])) + item[1])
+                else:
+                    out.append(indents + item[1])
+            return u'\n'.join(out)
+
         else:
             if not isinstance(src, basestring):
                 src = unicode(src)
