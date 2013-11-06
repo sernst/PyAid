@@ -257,6 +257,12 @@ class FileUtils(object):
 
         return cls._getAbsolutePath(out)
 
+#___________________________________________________________________________________________________ stripTail
+    @classmethod
+    def stripTail(cls, path):
+        if path.endswith(os.sep):
+            return path[:-1]
+
 #___________________________________________________________________________________________________ cleanupPath
     @classmethod
     def cleanupPath(cls, path, **kwargs):
