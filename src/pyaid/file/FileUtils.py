@@ -262,6 +262,7 @@ class FileUtils(object):
     def stripTail(cls, path):
         if path.endswith(os.sep):
             return path[:-1]
+        return path
 
 #___________________________________________________________________________________________________ cleanupPath
     @classmethod
