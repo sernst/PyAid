@@ -17,22 +17,16 @@ class DictUtils(object):
     @classmethod
     def merge(cls, a, b):
         if a and not b:
-            return a
+            return cls.clone(a)
         elif b and not a:
-            return b
+            return cls.clone(b)
         elif not a and not b:
-            return None
+            return dict()
 
         keys = tuple(set(a.keys() + b.keys()))
         out  = dict()
         for k in keys:
-            if k not in b:
-                out[k] = a[k]
-                continue
-            if k not in a:
-                out[k] = b[k]
-                continue
-            out[k] = cls._mergeValues(a[k], b[k])
+            out[k] = cls._mergeValues(a.get(k), b.get(k))
 
         return out
 
@@ -114,29 +108,44 @@ class DictUtils(object):
 #===================================================================================================
 #                                                                               P R O T E C T E D
 
+#___________________________________________________________________________________________________ _cloneValue
+    @classmethod
+    def _cloneValue(cls, value):
+        if isinstance(value, list):
+            from pyaid.list.ListUtils import ListUtils
+            return ListUtils.clone(value)
+        elif isinstance(value, tuple):
+            return tuple(ListUtils.clone(value))
+        elif isinstance(value, dict):
+            return cls.clone(value)
+        return value
+
 #___________________________________________________________________________________________________ _mergeValues
     @classmethod
     def _mergeValues(cls, a, b):
-        if a and not b:
-            return a
-        elif b and not a:
-            return b
+        target = None
+        if a is None and b is None:
+            return None
+        elif a is None:
+            return cls._cloneValue(b)
+        elif b is None:
+            return cls._cloneValue(a)
 
         if isinstance(a, list):
             if isinstance(b, list):
-                return a + b
-            return a + [b]
+                return cls._cloneValue(a) + cls._cloneValue(b)
+            return cls._cloneValue(a) + [cls._cloneValue(b)]
         elif isinstance(a, tuple):
             if isinstance(b, tuple):
-                return a + b
-            return a + (b,)
+                return cls._cloneValue(a) + cls._cloneValue(b)
+            return cls._cloneValue(a) + tuple([cls._cloneValue(b)])
         elif isinstance(b, list):
-            return [a] + b
+            return [cls._cloneValue(a)] + cls._cloneValue(b)
         elif isinstance(b, tuple):
-            return (a,) + b
+            return tuple([cls._cloneValue(a)]) + cls._cloneValue(b)
         elif isinstance(a, dict):
             if isinstance(b, dict):
                 return cls.merge(a, b)
-            return a
+            return cls.clone(a)
 
         return b
