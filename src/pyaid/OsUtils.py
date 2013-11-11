@@ -29,3 +29,13 @@ class OsUtils(object):
             if os.path.exists(item):
                 return item
         return None
+
+#___________________________________________________________________________________________________ getPerOsValue
+    @classmethod
+    def getPerOsValue(cls, windows =None, mac =None, linux =None):
+        if cls.isWindows():
+            return windows
+        elif cls.isMac():
+            return mac
+        else:
+            return linux
