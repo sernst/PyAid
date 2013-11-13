@@ -316,6 +316,10 @@ class FileUtils(object):
 #___________________________________________________________________________________________________ walkPath
     @classmethod
     def walkPath(cls, rootPath, callback, data =None):
+        """ Walks the specified root path, calling the specified callback in each folder
+            recursively. The signature of the callback should be callback(walkData), a single
+            argument that is an instance of FileUtils.WALK_DATA_NT. """
+
         os.path.walk(rootPath, cls._handleWalkPath, {
             'rootPath':rootPath,
             'callback':callback,

@@ -27,6 +27,21 @@ class StringUtils:
 
     _SOLO_BACKSLASH_PATTERN = re.compile('(?<!\\\)\\\(?!\\\)')
 
+#___________________________________________________________________________________________________ matches
+    @classmethod
+    def matches(cls, source, test):
+        """ Returns whether or not the source string matches the test string or any of the elements
+            in a list of test strings. """
+
+        if isinstance(test, basestring):
+            return source == test
+
+        for item in test:
+            if source == item:
+                return True
+
+        return False
+
 #___________________________________________________________________________________________________ contains
     @staticmethod
     def contains(source, test, offset =0):
