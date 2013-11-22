@@ -325,14 +325,15 @@ class Logger(object):
 
 #___________________________________________________________________________________________________ getFormattedStackTrace
     @staticmethod
-    def getFormattedStackTrace(skipStackLevels =0):
+    def getFormattedStackTrace(skipStackLevels =0, maxLevels =0):
         # Get the exception stack trace if it exists, otherwise extract the generic stack trace
         # instead.
         stack = Logger.getStackData()
         stop  = len(stack) - skipStackLevels
+        start = max(0, stop - maxLevels) if maxLevels > 0 else 0
         s     = u''
-        index = 0
-        for item in stack[:stop]:
+        index = start
+        for item in stack[start:stop]:
             index    += 1
             if item['internal']:
                 s += (u'\n\t[%s]: %s.%s [#%s]'
@@ -353,7 +354,7 @@ class Logger(object):
             s             = {}
             path          = unicode(item[0])
             s['path']     = path
-            s['internal'] = path.lower().find('vizme') != -1
+            s['internal'] = True #path.lower().find('vizme') != -1
             s['dir']      = unicode(os.path.dirname(path))
             s['file']     = unicode(os.path.basename(path).replace('.py',''))
 
