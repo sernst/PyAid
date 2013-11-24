@@ -27,7 +27,7 @@ class JSON(object):
 
 #___________________________________________________________________________________________________ fromFile
     @classmethod
-    def fromFile(cls, path, gzipped =False):
+    def fromFile(cls, path, gzipped =False, throwError =False):
         try:
             if gzipped:
                 f = gzip.open(path, 'r+')
@@ -37,12 +37,15 @@ class JSON(object):
             f.close()
             return cls.fromString(res.decode('utf-8', 'ignore'))
         except Exception, err:
-            print err
+            if throwError:
+                raise
+            else:
+                print err
             return None
 
 #___________________________________________________________________________________________________ toFile
     @classmethod
-    def toFile(cls, path, value, pretty =False, gzipped =False):
+    def toFile(cls, path, value, pretty =False, gzipped =False, throwError =False):
         try:
             res = cls.asString(value, pretty=pretty).encode('utf-8', 'ignore')
             if gzipped:
@@ -53,7 +56,10 @@ class JSON(object):
             f.close()
             return True
         except Exception, err:
-            print err
+            if throwError:
+                raise
+            else:
+                print err
             return False
 
 #===================================================================================================

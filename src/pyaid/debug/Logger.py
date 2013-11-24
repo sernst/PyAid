@@ -325,10 +325,10 @@ class Logger(object):
 
 #___________________________________________________________________________________________________ getFormattedStackTrace
     @staticmethod
-    def getFormattedStackTrace(skipStackLevels =0, maxLevels =0):
+    def getFormattedStackTrace(skipStackLevels =0, maxLevels =0, stackSource =None):
         # Get the exception stack trace if it exists, otherwise extract the generic stack trace
         # instead.
-        stack = Logger.getStackData()
+        stack = Logger.getStackData(stackSource)
         stop  = len(stack) - skipStackLevels
         start = max(0, stop - maxLevels) if maxLevels > 0 else 0
         s     = u''
@@ -348,9 +348,11 @@ class Logger(object):
 
 #___________________________________________________________________________________________________ getStackData
     @staticmethod
-    def getStackData():
-        res   = []
-        for item in Logger.getRawStack():
+    def getStackData(stackSource =None):
+        res = []
+        if not stackSource:
+            stackSource = Logger.getRawStack()
+        for item in stackSource:
             s             = {}
             path          = unicode(item[0])
             s['path']     = path
