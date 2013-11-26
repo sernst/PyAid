@@ -2,8 +2,9 @@
 # (C)2012-2013
 # Scott Ernst
 
-from mako.lookup import TemplateLookup
 from mako import exceptions
+from mako.lookup import TemplateLookup
+from mako.template import Template
 
 from pyaid.debug.Logger import Logger
 from pyaid.web.DomUtils import DomUtils
@@ -17,15 +18,16 @@ class MakoRenderer(object):
 #                                                                                       C L A S S
 
 #___________________________________________________________________________________________________ __init__
-    def __init__(self, template, rootPath, data =None, logger =None, minify =False):
+    def __init__(self, template, rootPath, data =None, logger =None, minify =False, source =None):
         """Creates a new instance of ClassTemplate."""
         self._template = template
-        self._data     = data if data else {}
+        self._data     = data if data else dict()
         self._error    = None
         self._minify   = minify
         self._errorMsg = ''
         self._rootDir  = rootPath
         self._result   = None
+        self._source   = source
         self._log      = logger if logger else Logger(self)
 
 #===================================================================================================
@@ -67,6 +69,11 @@ class MakoRenderer(object):
     def dom(self):
         return self._result if self._result else u''
 
+#___________________________________________________________________________________________________ GS: result
+    @property
+    def result(self):
+        return self.dom
+
 #===================================================================================================
 #                                                                                     P U B L I C
 
@@ -89,20 +96,22 @@ class MakoRenderer(object):
             encoding_errors='replace')
 
         template = self._template
-        if not template.startswith('/'):
-            template = '/' + template
+        if template:
+            if not template.startswith('/'):
+                template = '/' + template
 
-        try:
-            target = lookup.get_template(template)
-        except Exception, err:
-            self._result   = None
-            self._error    = err
-            self._errorMsg = 'Failed to get template (%s):\n%s' % (
-                template,
-                exceptions.text_error_template().render().replace('%','%%')
-            )
-            self._log.writeError(self._errorMsg, self._error)
-            return self.dom
+            try:
+                target = lookup.get_template(template)
+            except Exception, err:
+                self._result   = None
+                self._error    = err
+                self._errorMsg = 'Failed to get template (%s):\n%s' % (
+                    template,
+                    exceptions.text_error_template().render().replace('%','%%') )
+                self._log.writeError(self._errorMsg, self._error)
+                return self.dom
+        else:
+            target = Template(self._source if self._source else u'')
 
         mr = MakoDataTransporter(data=data, logger=self._log)
         try:
@@ -124,8 +133,8 @@ class MakoRenderer(object):
                 str(template),
                 str(stack),
                 ('TRACES:\n\t' + '\n\t'.join(traces) if traces else ''),
-                '\n\t'.join(d) if d else ''
-            )
+                '\n\t'.join(d) if d else '')
+
             self._log.write(self._errorMsg)
 
         if self._minify:
