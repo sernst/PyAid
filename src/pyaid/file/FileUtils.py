@@ -24,6 +24,16 @@ class FileUtils(object):
 #===================================================================================================
 #                                                                                     P U B L I C
 
+#___________________________________________________________________________________________________ isInFolder
+    @classmethod
+    def isInFolder(cls, path, folder):
+        if path.startswith(folder):
+            return True
+
+        test = FileUtils.createPath(folder, path.lstrip(os.sep))
+        if os.path.exists(test):
+            return True
+
 #___________________________________________________________________________________________________ getContents
     @classmethod
     def getContents(cls, path, raiseErrors =False, gzipped =False):

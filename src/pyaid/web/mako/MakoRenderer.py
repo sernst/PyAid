@@ -111,7 +111,7 @@ class MakoRenderer(object):
                 self._log.writeError(self._errorMsg, self._error)
                 return self.dom
         else:
-            target = Template(self._source if self._source else u'')
+            target = Template(self._source if self._source else u'', lookup=lookup)
 
         mr = MakoDataTransporter(data=data, logger=self._log)
         try:
