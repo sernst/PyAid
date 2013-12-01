@@ -2,7 +2,8 @@
 # (C)2011-2013
 # Scott Ernst
 
-import json
+from __future__ import absolute_import
+import json as jsonint
 import gzip
 
 #___________________________________________________________________________________________________ JSON
@@ -23,7 +24,7 @@ class JSON(object):
 #___________________________________________________________________________________________________ fromString
     @classmethod
     def fromString(cls, src):
-        return json.loads(src)
+        return jsonint.loads(src)
 
 #___________________________________________________________________________________________________ fromFile
     @classmethod
@@ -68,9 +69,9 @@ class JSON(object):
 #___________________________________________________________________________________________________ _dumpsCompact
     @classmethod
     def _dumpsCompact(cls, src):
-        return json.dumps(src, separators=(',', ':'))
+        return jsonint.dumps(src, separators=(',', ':'))
 
 #___________________________________________________________________________________________________ _dumpsPretty
     @classmethod
     def _dumpsPretty(cls, src):
-        return json.dumps(src, separators=(',', ': '), indent=4, sort_keys=True)
+        return jsonint.dumps(src, separators=(',', ': '), indent=4, sort_keys=True)

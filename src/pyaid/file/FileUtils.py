@@ -432,7 +432,7 @@ class FileUtils(object):
     @classmethod
     def _handleWalkPath(cls, args, dirname, names):
             args['callback'](cls.createWalkData(
-                rootPath=['rootPath'],
+                rootPath=args['rootPath'],
                 folder=dirname,
                 names=names,
                 data=args['data'] ))

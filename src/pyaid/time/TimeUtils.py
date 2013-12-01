@@ -16,8 +16,7 @@ class TimeUtils(object):
     @classmethod
     def utcToLocalDatetime(cls, utcDatetime):
         return cls.secondsToDatetime(
-            cls.datetimeToSeconds(utcDatetime) - (time.altzone if time.daylight else time.timezone)
-        )
+            cls.datetimeToSeconds(utcDatetime) - (time.altzone if time.daylight else time.timezone))
 
 #___________________________________________________________________________________________________ getFriendlyTimestamp
     @staticmethod
@@ -32,8 +31,7 @@ class TimeUtils(object):
             @@@param timeZoneOffset:int
                 Offset, in minutes, that should be subtracted from UTC time. Used to adjust to a
                 local time zone for display. For example, a value of -120 would specify the GMT +2
-                timezone, which is two hours ahead of GMT. Similarly, the PST time would be 480.
-        """
+                timezone, which is two hours ahead of GMT. Similarly, the PST time would be 480. """
 
         if not isinstance(timestamp, datetime):
             return ''
@@ -70,8 +68,7 @@ class TimeUtils(object):
     def serializeToList(timestamp):
         return [
             timestamp.year, timestamp.month, timestamp.day, timestamp.hour, timestamp.minute,
-            timestamp.second, timestamp.microsecond
-        ]
+            timestamp.second, timestamp.microsecond ]
 
 #___________________________________________________________________________________________________ parseSerialList
     @staticmethod
@@ -93,11 +90,17 @@ class TimeUtils(object):
 #___________________________________________________________________________________________________ getNowSeconds
     @staticmethod
     def getNowSeconds():
-        """Returns the current number of seconds since the Unix Epoch.
-        @return int
-        """
+        """ Returns the current number of seconds since the Unix Epoch
+
+            @return int """
 
         return int(calendar.timegm(datetime.utcnow().utctimetuple()))
+
+#___________________________________________________________________________________________________ getNowHours
+    @classmethod
+    def getNowHours(cls):
+        """ Returns the number of hours since the Unix Epoch """
+        return float(cls.getNowSeconds())/60.0
 
 #___________________________________________________________________________________________________ getNowDatetime
     @staticmethod
