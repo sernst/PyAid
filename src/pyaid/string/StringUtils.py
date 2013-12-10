@@ -346,3 +346,18 @@ class StringUtils:
         return re.match(
             '^.+@[a-zA-Z0-9\-\.]+\.([a-zA-Z]{2,}|[0-9]{1,3})$', value
         ) is not None
+
+
+#___________________________________________________________________________________________________ strToUnicode
+    @classmethod
+    def strToUnicode(cls, value):
+        if not isinstance(value, unicode):
+            return value.decode('utf8', 'ignore')
+        return value
+
+#___________________________________________________________________________________________________ unicodeToStr
+    @classmethod
+    def unicodeToStr(cls, value):
+        if isinstance(value, str):
+            return value.encode('utf8', 'ignore')
+        return value

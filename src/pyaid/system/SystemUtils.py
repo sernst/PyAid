@@ -290,30 +290,39 @@ class SystemUtils(object):
 
 #___________________________________________________________________________________________________ _remove
     @classmethod
-    def remove(cls, path):
+    def remove(cls, path, throwError =False):
         if not os.path.exists(path):
             return True
 
         if os.path.isdir(path):
             try:
                 shutil.rmtree(path)
-            except Exception, err:
+            except Exception, err1:
+                originalError = err
                 try:
                     os.rmdir(path)
-                except Exception, err:
+                except Exception, err2:
+                    if throwError:
+                        print 'ERROR:', err1
+                        raise err2
                     return False
         elif os.path.islink(path):
             try:
                 os.unlink(path)
             except Exception, err:
+                if throwError:
+                    raise err
                 return False
         else:
             try:
                 os.remove(path)
-            except OSError, err:
+            except OSError, err1:
                 try:
                     os.rmdir(path)
-                except Exception, err:
+                except Exception, err2:
+                    if throwError:
+                        print 'ERROR:', err1
+                        raise err2
                     return False
 
         return True

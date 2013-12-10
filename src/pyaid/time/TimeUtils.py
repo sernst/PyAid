@@ -98,9 +98,15 @@ class TimeUtils(object):
 
 #___________________________________________________________________________________________________ getNowHours
     @classmethod
+    def getNowMinutes(cls):
+        """ Returns the number of minutes since the Unix Epoch """
+        return float(cls.getNowSeconds())/60.0
+
+#___________________________________________________________________________________________________ getNowHours
+    @classmethod
     def getNowHours(cls):
         """ Returns the number of hours since the Unix Epoch """
-        return float(cls.getNowSeconds())/60.0
+        return float(cls.getNowSeconds())/3600.0
 
 #___________________________________________________________________________________________________ getNowDatetime
     @staticmethod
