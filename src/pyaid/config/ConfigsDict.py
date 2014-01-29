@@ -30,6 +30,8 @@ class ConfigsDict(object):
     @data.setter
     def data(self, value):
         self._data = value
+        if self._data is None:
+            self._data = dict()
 
 #___________________________________________________________________________________________________ GS: null
     @property
