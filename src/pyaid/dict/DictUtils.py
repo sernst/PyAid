@@ -105,6 +105,18 @@ class DictUtils(object):
 
         return True
 
+#___________________________________________________________________________________________________ prettyPrint
+    @classmethod
+    def prettyPrint(cls, source, delimiter = u' | ', separator = u': '):
+        out = []
+        for n,v in source.iteritems():
+            if v is dict:
+                v = u'{ ' + cls.prettyPrint() + u' }'
+            out.append(unicode(n) + separator + unicode(v))
+
+        out.sort(key=unicode.lower)
+        return delimiter.join(out)
+
 #===================================================================================================
 #                                                                               P R O T E C T E D
 
