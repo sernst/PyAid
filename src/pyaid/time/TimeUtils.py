@@ -6,6 +6,7 @@ import time
 import calendar
 from datetime import datetime, timedelta
 
+from pyaid.radix.Base36 import Base36
 from pyaid.radix.Base64 import Base64
 
 #___________________________________________________________________________________________________ TimeUtils
@@ -96,6 +97,24 @@ class TimeUtils(object):
 
         return int(calendar.timegm(datetime.utcnow().utctimetuple()))
 
+#___________________________________________________________________________________________________ getNowMacintoshSeconds
+    @classmethod
+    def getNowMacintoshSeconds(cls):
+        """ Returns the current number os seconds since the Apple Macintosh Epoch
+            of January 1, 1904.
+
+            QuickTime movies and other Apple formats store date and time information in Macintosh
+            date format: a 32-bit value indicating the number of seconds that have passed since
+            midnight January 1, 1904. This value does not specify a time zone. Common practice is
+            to use local time for the time zone where the value is generated. It is strongly
+            recommended that all calendar date and time values be stored using UTC time, so that
+            all files have a time and date relative to the same time zone.
+
+            @return int """
+
+        delta = datetime.utcnow() - datetime(1904, 1, 1)
+        return int(delta.total_seconds())
+
 #___________________________________________________________________________________________________ getNowHours
     @classmethod
     def getNowMinutes(cls):
@@ -154,6 +173,11 @@ class TimeUtils(object):
     @classmethod
     def getNowTimecode(cls, baseTime =0):
         return Base64.to64(cls.getNowSeconds() - baseTime)
+
+#___________________________________________________________________________________________________ getNowTimecode36
+    @classmethod
+    def getNowTimecode36(cls, baseTime =0):
+        return Base36.to36(cls.getNowSeconds() - baseTime)
 
 #___________________________________________________________________________________________________ timecodeToFriendlyTimestamp
     @classmethod
