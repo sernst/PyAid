@@ -2,6 +2,7 @@
 # (C)2011-2013
 # Scott Ernst
 
+from __future__ import absolute_import
 import os
 import sys
 import gzip
