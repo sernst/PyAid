@@ -281,9 +281,12 @@ class FileUtils(object):
         if not path:
             return path
 
+        noTail = ArgsUtils.get('noTail', False, kwargs)
+
         if os.path.exists(path):
-            if os.path.isdir(path) and not path.endswith(os.sep):
-                return cls._getAbsolutePath(path) + os.sep
+            if os.path.isdir(path):
+                return cls._getAbsolutePath(path) + (
+                    u'' if noTail or not path.endswith(os.sep) else u'/')
             return cls._getAbsolutePath(path)
 
         if ArgsUtils.get('isFile', False, kwargs):
@@ -291,7 +294,10 @@ class FileUtils(object):
                 return cls._getAbsolutePath(path[:-1])
             return cls._getAbsolutePath(path)
         elif ArgsUtils.get('isDir', False, kwargs):
-            if not path.endswith(os.sep):
+            if noTail:
+                if path.endswith(os.sep):
+                    path = path[:-1]
+            elif not path.endswith(os.sep):
                 path += os.sep
         else:
             sepIndex = path.rfind(os.sep)
