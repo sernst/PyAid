@@ -55,12 +55,12 @@ class DictUtils(object):
         """
 
         vi = sys.version_info
-        if vi[0] == 2 and (vi[1] < 7 or vi[0] < 5):
+        if vi[0] < 3 and (vi[1] < 7 or vi[2] < 5):
             out = dict()
             for n,v in source.iteritems():
                 out[str(n)] = v
         else:
-            out = source
+            return source
 
         return out
 
