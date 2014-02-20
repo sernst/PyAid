@@ -351,13 +351,19 @@ class StringUtils:
 #___________________________________________________________________________________________________ strToUnicode
     @classmethod
     def strToUnicode(cls, value):
-        if not isinstance(value, unicode):
-            return value.decode('utf8', 'ignore')
-        return value
+        try:
+            if not isinstance(value, unicode):
+                return value.decode('utf8', 'ignore')
+            return value
+        except Exception, err:
+            return value
 
 #___________________________________________________________________________________________________ unicodeToStr
     @classmethod
     def unicodeToStr(cls, value):
-        if isinstance(value, str):
-            return value.encode('utf8', 'ignore')
-        return value
+        try:
+            if not isinstance(value, str):
+                return value.encode('utf8', 'ignore')
+            return value
+        except Exception, err:
+            return value

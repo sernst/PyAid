@@ -108,6 +108,9 @@ class DictUtils(object):
 #___________________________________________________________________________________________________ prettyPrint
     @classmethod
     def prettyPrint(cls, source, delimiter = u' | ', separator = u': '):
+        if not source:
+            return '[EMPTY]'
+
         out = []
         for n,v in source.iteritems():
             if v is dict:
