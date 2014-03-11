@@ -213,7 +213,8 @@ class FileUtils(object):
         fl = FileList()
 
         if os.path.isfile(source):
-            return cls._copyFile(source, destination, overwriteExisting, fileList=fl)
+            cls._copyFile(source, destination, overwriteExisting, fileList=fl)
+            return fl
 
         if not source.endswith(os.sep):
             source += os.sep
@@ -226,8 +227,7 @@ class FileUtils(object):
                 'source':source,
                 'destination':destination,
                 'overwriteExisting':overwriteExisting,
-                'fileList':fl
-            })
+                'fileList':fl })
         except Exception, err:
             return None
 
