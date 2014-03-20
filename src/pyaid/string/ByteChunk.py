@@ -4,7 +4,9 @@
 
 import math
 import struct
+import zlib
 
+from pyaid.file.FileUtils import FileUtils
 from pyaid.string.StringUtils import StringUtils
 
 from pyaid.string.ByteUtils import ByteUtils
@@ -20,29 +22,29 @@ class ByteChunk(object):
     LITTLE_ENDIAN   = '<'
 
 #___________________________________________________________________________________________________ __init__
-    def __init__(self, endianess = None, bytes = None):
+    def __init__(self, endianess = None, sourceBytes = None):
         """Creates a new instance of ByteChunk."""
-        self.chunk      = bytes if bytes else bytearray()
+        self._data      = sourceBytes if sourceBytes is not None else bytearray()
         self._endianess = endianess if endianess else self.LITTLE_ENDIAN
         self._position  = 0
 
 #===================================================================================================
 #                                                                                   G E T / S E T
 
+#___________________________________________________________________________________________________ GS: byteArray
+    @property
+    def byteArray(self):
+        return self._data
+
 #___________________________________________________________________________________________________ GS: isEmpty
     @property
     def isEmpty(self):
         return self.length == 0
 
-#___________________________________________________________________________________________________ GS: byteArray
-    @property
-    def byteArray(self):
-        return self.chunk
-
 #___________________________________________________________________________________________________ GS: length
     @property
     def length(self):
-        return len(self.chunk)
+        return len(self._data)
 
 #___________________________________________________________________________________________________ GS: bytesLeft
     @property
@@ -89,26 +91,27 @@ class ByteChunk(object):
 
 #___________________________________________________________________________________________________ writeBytes
     def writeBytes(self, ba):
-        if self._position == self.length - 1:
-            self.chunk += ba
+        if self._position >= self.length - 1:
+            self._data += ba
             self._position = self.length - 1
             return
 
         end = self._position + len(ba)
-        self.chunk = self.chunk[:self._position] + ba + self.chunk[end:]
+        self._data = self._data[:self._position] + ba + self._data[end:]
         self._position = end
-
-#___________________________________________________________________________________________________ writeChunk
-    def writeChunk(self, chunk):
-        self.writeBytes(chunk.chunk)
 
 #___________________________________________________________________________________________________ writeByte
     def writeByte(self, value):
-        if self._position == self.length - 1:
-            self.chunk.append(value)
+        if self._position >= self.length - 1:
+            self._data.append(value)
+            self._position = self.length - 1
         else:
-            self.chunk[self._position] = value
-        self._position += 1
+            self._data[self._position] = value
+            self._position += 1
+
+#___________________________________________________________________________________________________ writeChunk
+    def writeChunk(self, chunk):
+        self.writeBytes(chunk.byteArray)
 
 #___________________________________________________________________________________________________ writeString
     def writeString(self, value):
@@ -219,11 +222,11 @@ class ByteChunk(object):
             self.position = self.length + length + 1
         else:
             self.position += length
-        return self.chunk[start:self.position].decode('utf-8')
+        return self._data[start:self.position].decode('utf-8')
 
 #___________________________________________________________________________________________________ seek
     def seek(self, position):
-        self.position = min(len(self.chunk) - 1, max(0, position))
+        self.position = min(len(self._data) - 1, max(0, position))
 
 #___________________________________________________________________________________________________ unpack
     def unpack(self, dataType, length):
@@ -331,8 +334,28 @@ class ByteChunk(object):
 
 #___________________________________________________________________________________________________ clear
     def clear(self):
-        self.chunk    = bytearray()
+        self._data    = bytearray()
         self.position = 0
+
+#___________________________________________________________________________________________________ toFile
+    def toFile(self, path):
+        path = FileUtils.cleanupPath(path, isFile=True)
+
+        try:
+            f = open(path, 'wb')
+            f.write(self._data)
+            f.close()
+        except Exception, err:
+            print 'FAILED: Write ByteChunk to file'
+            raise
+
+#___________________________________________________________________________________________________ compress
+    def compress(self, level =6):
+        self._data = bytearray(zlib.compress(bytes(self._data), level))
+
+#___________________________________________________________________________________________________ uncompress
+    def uncompress(self):
+        self._data = bytearray(zlib.decompress(bytes(self._data)))
 
 #===================================================================================================
 #                                                                               I N T R I N S I C
