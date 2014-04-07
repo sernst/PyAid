@@ -282,17 +282,19 @@ class FileUtils(object):
             return path
 
         noTail = ArgsUtils.get('noTail', False, kwargs)
+        path = cls._getAbsolutePath(path)
 
         if os.path.exists(path):
             if os.path.isdir(path):
-                return cls._getAbsolutePath(path) + (
-                    u'' if noTail or not path.endswith(os.sep) else u'/')
-            return cls._getAbsolutePath(path)
+                if noTail:
+                    return path[:-1] if path.endswith(os.sep) else path
+                return path + (u'' if path.endswith(os.sep) else os.sep)
+            return path
 
         if ArgsUtils.get('isFile', False, kwargs):
             if path.endswith(os.sep):
-                return cls._getAbsolutePath(path[:-1])
-            return cls._getAbsolutePath(path)
+                return path[:-1]
+            return path
         elif ArgsUtils.get('isDir', False, kwargs):
             if noTail:
                 if path.endswith(os.sep):
@@ -300,12 +302,16 @@ class FileUtils(object):
             elif not path.endswith(os.sep):
                 path += os.sep
         else:
-            sepIndex = path.rfind(os.sep)
-            extIndex = path.rfind('.')
-            if extIndex < sepIndex and not path.endswith(os.sep):
-                path += os.sep
+            if path.endswith(os.sep):
+                return path[:-1] if noTail else path
 
-        return cls._getAbsolutePath(path)
+            if not noTail:
+                sepIndex = path.rfind(os.sep)
+                extIndex = path.rfind('.')
+                if extIndex < sepIndex:
+                    path += os.sep
+
+        return path
 
 #___________________________________________________________________________________________________ changePathRoot
     @classmethod

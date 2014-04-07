@@ -29,6 +29,8 @@ class Base36(object):
 # __________________________________________________________________________________________________ from64
     @staticmethod
     def from36(n, clean =False):
+        if n == '0':
+            return 0
 
         if clean:
             n = Base36.ILLEGAL_CHAR_RE.sub('', n)

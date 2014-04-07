@@ -108,6 +108,9 @@ class ByteChunk(object):
         else:
             self._data[self._position] = value
             self._position += 1
+#___________________________________________________________________________________________________ writeNullByte
+    def writeNullByte(self):
+        self.writeByte(struct.pack('x'))
 
 #___________________________________________________________________________________________________ writeChunk
     def writeChunk(self, chunk):

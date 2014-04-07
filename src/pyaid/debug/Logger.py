@@ -1,5 +1,5 @@
 # Logger.py
-# (C)2010-2013
+# (C)2010-2014
 # Scott Ernst and Thomas Gilray
 
 import sys
@@ -73,8 +73,13 @@ class Logger(object):
 
         logFolder = self.getLogFolder()
         if logFolder:
-            self._logFile = FileUtils.createPath(
-                logFolder, self._name + '_' + self._timeCode + '.log')
+            name = self._name
+            extension = kwargs.get('extension', 'log').lstrip('.')
+            if kwargs.get('timestampFileSuffix', True):
+                name += '_' + self._timeCode
+            self._logFile = FileUtils.createPath(logFolder, name + '.' + extension)
+            if kwargs.get('removeIfExists', False):
+                self.resetLogFile()
         else:
             self._logFile = None
 
@@ -109,6 +114,14 @@ class Logger(object):
 
 #===================================================================================================
 #                                                                                     P U B L I C
+
+#___________________________________________________________________________________________________ resetLogFile
+    def resetLogFile(self):
+        if self._logFile is not None and os.path.exists(self._logFile):
+            try:
+                os.remove(self._logFile)
+            except Exception, err:
+                pass
 
 #___________________________________________________________________________________________________ addPrintCallback
     def addPrintCallback(self, callback):
@@ -178,77 +191,25 @@ class Logger(object):
 #___________________________________________________________________________________________________ add
     def add(self, s, traceStack =False, shaveStackTrace =0, request =None, htmlEscape =False):
         """Prints s to standard output and a log file."""
-        s = Logger._formatAsString(s)
-        if traceStack:
-            s += '\nStack Trace:\n' + Logger.getFormattedStackTrace(shaveStackTrace)
 
-        if self._htmlEscape or htmlEscape:
-            s = StringUtils.htmlEscape(s)
-
-        if self._traceLogs:
-            out = self._asASCII(s)
-            print out
-            for cb in self._printCallbacks:
-                try:
-                    cb(self, out)
-                except Exception, err:
-                    pass
-
-        if len(self._name) < 1:
-            return
-
-        tp = '' if self.headerless else self.getPrefix() + ':\n\t'
-        s  = s.replace('\n', '\n\t')
-        try:
-            logValue = (tp + s + "\n").encode('utf-8')
-        except Exception, err:
-            try:
-                logValue = (tp + str(s) + "\n").encode('utf-8')
-            except Exception, err:
-                logValue = (tp + "FAILED TO LOG VALUE").encode('utf-8')
-
-        self._buffer.append({'log':logValue, 'stack':traceStack})
+        out = self._createLogMessage(s, traceStack, shaveStackTrace, request, htmlEscape)
+        self._buffer.append(out)
         if self._storageBuffer is not None:
-            self._storageBuffer.append({'log':logValue, 'stack':traceStack})
+            self._storageBuffer.append(out)
+        return out['log']
+
+#___________________________________________________________________________________________________ echo
+    def echo(self, s, traceStack =False, shaveStackTrace =0, request =None, htmlEscape =False):
+        return self._createLogMessage(s, traceStack, shaveStackTrace, request, htmlEscape)['log']
+
+#___________________________________________________________________________________________________ echoError
+    def echoError(self, s, err, request =None, htmlEscape =False):
+        return self.echo(self._createErrorMessage(s, err), True, htmlEscape=htmlEscape)
 
 #___________________________________________________________________________________________________ addError
     def addError(self, s, err, request =None, htmlEscape =False):
         self._hasError = True
-
-        try:
-            errorType = unicode(sys.exc_info()[0])
-        except Exception, err:
-            try:
-                errorType = str(sys.exc_info()[0])
-            except Exception, err:
-                errorType = '[[UNABLE TO PARSE]]'
-
-        try:
-            errorValue = unicode(sys.exc_info()[1])
-        except Exception, err:
-            try:
-                errorValue = str(sys.exc_info()[1])
-            except Exception, err:
-                errorValue = '[[UNABLE TO PARSE]]'
-
-        try:
-            error = unicode(err)
-        except Exception, err:
-            try:
-                error = str(err)
-            except Exception, err:
-                error = '[[UNABLE TO PARSE]]'
-
-        try:
-            es = (Logger._formatAsString(s) + "\n\tType: %s\n\tValue: %s\nError: %s\n") \
-               % (errorType, errorValue, error)
-        except Exception, err:
-            try:
-                es = Logger._formatAsString(s) + "\n\t[[ERROR ATTRIBUTE PARSING FAILURE]]"
-            except Exception, err:
-                es = 'FAILED TO PARSE EXCEPTION'
-
-        self.add(es, True, htmlEscape=htmlEscape)
+        return self.add(self._createErrorMessage(s, err), True, htmlEscape=htmlEscape)
 
 #___________________________________________________________________________________________________ __call__
     def __call__(self, s ='', *args, **kwargs):
@@ -276,13 +237,15 @@ class Logger(object):
 #___________________________________________________________________________________________________ write
     def write(self, s, traceStack =False, shaveStackTrace =0, request =None, htmlEscape =False):
         """Adds the log item and flushes the buffer to the log file."""
-        self.add(s, traceStack, shaveStackTrace, htmlEscape=htmlEscape)
+        result = self.add(s, traceStack, shaveStackTrace, htmlEscape=htmlEscape)
         self.flush()
+        return result
 
 #___________________________________________________________________________________________________ writeError
     def writeError(self, s, err, request =None, htmlEscape =False):
-        self.addError(s, err, request=request, htmlEscape=htmlEscape)
+        result = self.addError(s, err, request=request, htmlEscape=htmlEscape)
         self.flush()
+        return result
 
 #___________________________________________________________________________________________________ flush
     def flush(self, **kwargs):
@@ -307,10 +270,11 @@ class Logger(object):
         if sys.platform.startswith('win') and not self._logPath:
             self.clear()
             return
+
         elif self._logFile:
             try:
                 exists = os.path.exists(self._logFile)
-                with FileLock(self._logFile, 'a+') as lock:
+                with FileLock(self._logFile, 'a') as lock:
                     lock.file.write('\n'.join(items))
                     lock.release()
 
@@ -336,12 +300,12 @@ class Logger(object):
         for item in stack[start:stop]:
             index    += 1
             if item['internal']:
-                s += (u'\n\t[%s]: %s.%s [#%s]'
-                      + '\n\t     code: %s') \
+                s += (u'\n    [%s]: %s.%s [#%s]'
+                      + '\n         code: %s') \
                   % (unicode(index), item['file'], item['function'], unicode(item['line']),
                      item['code'][:100])
             else:
-                s += u'\n\t[%s] EXT: %s {line: %s}' % (
+                s += u'\n    [%s] EXT: %s {line: %s}' % (
                     unicode(index), item['file'], unicode(item['line']))
 
         return s
@@ -387,7 +351,7 @@ class Logger(object):
 #___________________________________________________________________________________________________ prettyPrint
     @staticmethod
     def prettyPrint(target, indentLevel =1):
-        indent = u'\n' + (indentLevel*u'\t')
+        indent = u'\n' + (indentLevel*u'    ')
         s = u'\n'
         if isinstance(target, list):
             index = 0
@@ -420,6 +384,76 @@ class Logger(object):
 
 #===================================================================================================
 #                                                                               P R O T E C T E D
+
+#___________________________________________________________________________________________________ _createLogMessage
+    def _createLogMessage(self, s, traceStack, shaveStackTrace, request, htmlEscape):
+        s = Logger._formatAsString(s)
+        if traceStack:
+            s += '\nStack Trace:\n' + Logger.getFormattedStackTrace(shaveStackTrace)
+
+        if self._htmlEscape or htmlEscape:
+            s = StringUtils.htmlEscape(s)
+
+        if self._traceLogs:
+            out = self._asASCII(s)
+            print out
+            for cb in self._printCallbacks:
+                try:
+                    cb(self, out)
+                except Exception, err:
+                    pass
+
+        if len(self._name) < 1:
+            return
+
+        tp = '' if self.headerless else self.getPrefix() + ':\n    '
+        s  = s.replace('\n', '\n    ')
+        try:
+            logValue = (tp + s + "\n").encode('utf-8')
+        except Exception, err:
+            try:
+                logValue = (tp + str(s) + "\n").encode('utf-8')
+            except Exception, err:
+                logValue = (tp + "FAILED TO LOG VALUE").encode('utf-8')
+
+        return {'log':logValue, 'stack':traceStack}
+
+#___________________________________________________________________________________________________ _createErrorMessage
+    def _createErrorMessage(self, s, err):
+        try:
+            errorType = unicode(sys.exc_info()[0])
+        except Exception, err:
+            try:
+                errorType = str(sys.exc_info()[0])
+            except Exception, err:
+                errorType = '[[UNABLE TO PARSE]]'
+
+        try:
+            errorValue = unicode(sys.exc_info()[1])
+        except Exception, err:
+            try:
+                errorValue = str(sys.exc_info()[1])
+            except Exception, err:
+                errorValue = '[[UNABLE TO PARSE]]'
+
+        try:
+            error = unicode(err)
+        except Exception, err:
+            try:
+                error = str(err)
+            except Exception, err:
+                error = '[[UNABLE TO PARSE]]'
+
+        try:
+            es = (Logger._formatAsString(s) + "\n    Type: %s\n    Value: %s\nError: %s\n") \
+               % (errorType, errorValue, error)
+        except Exception, err:
+            try:
+                es = Logger._formatAsString(s) + "\n    [[ERROR ATTRIBUTE PARSING FAILURE]]"
+            except Exception, err:
+                es = 'FAILED TO PARSE EXCEPTION'
+
+        return es
 
 #___________________________________________________________________________________________________ __del__
     def __del__(self):

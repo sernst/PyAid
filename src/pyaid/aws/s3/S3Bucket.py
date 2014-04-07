@@ -132,7 +132,7 @@ class S3Bucket(object):
 #___________________________________________________________________________________________________ putFile
     def putFile(
             self, key, filename, maxAge =-1, eTag =None, expires =None, newerThanDate =None,
-            policy =None
+            policy =None, zipContents =False
     ):
         k = self.getKey(key)
 
@@ -140,6 +140,25 @@ class S3Bucket(object):
             return False
 
         headers = self._generateHeaders(k.name, expires=expires, eTag=eTag, maxAge=maxAge)
+
+        if zipContents:
+            with open(filename, 'r') as f:
+                contents = f.read()
+
+            fd, tempPath = tempfile.mkstemp()
+            with gzip.open(tempPath, 'w+b') as f:
+                f.write(contents.encode('utf-8', 'ignore'))
+
+            headers['Content-Encoding'] = 'gzip'
+            filename = tempPath
+
+            k.set_contents_from_filename(filename=filename, headers=headers, policy=policy)
+
+            os.close(fd)
+            if os.path.exists(tempPath):
+                os.remove(tempPath)
+            return True
+
         k.set_contents_from_filename(filename=filename, headers=headers, policy=policy)
         return True
 

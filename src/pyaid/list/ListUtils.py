@@ -14,6 +14,29 @@ class ListUtils(object):
 #===================================================================================================
 #                                                                                      C L A S S
 
+#___________________________________________________________________________________________________ listToRanges
+    @classmethod
+    def listToRanges(cls, source):
+        """ Takes a list of integers and turns it into a list tuples representing continous ranges. """
+        if not source:
+            return []
+
+        source = sorted(list(set(source)))
+        start  = source[0]
+        last   = start
+        out    = []
+        for entry in source[1:]:
+            if entry == last + 1:
+                last = entry
+                continue
+
+            out.append((start, last + 1))
+            start = entry
+            last  = entry
+
+        out.append((start, last + 1))
+        return out
+
 #___________________________________________________________________________________________________ addIfMissing
     @classmethod
     def addIfMissing(cls, value, targetList, reorder =False, frontOrdering =False):
