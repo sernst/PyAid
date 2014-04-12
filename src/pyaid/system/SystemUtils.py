@@ -117,7 +117,7 @@ class SystemUtils(object):
 
 #___________________________________________________________________________________________________ copy
     @classmethod
-    def copy(cls, source, destination):
+    def copy(cls, source, destination, echo =False):
         if os.path.isdir(source):
             try:
                 shutil.copytree(source, destination)
@@ -125,7 +125,7 @@ class SystemUtils(object):
                 try:
                     shutil.copy2(source, destination)
                 except Exception, err:
-                    print 'FAILED TO COPY: %s -> %s' % (source, destination)
+                    print 'FAILED TO COPY:\n    FROM: %s\n      TO: %s' % (source, destination)
                     return False
         else:
             try:
@@ -134,10 +134,11 @@ class SystemUtils(object):
                 try:
                     shutil.copytree(source, destination)
                 except Exception, err:
-                    print 'FAILED TO COPY: %s -> %s' % (source, destination)
+                    print 'FAILED TO COPY:\n    FROM: %s\n      TO: %s' % (source, destination)
                     return False
 
-        print 'COPIED: %s -> %s' % (source, destination)
+        if echo:
+            print 'COPIED:\n    FROM: %s\n      TO: %s' % (source, destination)
         return True
 
 #___________________________________________________________________________________________________ gzip
