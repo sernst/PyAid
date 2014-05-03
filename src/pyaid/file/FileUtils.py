@@ -248,12 +248,12 @@ class FileUtils(object):
                 src.append(item)
         out = os.path.join(*src)
 
-        if out.endswith(os.sep) or ArgsUtils.get('isFile', False, kwargs):
-            return cls._getAbsolutePath(out)
-
         noTail = ArgsUtils.get('noTail', False, kwargs)
+        if out.endswith(os.sep) or ArgsUtils.get('isFile', False, kwargs):
+            return cls._getAbsolutePath(out, noTail=noTail)
+
         if ArgsUtils.get('isDir', False, kwargs):
-            return cls._getAbsolutePath(out) if noTail else (cls._getAbsolutePath(out) + os.sep)
+            return cls._getAbsolutePath(out, noTail=noTail)
 
         if os.path.exists(out):
             if os.path.isfile(out):
@@ -358,9 +358,9 @@ class FileUtils(object):
 
 #___________________________________________________________________________________________________ _getAbsolutePath
     @classmethod
-    def _getAbsolutePath(cls, path):
+    def _getAbsolutePath(cls, path, noTail =False):
         if path.endswith(os.sep):
-            return os.path.abspath(path[:-1]) + os.sep
+            return os.path.abspath(path[:-1]) + ('' if noTail else os.sep)
         return os.path.abspath(path)
 
 #___________________________________________________________________________________________________ _copyFile
