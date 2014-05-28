@@ -49,13 +49,13 @@ class DictUtils(object):
 
 #___________________________________________________________________________________________________ cleanDictKeys
     @classmethod
-    def cleanDictKeys(cls, source):
+    def cleanDictKeys(cls, source, force =False):
         """ Python 2.6 and below don't allow unicode argument keys, so these must be converted to
             byte strings explicitly to prevent exceptions.
         """
 
         vi = sys.version_info
-        if vi[0] < 3 and (vi[1] < 7 or vi[2] < 5):
+        if force or (vi[0] < 3 and (vi[1] < 7 or vi[2] < 5)):
             out = dict()
             for n,v in source.iteritems():
                 out[str(n)] = v
