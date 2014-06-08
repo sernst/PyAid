@@ -25,6 +25,13 @@ class FileUtils(object):
 #===================================================================================================
 #                                                                                     P U B L I C
 
+#___________________________________________________________________________________________________ equivalentPaths
+    @classmethod
+    def equivalentPaths(cls, path1, path2):
+        path1 = FileUtils.cleanupPath(path1, noTail=True)
+        path2 = FileUtils.cleanupPath(path2, noTail=True)
+        return path1 == path2
+
 #___________________________________________________________________________________________________ isInFolder
     @classmethod
     def isInFolder(cls, path, folder):
@@ -249,15 +256,15 @@ class FileUtils(object):
         out = os.path.join(*src)
 
         noTail = ArgsUtils.get('noTail', False, kwargs)
-        if out.endswith(os.sep) or ArgsUtils.get('isFile', False, kwargs):
-            return cls._getAbsolutePath(out, noTail=noTail)
+        if ArgsUtils.get('isFile', False, kwargs):
+            return cls._getAbsolutePath(out, noTail=False, isDir=False)
 
-        if ArgsUtils.get('isDir', False, kwargs):
-            return cls._getAbsolutePath(out, noTail=noTail)
+        if ArgsUtils.get('isDir', False, kwargs) or out.endswith(os.sep):
+            return cls._getAbsolutePath(out, noTail=noTail, isDir=True)
 
         if os.path.exists(out):
             if os.path.isfile(out):
-                return cls._getAbsolutePath(out)
+                return cls._getAbsolutePath(out, noTail=True, isDir=False)
 
             if os.path.isdir(out) and not noTail and not out.endswith(os.sep):
                 out += os.sep
@@ -266,7 +273,7 @@ class FileUtils(object):
         elif src[-1].find('.') == -1:
             out += os.sep
 
-        return cls._getAbsolutePath(out)
+        return cls._getAbsolutePath(out, noTail=noTail)
 
 #___________________________________________________________________________________________________ stripTail
     @classmethod
@@ -358,10 +365,11 @@ class FileUtils(object):
 
 #___________________________________________________________________________________________________ _getAbsolutePath
     @classmethod
-    def _getAbsolutePath(cls, path, noTail =False):
-        if path.endswith(os.sep):
-            return os.path.abspath(path[:-1]) + ('' if noTail else os.sep)
-        return os.path.abspath(path)
+    def _getAbsolutePath(cls, path, noTail =False, isDir =False):
+        outPath = os.path.abspath(path[:-1] if path.endswith(os.sep) else path)
+        if not noTail and (isDir or path.endswith(os.sep)):
+            return outPath + os.sep
+        return outPath
 
 #___________________________________________________________________________________________________ _copyFile
     @classmethod
