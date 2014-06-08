@@ -392,8 +392,9 @@ class FileUtils(object):
         if directory in ['.svn']:
             return
 
-        source      = args['source']
-        destination = args['destination']
+        directory   = cls.cleanupPath(directory, isDir=True)
+        source      = cls.cleanupPath(args['source'], isDir=True)
+        destination = cls.cleanupPath(args['destination'], isDir=True)
         overwrite   = args['overwriteExisting']
         fileList    = args['fileList']
 

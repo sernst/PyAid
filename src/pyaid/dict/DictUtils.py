@@ -7,6 +7,9 @@ import sys
 # AS NEEDED: from pyaid.list.ListUtils import ListUtils
 
 #___________________________________________________________________________________________________ DictUtils
+from pyaid.string.StringUtils import StringUtils
+
+
 class DictUtils(object):
     """A class for..."""
 
@@ -109,13 +112,23 @@ class DictUtils(object):
     @classmethod
     def prettyPrint(cls, source, delimiter = u' | ', separator = u': '):
         if not source:
-            return '[EMPTY]'
+            return u'[EMPTY]'
 
         out = []
         for n,v in source.iteritems():
-            if v is dict:
+            if isinstance(n, str):
+                n = StringUtils.strToUnicode(n)
+            else:
+                n = unicode(n)
+
+            if isinstance(v, dict):
                 v = u'{ ' + cls.prettyPrint() + u' }'
-            out.append(unicode(n) + separator + unicode(v))
+            elif isinstance(v, str):
+                v = StringUtils.strToUnicode(v)
+            else:
+                v = unicode(v)
+
+            out.append(n + separator + v)
 
         out.sort(key=unicode.lower)
         return delimiter.join(out)
