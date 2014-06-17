@@ -122,7 +122,7 @@ class DictUtils(object):
                 n = unicode(n)
 
             if isinstance(v, dict):
-                v = u'{ ' + cls.prettyPrint() + u' }'
+                v = u'{ ' + cls.prettyPrint(v, delimiter=delimiter, separator=separator) + u' }'
             elif isinstance(v, str):
                 v = StringUtils.strToUnicode(v)
             else:

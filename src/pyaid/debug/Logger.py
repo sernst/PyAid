@@ -22,11 +22,14 @@ class Logger(object):
 #===================================================================================================
 #                                                                                       C L A S S
 
+    PACIFIC_TIMEZONE = 'US/Pacific'
+
 #___________________________________________________________________________________________________ __init__
     def __init__(self, name=None, **kwargs):
         """Initializes settings."""
+        self.timezone    = kwargs.get('timezone', None)
         self.headerless  = kwargs.get('headerless', False)
-        self._time       = self._getTime()
+        self._time       = self.getTime()
         self._timeCode   = self._time.strftime('%y-%U')
         self._timestamp  = self._time.strftime('%Y|%m|%d|%H|%M|%S')
 
@@ -173,7 +176,7 @@ class Logger(object):
         else:
             loc = u']'
 
-        return unicode(self._getTime().strftime(u'[%a %H:%M <%S.%f>') + loc)
+        return unicode(self.getTime(self.timezone).strftime(u'[%a %H:%M <%S.%f>') + loc)
 
 #___________________________________________________________________________________________________ clear
     def clear(self, storage =False):
@@ -189,61 +192,52 @@ class Logger(object):
             os.remove(self._logFile)
 
 #___________________________________________________________________________________________________ add
-    def add(self, s, traceStack =False, shaveStackTrace =0, request =None, htmlEscape =False):
+    def add(self, s, traceStack =False, shaveStackTrace =0, htmlEscape =None):
         """Prints s to standard output and a log file."""
 
-        out = self._createLogMessage(s, traceStack, shaveStackTrace, request, htmlEscape)
+        out = self.createLogMessage(
+            s, traceStack, shaveStackTrace,
+            self._htmlEscape if htmlEscape is None else htmlEscape,
+            prefix=self.getPrefix() if self.headerless else None)
+
+        if self._traceLogs:
+            self.traceLogMessage(out, self._printCallbacks, self)
+
         self._buffer.append(out)
         if self._storageBuffer is not None:
             self._storageBuffer.append(out)
         return out['log']
 
 #___________________________________________________________________________________________________ echo
-    def echo(self, s, traceStack =False, shaveStackTrace =0, request =None, htmlEscape =False):
-        return self._createLogMessage(s, traceStack, shaveStackTrace, request, htmlEscape)['log']
+    def echo(self, s, traceStack =False, shaveStackTrace =0, htmlEscape =None):
+        out = self.createLogMessage(
+            s, traceStack, shaveStackTrace,
+            self._htmlEscape if htmlEscape is None else htmlEscape,
+            prefix=self.getPrefix() if self.headerless else None)
+
+        if self._traceLogs:
+            self.traceLogMessage(out, self._printCallbacks, self)
+        return out['log'] + u'\n' + out['stack']
 
 #___________________________________________________________________________________________________ echoError
-    def echoError(self, s, err, request =None, htmlEscape =False):
-        return self.echo(self._createErrorMessage(s, err), True, htmlEscape=htmlEscape)
+    def echoError(self, s, err, htmlEscape =False):
+        return self.echo(self.createErrorMessage(s, err), True, htmlEscape=htmlEscape)
 
 #___________________________________________________________________________________________________ addError
-    def addError(self, s, err, request =None, htmlEscape =False):
+    def addError(self, s, err, htmlEscape =False):
         self._hasError = True
-        return self.add(self._createErrorMessage(s, err), True, htmlEscape=htmlEscape)
-
-#___________________________________________________________________________________________________ __call__
-    def __call__(self, s ='', *args, **kwargs):
-
-        request = ArgsUtils.get('request', kwargs)
-
-        # If the call is an error, write the error
-        err = ArgsUtils.get('err', args=args, index=1)
-        if err and isinstance(err, Exception):
-            if self._buffer:
-                self.addError(s, err, request=request)
-            else:
-                self.writeError(s, err, request=request)
-
-            return
-
-        # Handle the non-error case
-        traceStack      = ArgsUtils.get('traceStack', False, kwargs, args, 1)
-        shaveStackTrace = ArgsUtils.get('shaveStackTrace', 0, kwargs, args, 2)
-        if self._buffer:
-            self.add(s, traceStack, shaveStackTrace, request=request)
-        else:
-            self.write(s, traceStack, shaveStackTrace, request=request)
+        return self.add(self.createErrorMessage(s, err), True, htmlEscape=htmlEscape)
 
 #___________________________________________________________________________________________________ write
-    def write(self, s, traceStack =False, shaveStackTrace =0, request =None, htmlEscape =False):
+    def write(self, s, traceStack =False, shaveStackTrace =0, htmlEscape =False):
         """Adds the log item and flushes the buffer to the log file."""
         result = self.add(s, traceStack, shaveStackTrace, htmlEscape=htmlEscape)
         self.flush()
         return result
 
 #___________________________________________________________________________________________________ writeError
-    def writeError(self, s, err, request =None, htmlEscape =False):
-        result = self.addError(s, err, request=request, htmlEscape=htmlEscape)
+    def writeError(self, s, err, htmlEscape =False):
+        result = self.addError(s, err, htmlEscape=htmlEscape)
         self.flush()
         return result
 
@@ -254,7 +248,7 @@ class Logger(object):
 
         items = []
         for logItem in self._buffer:
-            item = logItem['log']
+            item = self.logMessageToString(logMessage=logItem) + u'\n'
             try:
                 item = item.encode('utf8', 'ignore')
             except Exception, err:
@@ -288,10 +282,11 @@ class Logger(object):
         self.clear()
 
 #___________________________________________________________________________________________________ getFormattedStackTrace
-    @staticmethod
-    def getFormattedStackTrace(skipStackLevels =0, maxLevels =0, stackSource =None):
-        # Get the exception stack trace if it exists, otherwise extract the generic stack trace
-        # instead.
+    @classmethod
+    def getFormattedStackTrace(cls, skipStackLevels =0, maxLevels =0, stackSource =None):
+        """ Get the exception stack trace if it exists, otherwise extract the generic stack trace
+            instead. """
+
         stack = Logger.getStackData(stackSource)
         stop  = len(stack) - skipStackLevels
         start = max(0, stop - maxLevels) if maxLevels > 0 else 0
@@ -316,18 +311,17 @@ class Logger(object):
         res = []
         if not stackSource:
             stackSource = Logger.getRawStack()
-        for item in stackSource:
-            s             = {}
-            path          = unicode(item[0])
-            s['path']     = path
-            s['internal'] = True #path.lower().find('vizme') != -1
-            s['dir']      = unicode(os.path.dirname(path))
-            s['file']     = unicode(os.path.basename(path).replace('.py',''))
 
-            s['line']     = item[1]
-            s['function'] = unicode(item[2])
-            s['code']     = unicode(item[3])
-            res.append(s)
+        for item in stackSource:
+            path = unicode(item[0])
+            res.append(dict(
+                path=path,
+                internal=True,
+                dir=unicode(os.path.dirname(path)),
+                file=unicode(os.path.basename(path).replace('.py','')),
+                line=item[1],
+                function=unicode(item[2]),
+                code=unicode(item[3]) ))
 
         return res
 
@@ -382,44 +376,9 @@ class Logger(object):
             s += u'%s%s: %s' % (indent, n, v)
         return s
 
-#===================================================================================================
-#                                                                               P R O T E C T E D
-
-#___________________________________________________________________________________________________ _createLogMessage
-    def _createLogMessage(self, s, traceStack, shaveStackTrace, request, htmlEscape):
-        s = Logger._formatAsString(s)
-        if traceStack:
-            s += '\nStack Trace:\n' + Logger.getFormattedStackTrace(shaveStackTrace)
-
-        if self._htmlEscape or htmlEscape:
-            s = StringUtils.htmlEscape(s)
-
-        if self._traceLogs:
-            out = self._asASCII(s)
-            print out
-            for cb in self._printCallbacks:
-                try:
-                    cb(self, out)
-                except Exception, err:
-                    pass
-
-        if len(self._name) < 1:
-            return
-
-        tp = '' if self.headerless else self.getPrefix() + ':\n    '
-        s  = s.replace('\n', '\n    ')
-        try:
-            logValue = (tp + s + "\n").encode('utf-8')
-        except Exception, err:
-            try:
-                logValue = (tp + str(s) + "\n").encode('utf-8')
-            except Exception, err:
-                logValue = (tp + "FAILED TO LOG VALUE").encode('utf-8')
-
-        return {'log':logValue, 'stack':traceStack}
-
-#___________________________________________________________________________________________________ _createErrorMessage
-    def _createErrorMessage(self, s, err):
+#___________________________________________________________________________________________________ createErrorMessage
+    @classmethod
+    def createErrorMessage(cls, message, err):
         try:
             errorType = unicode(sys.exc_info()[0])
         except Exception, err:
@@ -445,51 +404,23 @@ class Logger(object):
                 error = '[[UNABLE TO PARSE]]'
 
         try:
-            es = (Logger._formatAsString(s) + "\n    Type: %s\n    Value: %s\nError: %s\n") \
+            es = (cls.formatAsString(message) + "\n    Type: %s\n    Value: %s\nError: %s\n") \
                % (errorType, errorValue, error)
         except Exception, err:
             try:
-                es = Logger._formatAsString(s) + "\n    [[ERROR ATTRIBUTE PARSING FAILURE]]"
+                es = cls.formatAsString(message) + "\n    [[ERROR ATTRIBUTE PARSING FAILURE]]"
             except Exception, err:
                 es = 'FAILED TO PARSE EXCEPTION'
 
         return es
 
-#___________________________________________________________________________________________________ __del__
-    def __del__(self):
-        """ Flush the buffer if not empty."""
-        self.flush()
-
-#___________________________________________________________________________________________________ _getTime
-    def _getTime(self):
-        try:
-            import pytz
-            dt = datetime.datetime.now(tz=pytz.utc)
-            return dt.astimezone(tz=pytz.timezone('US/Pacific'))
-        except Exception, err:
-            return datetime.datetime.utcnow()
-
-#___________________________________________________________________________________________________ _asASCII
-    @staticmethod
-    def _asASCII(string):
-        if isinstance(string, unicode):
-            try:
-                return string.encode('utf8', 'ignore')
-            except Exception, err:
-                try:
-                    return unicodedata.normalize('NFKD', string).encode('ascii', 'ignore')
-                except Exception, err:
-                    return '[[UNABLE TO DISPLAY LOG ENTRY IN ASCII CHARS]]'
-        else:
-            return string
-
-#___________________________________________________________________________________________________ _formatAsString
-    @staticmethod
-    def _formatAsString(src, indentLevel =0):
+#___________________________________________________________________________________________________ formatAsString
+    @classmethod
+    def formatAsString(cls, src, indentLevel =0):
         indents = u'    '*indentLevel
         if isinstance(src, list) or isinstance(src, tuple):
             out      = [indents + unicode(src[0]) + (u'' if src[0].endswith(u':') else u':')]
-            indents  = indents + u'    '
+            indents += u'    '
             lines    = []
             maxIndex = 0
 
@@ -517,3 +448,125 @@ class Logger(object):
             elif isinstance(src, str):
                 src = src.decode('utf-8')
             return indents + src
+
+#___________________________________________________________________________________________________ traceLogMessage
+    @classmethod
+    def traceLogMessage(cls, logMessage, callbacks =None, callbackTarget =None):
+
+        out = cls.asAscii(logMessage['log'])
+        print out
+
+        try:
+            for cb in callbacks:
+                try:
+                    cb(callbackTarget, out)
+                except Exception, err:
+                    pass
+        except Exception, err:
+            pass
+
+        return out
+
+#___________________________________________________________________________________________________ createLogMessage
+    @classmethod
+    def createLogMessage(cls, logValue, traceStack, shaveStackTrace, htmlEscape, prefix =None):
+        logValue = cls.formatAsString(logValue)
+        if htmlEscape:
+            logValue = StringUtils.htmlEscape(logValue)
+
+        logValue = StringUtils.strToUnicode(logValue.replace('\n', '\n    '))
+        if not isinstance(logValue, unicode):
+            logValue = u'FAILED TO LOG RESPONSE'
+
+        out = {'log':logValue}
+
+        if prefix:
+            logPrefix = StringUtils.strToUnicode(prefix)
+            if not isinstance(logPrefix, unicode):
+                logPrefix = u'FAILED TO CREATE PREFIX'
+            out['prefix'] = logPrefix
+
+        if traceStack:
+            logStack = StringUtils.strToUnicode(
+                'Stack Trace:\n' + cls.getFormattedStackTrace(shaveStackTrace))
+            if not isinstance(logStack, unicode):
+                logStack = u'FAILED TO CREATE STACK'
+            out['stack'] = logStack
+
+        return out
+
+#___________________________________________________________________________________________________ getTime
+    @classmethod
+    def getTime(cls, timezone =None):
+        if timezone is None:
+            return datetime.datetime.utcnow()
+
+        try:
+            import pytz
+            dt = datetime.datetime.now(tz=pytz.utc)
+            return dt.astimezone(tz=pytz.timezone(timezone))
+        except Exception, err:
+            return datetime.datetime.utcnow()
+
+#___________________________________________________________________________________________________ asAscii
+    @classmethod
+    def asAscii(cls, string):
+        if isinstance(string, unicode):
+            try:
+                return string.encode('utf8', 'ignore')
+            except Exception, err:
+                try:
+                    return unicodedata.normalize('NFKD', string).encode('ascii', 'ignore')
+                except Exception, err:
+                    return '[[UNABLE TO DISPLAY LOG ENTRY IN ASCII CHARS]]'
+        else:
+            return string
+
+#___________________________________________________________________________________________________ logMessageToString
+    @classmethod
+    def logMessageToString(
+            cls, logMessage, includePrefix =True, includeStack =True, prefixSeparator =u'\n    ',
+            stackSeparator =u'\n'
+    ):
+        out = []
+        if includePrefix and 'prefix' in logMessage:
+            out.append(logMessage['prefix']) + prefixSeparator
+
+        out.append(logMessage['log'])
+
+        if includeStack and 'stack' in logMessage:
+            out.append(stackSeparator + logMessage['stack'])
+
+        return u''.join(out)
+
+#===================================================================================================
+#                                                                               I N T R I N S I C
+
+#___________________________________________________________________________________________________ __call__
+    def __call__(self, s ='', *args, **kwargs):
+
+        # If the call is an error, write the error
+        err = ArgsUtils.get('err', args=args, index=1)
+        if err and isinstance(err, Exception):
+            if self._buffer:
+                self.addError(s, err)
+            else:
+                self.writeError(s, err)
+
+            return
+
+        # Handle the non-error case
+        traceStack      = ArgsUtils.get('traceStack', False, kwargs, args, 1)
+        shaveStackTrace = ArgsUtils.get('shaveStackTrace', 0, kwargs, args, 2)
+        if self._buffer:
+            self.add(s, traceStack, shaveStackTrace)
+        else:
+            self.write(s, traceStack, shaveStackTrace)
+
+#___________________________________________________________________________________________________ __del__
+    def __del__(self):
+        """ Attempt to flush the buffer if not empty as part of the deletion process."""
+        try:
+            self.flush()
+        except Exception, err:
+            pass
