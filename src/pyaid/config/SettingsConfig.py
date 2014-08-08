@@ -24,6 +24,10 @@ class SettingsConfig(object):
 #===================================================================================================
 #                                                                                     P U B L I C
 
+#___________________________________________________________________________________________________ fetch
+    def fetch(self, key, defaultValue =None):
+        return self.get(key, defaultValue=defaultValue)
+
 #___________________________________________________________________________________________________ get
     def get(self, key, defaultValue =None):
         self._loadSettings()
@@ -46,6 +50,10 @@ class SettingsConfig(object):
         self._loadSettings()
         self._updateSetting(key, value)
         self._saveSettings()
+
+#___________________________________________________________________________________________________ put
+    def put(self, key, value):
+        self.set(key, value)
 
 #___________________________________________________________________________________________________ setFromDict
     def setFromDict(self, keysAndValues):

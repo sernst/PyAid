@@ -1,5 +1,5 @@
 # StringUtils.py
-# (C)2011-2013
+# (C)2011-2014
 # Scott Ernst and Eric David Wills
 
 import os
@@ -11,8 +11,7 @@ import math
 #___________________________________________________________________________________________________ StringUtils
 class StringUtils:
     """ A class for string related operations, targeting both byte and unicode strings, but
-        focusing primarily on unicode strings for forward compatibility.
-    """
+        focusing primarily on unicode strings for forward compatibility. """
 
 #===================================================================================================
 #                                                                                     P U B L I C
@@ -23,7 +22,9 @@ class StringUtils:
         ('>', '&gt;'),
         ('"', '&quot;'),
         ("'", '&#39;'),
-    ]
+        (u'$', u'&#36;'),
+        (u'\u201d', u'&quot;'),
+        (u'\u201c', u'&quot;') ]
 
     _SOLO_BACKSLASH_PATTERN = re.compile('(?<!\\\)\\\(?!\\\)')
 

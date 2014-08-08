@@ -1,5 +1,5 @@
 # ListUtils.py
-# (C)2011-2013
+# (C)2011-2014
 # Scott Ernst
 
 from operator import itemgetter
@@ -13,6 +13,36 @@ class ListUtils(object):
 
 #===================================================================================================
 #                                                                                      C L A S S
+
+#___________________________________________________________________________________________________ hasAny
+    @classmethod
+    def hasAny(cls, target, options):
+        """ Returns true if any of the options are found within the target list or tuple, otherwise
+            returns False. """
+        if not options:
+            return False
+
+        for item in options:
+            if item in target:
+                return True
+        return False
+
+#___________________________________________________________________________________________________ indexOfAny
+    @classmethod
+    def indexOfAny(cls, target, options):
+        """ Finds any of the iterable options in the target list or tuple and returns the index if
+            found or -1 otherwise. """
+        if not options:
+            return -1
+
+        for item in options:
+            try:
+                index = target.find(item)
+            except Exception, err:
+                continue
+            return index
+
+        return -1
 
 #___________________________________________________________________________________________________ listToRanges
     @classmethod
