@@ -221,12 +221,12 @@ class Logger(object):
 
 #___________________________________________________________________________________________________ echoError
     def echoError(self, s, err, htmlEscape =False):
-        return self.echo(self.createErrorMessage(s, err), True, htmlEscape=htmlEscape)
+        return self.echo(self.createErrorMessage(s, err), traceStack=True, htmlEscape=htmlEscape)
 
 #___________________________________________________________________________________________________ addError
     def addError(self, s, err, htmlEscape =False):
         self._hasError = True
-        return self.add(self.createErrorMessage(s, err), True, htmlEscape=htmlEscape)
+        return self.add(self.createErrorMessage(s, err), traceStack=True, htmlEscape=htmlEscape)
 
 #___________________________________________________________________________________________________ write
     def write(self, s, traceStack =False, shaveStackTrace =0, htmlEscape =False):
