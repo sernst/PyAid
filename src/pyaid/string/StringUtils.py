@@ -368,3 +368,8 @@ class StringUtils:
             return value
         except Exception, err:
             return value
+
+#___________________________________________________________________________________________________ zeroFill
+    @classmethod
+    def zeroFill(cls, source, length):
+        return source.zfill(length)

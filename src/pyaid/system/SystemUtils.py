@@ -8,9 +8,9 @@ import shutil
 import datetime
 import subprocess
 
-
 # AS NEEDED: import urllib2
 # AS NEEDED: import requests
+# AS NEEDED: from pyaid.list.ListUtils import ListUtils
 
 #___________________________________________________________________________________________________ SystemUtils
 class SystemUtils(object):
@@ -23,7 +23,8 @@ class SystemUtils(object):
     @classmethod
     def executeCommand(cls, cmd, remote =False, shell =True, wait =False):
         if shell and not isinstance(cmd, basestring):
-            cmd = ' '.join(cmd)
+            from pyaid.list.ListUtils import ListUtils
+            cmd = ' '.join(ListUtils.itemsToString(cmd))
 
         if remote:
             pipe = subprocess.Popen(

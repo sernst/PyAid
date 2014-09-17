@@ -29,7 +29,7 @@ class Reflection(object):
 
 #___________________________________________________________________________________________________ getReflectionDict
     @staticmethod
-    def getReflectionDict(source, lowerKeys =False):
+    def getReflectionDict(source, lowerKeys =False, includeProtected =False, includeIntrinsic =False):
         """ Uses reflection to get the attributes of source and returns the results as a dictionary
             with the keys being the names of the source attributes. Attributes that begin with an
             underscore are considered private and ignored.
@@ -38,8 +38,12 @@ class Reflection(object):
         res = dict()
 
         for attr in dir(source):
-            if attr.startswith('_'):
-                continue
+            if attr[0] == '_':
+                if not includeProtected:
+                    continue
+
+                if not includeIntrinsic and attr[1] == '_':
+                    continue
 
             a = getattr(source, attr)
             if not a:

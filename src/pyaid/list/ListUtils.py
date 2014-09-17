@@ -6,6 +6,7 @@ from operator import itemgetter
 from operator import attrgetter
 
 # AS NEEDED: from pyaid.dict.DictUtils import DictUtils
+# As NEEDED: from pyaid.string.StringUtils import StringUtils
 
 #___________________________________________________________________________________________________ ListUtils
 class ListUtils(object):
@@ -13,6 +14,47 @@ class ListUtils(object):
 
 #===================================================================================================
 #                                                                                      C L A S S
+
+#___________________________________________________________________________________________________ itemsToString
+    @classmethod
+    def itemsToString(cls, target, inPlace =False):
+        """ Iterates through the elements of the target list and converts each of them to binary
+            strings, including decoding unicode strings to byte strings."""
+
+        from pyaid.string.StringUtils import StringUtils
+
+        output = target if inPlace else (target + [])
+        index  = 0
+
+        while index < len(target):
+            source = target[index]
+            if isinstance(source, basestring):
+                output[index] = StringUtils.unicodeToStr(source)
+            else:
+                output[index] = str(source)
+            index += 1
+
+        return output
+
+#___________________________________________________________________________________________________ itemsToUnicode
+    @classmethod
+    def itemsToUnicode(cls, target, inPlace =False):
+        """ Iterates through the elements of the target list and converts each of them to unicode
+            strings, including decoding byte strings to unicode strings."""
+
+        from pyaid.string.StringUtils import StringUtils
+
+        output = target if inPlace else []
+        index  = 0
+
+        while index < len(target):
+            source = target[index]
+            if isinstance(source, basestring):
+                output[index] = StringUtils.strToUnicode(source)
+            else:
+                output[index] = unicode(source)
+
+        return output
 
 #___________________________________________________________________________________________________ hasAny
     @classmethod
