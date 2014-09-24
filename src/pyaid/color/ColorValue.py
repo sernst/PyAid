@@ -33,7 +33,6 @@ class ColorValue(object):
         self._hsvNormColor          = None
         self._webColor              = None
         self._webCompactColor       = None
-        self._hexColor              = None
         self._lumaColor             = None
         self._shiftUpColors         = None
         self._shiftDownColors       = None
@@ -48,6 +47,34 @@ class ColorValue(object):
     @opacity.setter
     def opacity(self, value):
         self._opacity = float(value)
+
+#___________________________________________________________________________________________________ GS: hexRgb
+    @property
+    def hexRgb(self):
+        return hex(self._rawColor)
+    @hexRgb.setter
+    def hexRgb(self, value):
+        self._rawColor = int(value)
+        self._unCache()
+
+#___________________________________________________________________________________________________ GS: hexRgba
+    @property
+    def hexRgba(self):
+        return self.hexRgb << self.hexAlpha
+    @hexRgba.setter
+    def hexRgba(self, value):
+        self._opacity  = float(int(value & 0xFF))/255.0
+        self._rawColor = int(value >> 0xFF)
+        self._unCache()
+
+#___________________________________________________________________________________________________ GS: hexAlpha
+    @property
+    def hexAlpha(self):
+        return hex(int(round(255.0*self._opacity)))
+    @hexAlpha.setter
+    def hexAlpha(self, value):
+        self._opacity  = float(int(value))/255.0
+        self._unCache()
 
 #___________________________________________________________________________________________________ GS: bareHex
     @property
@@ -316,6 +343,14 @@ class ColorValue(object):
 #===================================================================================================
 #                                                                                     P U B L I C
 
+#___________________________________________________________________________________________________ copyFrom
+    def copyFrom(self, color):
+        return self._setColor(color.asInt())
+
+#___________________________________________________________________________________________________ load
+    def load(self, value, normalized =False):
+        return self._setColor(value, normalized =False)
+
 #___________________________________________________________________________________________________ __str__
     def __str___(self):
         return self.asWeb
@@ -331,8 +366,7 @@ class ColorValue(object):
             unicode(c[0]),
             unicode(c[1]),
             unicode(c[2]),
-            unicode(self._opacity if opacity is None else opacity)
-        )
+            unicode(self._opacity if opacity is None else opacity) )
 
 #___________________________________________________________________________________________________ asWebRgbOpacity
     def asWebRgbOpacity(self, opacity =None):
@@ -341,8 +375,7 @@ class ColorValue(object):
             unicode(c[0]),
             unicode(c[1]),
             unicode(c[2]),
-            unicode(100.0*(self._opacity if opacity is None else opacity)) + u'%'
-        )
+            unicode(100.0*(self._opacity if opacity is None else opacity)) + u'%' )
 
 #___________________________________________________________________________________________________ asRgb
     def asRgb(self, normalize =False, output =None):
@@ -377,10 +410,7 @@ class ColorValue(object):
 
 #___________________________________________________________________________________________________ asHex
     def asHex(self):
-        if self._hexColor is None:
-            self._hexColor = hex(self._rawColor)
-
-        return self._hexColor
+        return hex(self._rawColor)
 
 #___________________________________________________________________________________________________ asLuma
     def asLuma(self):
@@ -388,6 +418,14 @@ class ColorValue(object):
             rgb = self.asRgb()
             self._lumaColor = (0.2126*rgb['r'] + 0.7152*rgb['g'] + 0.0722*rgb['b'])/255.0
         return self._lumaColor
+
+#___________________________________________________________________________________________________ asWebAlpha
+    def asWebAlpha(self):
+        return hex(int(round(255.0*self._opacity))).replace('0x', '')
+
+#___________________________________________________________________________________________________ asWebRgba
+    def asWebRgba(self):
+        return self.asWeb(compactify=False) + self.asWebAlpha()
 
 #___________________________________________________________________________________________________ asWeb
     def asWeb(self, compactify =True):
@@ -854,7 +892,6 @@ class ColorValue(object):
         self._hsvNormColor          = None
         self._webColor              = None
         self._webCompactColor       = None
-        self._hexColor              = None
         self._lumaColor             = None
         self._shiftUpColors         = None
         self._shiftDownColors       = None
