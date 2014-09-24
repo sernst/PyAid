@@ -63,8 +63,8 @@ class ColorValue(object):
         return self.hexRgb << self.hexAlpha
     @hexRgba.setter
     def hexRgba(self, value):
-        self._opacity  = float(int(value & 0xFF))/255.0
-        self._rawColor = int(value >> 0xFF)
+        self._opacity  = float(value & 0xFF)/255.0
+        self._rawColor = value >> 8
         self._unCache()
 
 #___________________________________________________________________________________________________ GS: hexAlpha
