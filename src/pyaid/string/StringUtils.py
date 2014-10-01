@@ -7,6 +7,7 @@ import re
 import string
 import random
 import math
+import unicodedata
 
 #___________________________________________________________________________________________________ StringUtils
 class StringUtils:
@@ -27,6 +28,15 @@ class StringUtils:
         (u'\u201c', u'&quot;') ]
 
     _SOLO_BACKSLASH_PATTERN = re.compile('(?<!\\\)\\\(?!\\\)')
+
+#___________________________________________________________________________________________________ source
+    @classmethod
+    def slugify(cls, source):
+        """ Normalizes string, converts to lowercase, removes non-alpha characters,
+            and converts spaces to hyphens. Useful in creating safe filenames. """
+
+        source = unicodedata.normalize('NFKD', source).encode('ascii', 'ignore')
+        return unicode(re.sub('[^\w\s-]', '', source).strip().lower())
 
 #___________________________________________________________________________________________________ matches
     @classmethod

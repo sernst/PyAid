@@ -25,6 +25,16 @@ class FileUtils(object):
 #===================================================================================================
 #                                                                                     P U B L I C
 
+#___________________________________________________________________________________________________ cleanFilename
+    @classmethod
+    def cleanFilename(cls, filename):
+        if not filename:
+            return StringUtils.getRandomString(12)
+        out = StringUtils.slugify(filename)
+        if not out:
+            return StringUtils.getRandomString(12)
+        return out
+
 #___________________________________________________________________________________________________ equivalentPaths
     @classmethod
     def equivalentPaths(cls, path1, path2):

@@ -40,6 +40,35 @@ class ColorValue(object):
 #===================================================================================================
 #                                                                                   G E T / S E T
 
+#___________________________________________________________________________________________________ GS: intRgb
+    @property
+    def intRgb(self):
+        return self._rawColor
+    @intRgb.setter
+    def intRgb(self, value):
+        self._rawColor = int(value)
+        self._unCache()
+
+#___________________________________________________________________________________________________ GS: intAlpha
+    @property
+    def intAlpha(self):
+        return int(round(255.0*self._opacity))
+    @intAlpha.setter
+    def intAlpha(self, value):
+        self._opacity  = float(int(value))/255.0
+        self._unCache()
+
+#___________________________________________________________________________________________________ GS: intRgba
+    @property
+    def intRgba(self):
+        return (self._rawColor << 8) & self.intAlpha
+    @intRgba.setter
+    def intRgba(self, value):
+        value          = int(value)
+        self._opacity  = float(value & 0xFF)/255.0
+        self._rawColor = value >> 8
+        self._unCache()
+
 #___________________________________________________________________________________________________ GS: opacity
     @property
     def opacity(self):
@@ -54,26 +83,23 @@ class ColorValue(object):
         return hex(self._rawColor)
     @hexRgb.setter
     def hexRgb(self, value):
-        self._rawColor = int(value)
-        self._unCache()
+        self.intRgb = int(value, 8)
 
 #___________________________________________________________________________________________________ GS: hexRgba
     @property
     def hexRgba(self):
-        return self.hexRgb << self.hexAlpha
+        return hex(self.intRgba)
     @hexRgba.setter
     def hexRgba(self, value):
-        self._opacity  = float(value & 0xFF)/255.0
-        self._rawColor = value >> 8
-        self._unCache()
+        self.intRgba = int(value, 8)
 
 #___________________________________________________________________________________________________ GS: hexAlpha
     @property
     def hexAlpha(self):
-        return hex(int(round(255.0*self._opacity)))
+        return hex(self.intAlpha)
     @hexAlpha.setter
     def hexAlpha(self, value):
-        self._opacity  = float(int(value))/255.0
+        self.intAlpha = int(value, 8)
         self._unCache()
 
 #___________________________________________________________________________________________________ GS: bareHex
@@ -343,6 +369,20 @@ class ColorValue(object):
 #===================================================================================================
 #                                                                                     P U B L I C
 
+#___________________________________________________________________________________________________ toDict
+    def toDict(self):
+        return self.createDict(color=self._rawColor, alpha=self._opacity)
+
+#___________________________________________________________________________________________________ createDict
+    @classmethod
+    def createDict(cls, color, alpha =1.0):
+        return {'color':color, 'alpha':alpha}
+
+#___________________________________________________________________________________________________ fromDict
+    def fromDict(self, value):
+        self._rawColor = value['color']
+        self._opacity  = value['alpha']
+
 #___________________________________________________________________________________________________ copyFrom
     def copyFrom(self, color):
         return self._setColor(color.asInt())
@@ -552,12 +592,11 @@ class ColorValue(object):
     def burnShift(self, amount, maxAmount =None):
         c      = self.asHsv()
         coeff  = 1 - max(50 - c['s'], 0)/50
-        cls    = self.__class__
         adjust = c['s'] + min(maxAmount if maxAmount else 100.0, coeff*amount*(100 - c['s']))
-        c['s'] = cls.clamp(adjust, 0, 100)
+        c['s'] = self.clamp(adjust, 0, 100)
 
         adjust = c['v'] - min(maxAmount if maxAmount else 100.0, amount*c['v'])
-        c['v'] = cls.clamp(adjust, 0, 100)
+        c['v'] = self.clamp(adjust, 0, 100)
         self._setColor(c)
 
 #___________________________________________________________________________________________________ rgbShift
@@ -825,6 +864,35 @@ class ColorValue(object):
         else:
             return 0
 
+#___________________________________________________________________________________________________ fromIntRgb
+    @classmethod
+    def fromIntRgb(cls, value, alpha =1.0):
+        return cls.createDict(color=int(value), alpha=alpha)
+
+#___________________________________________________________________________________________________ fromIntRgb
+    @classmethod
+    def fromIntRgba(cls, value):
+        color = int(value) >> 8
+        alpha = float(int(value) & 0xFF)/255.0
+        return cls.createDict(color=value, alpha=alpha)
+
+#___________________________________________________________________________________________________ fromIntRgb
+    @classmethod
+    def fromHexRgb(cls, value, alpha =1.0):
+        return cls.createDict(color=int(value, 8), alpha=alpha)
+
+#___________________________________________________________________________________________________ fromIntRgb
+    @classmethod
+    def fromHexRgba(cls, value):
+        color = int(value, 8) >> 8
+        alpha = float(int(value, 8) & 0xFF)/255.0
+        return cls.createDict(color=value, alpha=alpha)
+
+#___________________________________________________________________________________________________ fromWebRgba
+    @classmethod
+    def fromWebRgba(cls, value):
+        pass
+
 #===================================================================================================
 #                                                                               P R O T E C T E D
 
@@ -833,8 +901,12 @@ class ColorValue(object):
         bendCount = None
         cls       = self.__class__
 
+        # COLOR VALUE DICT
+        if isinstance(sourceColor, dict) and 'color' in sourceColor:
+            self.fromDict(sourceColor)
+
         # INTEGER COLOR
-        if isinstance(sourceColor, int) or isinstance(sourceColor, long):
+        elif isinstance(sourceColor, int) or isinstance(sourceColor, long):
             self._rawColor = int(sourceColor)
 
         # FLOAT LUMA COLOR
@@ -858,6 +930,9 @@ class ColorValue(object):
             factor = 255.0 if normalized else 1.0
             c      = {'r':round(factor*r), 'g':round(factor*g), 'b':round(factor*b)}
             self._rawColor = cls.rgbToInt(c)
+
+            if len(sourceColor) > 3:
+                self._opacity = float(sourceColor[3])
 
         # STRING-BASED COLORS
         elif isinstance(sourceColor, basestring):

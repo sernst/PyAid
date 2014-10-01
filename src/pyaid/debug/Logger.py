@@ -27,18 +27,24 @@ class Logger(object):
 #___________________________________________________________________________________________________ __init__
     def __init__(self, name=None, **kwargs):
         """Initializes settings."""
-        self.timezone    = kwargs.get('timezone', None)
-        self.headerless  = kwargs.get('headerless', False)
-        self._time       = self.getTime()
-        self._timeCode   = self._time.strftime('%y-%U')
-        self._timestamp  = self._time.strftime('%Y|%m|%d|%H|%M|%S')
+        self.timezone            = kwargs.get('timezone', None)
+        self.headerless          = kwargs.get('headerless', False)
+        self.logPath             = kwargs.get('logFolder', None)
+        self.logFileExtension    = kwargs.get('extension', 'log').lstrip('.')
+        self.timestampFileSuffix = kwargs.get('timestampFileSuffix', True)
+        self.removeIfExists      = kwargs.get('removeIfExists', False)
 
-        self._logPath    = kwargs.get('logFolder', None)
-        if self._logPath:
-            self._logPath = FileUtils.cleanupPath(self._logPath)
-
-        self._htmlEscape    = kwargs.get('htmlEscape', False)
-        self._storageBuffer = [] if kwargs.get('useStorageBuffer', False) else None
+        self._time              = self.getTime()
+        self._timeCode          = self._time.strftime('%y-%U')
+        self._timestamp         = self._time.strftime('%Y|%m|%d|%H|%M|%S')
+        self._htmlEscape        = kwargs.get('htmlEscape', False)
+        self._storageBuffer     = [] if kwargs.get('useStorageBuffer', False) else None
+        self._locationPrefix    = kwargs.get('locationPrefix', False)
+        self._traceLogs         = kwargs.get('printOut', False)
+        self._buffer            = []
+        self._hasError          = False
+        self._logPath           = None
+        self._logFile           = None
 
         writeCallbacks = kwargs.get('writeCallbacks', None)
         if writeCallbacks:
@@ -54,37 +60,7 @@ class Logger(object):
         else:
             self._printCallbacks = []
 
-        self._locationPrefix = kwargs.get('locationPrefix', False)
-        self._traceLogs      = kwargs.get('printOut', False)
-        self._buffer         = []
-        self._hasError       = False
-
-        if isinstance(name, basestring) and len(name) > 0:
-            self._name = name
-        elif hasattr(name, '__class__'):
-            try:
-                self._name = name.__class__.__name__
-            except Exception, err:
-                self._name = 'UnknownObject'
-        elif hasattr(name, '__name__'):
-            try:
-                self._name = name.__name__
-            except Exception, err:
-                self._name = 'UnknownClass'
-        else:
-            self._name = 'General'
-
-        logFolder = self.getLogFolder()
-        if logFolder:
-            name = self._name
-            extension = kwargs.get('extension', 'log').lstrip('.')
-            if kwargs.get('timestampFileSuffix', True):
-                name += '_' + self._timeCode
-            self._logFile = FileUtils.createPath(logFolder, name + '.' + extension)
-            if kwargs.get('removeIfExists', False):
-                self.resetLogFile()
-        else:
-            self._logFile = None
+        self._name = self.createLogName(name)
 
 #===================================================================================================
 #                                                                                   G E T / S E T
@@ -95,7 +71,19 @@ class Logger(object):
         return self._logPath
     @loggingPath.setter
     def loggingPath(self, value):
-        self._logPath = value
+        self._logPath = FileUtils.cleanupPath(value)
+
+        logFolder = self.getLogFolder()
+        if logFolder:
+            name = self._name
+            extension = self.logFileExtension
+            if self.timestampFileSuffix:
+                name += '_' + self._timeCode
+            self._logFile = FileUtils.createPath(logFolder, name + '.' + extension)
+            if self.removeIfExists:
+                self.resetLogFile()
+        else:
+            self._logFile = None
 
 #___________________________________________________________________________________________________ GS: storageBuffer
     @property
@@ -261,7 +249,7 @@ class Logger(object):
             except Exception, err:
                 pass
 
-        if sys.platform.startswith('win') and not self._logPath:
+        if not self._logPath:
             self.clear()
             return
 
@@ -272,14 +260,35 @@ class Logger(object):
                     lock.file.write('\n'.join(items))
                     lock.release()
 
-                if not exists:
-                    os.system('chmod 775 ' + self._logFile)
+                try:
+                    if not exists:
+                        os.system('chmod 775 ' + self._logFile)
+                except Exception, err:
+                    pass
 
             except Exception, err:
                 print "LOGGER ERROR: Unable to write log file."
                 print err
 
         self.clear()
+
+#___________________________________________________________________________________________________ createLogName
+    @classmethod
+    def createLogName(cls, name):
+        if isinstance(name, basestring) and len(name) > 0:
+            return name
+        elif hasattr(name, '__class__'):
+            try:
+                return name.__class__.__name__
+            except Exception, err:
+                return 'UnknownObject'
+        elif hasattr(name, '__name__'):
+            try:
+                return name.__name__
+            except Exception, err:
+                return 'UnknownClass'
+        else:
+            return 'General'
 
 #___________________________________________________________________________________________________ getFormattedStackTrace
     @classmethod
@@ -530,7 +539,7 @@ class Logger(object):
     ):
         out = []
         if includePrefix and 'prefix' in logMessage:
-            out.append(logMessage['prefix']) + prefixSeparator
+            out.append(logMessage['prefix'] + prefixSeparator)
 
         out.append(logMessage['log'])
 
