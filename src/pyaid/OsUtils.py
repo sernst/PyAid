@@ -88,7 +88,7 @@ class OsUtils(object):
             return True
 
         if cls.isWindows():
-            return False
+            return cls._getWindowsDpi() > 72.0
 
 #___________________________________________________________________________________________________ getScreenResolution
     @classmethod
@@ -138,9 +138,10 @@ class OsUtils(object):
             except Exception, err:
                 return None
             user32 = ctypes.windll.user32
-            return int(user32.GetSystemMetrics(0)), int(user32.GetSystemMetrics(1))
-
-
+            dpiScale = cls._getWindowsDpi()/72.0
+            return (
+                int(dpiScale*float(user32.GetSystemMetrics(0))),
+                int(dpiScale*float(user32.GetSystemMetrics(1))) )
 
 #===================================================================================================
 #                                                                               P R O T E C T E D
@@ -150,3 +151,24 @@ class OsUtils(object):
     def _getOsxDisplayInfo(cls):
         from pyaid.system.SystemUtils import SystemUtils
         return SystemUtils.executeCommand(['system_profiler', 'SPDisplaysDataType'])
+
+#___________________________________________________________________________________________________ _getWindowsDpi
+    @classmethod
+    def _getWindowsDpi(cls):
+        from pyaid.system.SystemUtils import SystemUtils
+        result = SystemUtils.executeCommand([
+            'wmic', 'DesktopMonitor', 'Get', 'PixelsPerXLogicalInch, PixelsPerYLogicalInch'])
+        if result['code'] or not 'out' in result:
+            return 72.0
+
+        data = result['out'].replace('\r', '').strip().split('\n')[-1].strip()
+        if not data:
+            return 72.0
+
+        if data.find(' ') == -1:
+            return float(data)
+
+        data = re.sub(r'\s{2,}', ' ', data).split(' ')
+        return float(data[0])
+
+
