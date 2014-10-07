@@ -138,10 +138,7 @@ class OsUtils(object):
             except Exception, err:
                 return None
             user32 = ctypes.windll.user32
-            dpiScale = cls._getWindowsDpi()/72.0
-            return (
-                int(dpiScale*float(user32.GetSystemMetrics(0))),
-                int(dpiScale*float(user32.GetSystemMetrics(1))) )
+            return int(user32.GetSystemMetrics(0)), int(user32.GetSystemMetrics(1))
 
 #===================================================================================================
 #                                                                               P R O T E C T E D

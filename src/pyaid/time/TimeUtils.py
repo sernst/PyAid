@@ -179,6 +179,15 @@ class TimeUtils(object):
     def getNowTimecode36(cls, baseTime =0):
         return Base36.to36(cls.getNowSeconds() - baseTime)
 
+#___________________________________________________________________________________________________ getUidTimecode
+    @classmethod
+    def getUidTimecode(cls, prefix =None, suffix =None):
+        """ Creates a timecode down to the microsecond for use in creating unique UIDs. """
+        out = Base64.to64(cls.getNowSeconds()) + u'-' + Base64.to64(datetime.microsecond)
+
+        return ((unicode(prefix) + u'-') if prefix else u'') + out \
+            + ((u'-' + unicode(suffix)) if suffix else u'')
+
 #___________________________________________________________________________________________________ timecodeToFriendlyTimestamp
     @classmethod
     def timecodeToFriendlyTimestamp(cls, timeCode, baseTime =0):
