@@ -253,13 +253,16 @@ class FileUtils(object):
 #___________________________________________________________________________________________________ createPath
     @classmethod
     def createPath(cls, *args, **kwargs):
-        """Doc..."""
-        if not args or args[0] is None:
+        """ Creates a system file path with the structure specified by the args arguments. """
+        if not args:
             return None
 
         src = []
         for item in args:
-            if isinstance(item, list):
+            if not item:
+                continue
+
+            elif isinstance(item, list):
                 src.extend(item)
             else:
                 src.append(item)
