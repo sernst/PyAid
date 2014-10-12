@@ -15,11 +15,25 @@ class SettingsConfig(object):
 #                                                                                       C L A S S
 
 #___________________________________________________________________________________________________ __init__
-    def __init__(self, path, pretty =False):
+    def __init__(self, path =None, pretty =False):
         """Creates a new instance of SettingsConfig."""
         self._path     = path
         self._settings = None
         self._pretty   = pretty
+
+#===================================================================================================
+#                                                                                   G E T / S E T
+
+#___________________________________________________________________________________________________ GS: path
+    @property
+    def path(self):
+        return self._path
+    @path.setter
+    def path(self, value):
+        if self._path == value:
+            return
+        self._path = value
+        self.refresh()
 
 #===================================================================================================
 #                                                                                     P U B L I C
@@ -35,7 +49,7 @@ class SettingsConfig(object):
             return self._settings
 
         if isinstance(key, basestring):
-            key = [key]
+            key = key.split('->')
         value = self._settings
         for k in key:
             if k in value:
@@ -97,7 +111,7 @@ class SettingsConfig(object):
 #___________________________________________________________________________________________________ _updateSetting
     def _updateSetting(self, key, value):
         if isinstance(key, basestring):
-            key = [key]
+            key = key.split('->')
 
         src = self._settings
         for k in key[:-1]:
