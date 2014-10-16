@@ -146,8 +146,8 @@ class FileUtils(object):
 #___________________________________________________________________________________________________ getFilesOnPath
     @classmethod
     def getFilesOnPath(cls, rootPath, recursive =True, **kwargs):
-        """ Returns a listing of the files (and directories is requested) for the given path as
-            absolute path elements.
+        """ Returns a listing of the files (and directories if requested) for the given path as
+            absolute or root-relative path elements as specified by the following arguments.
 
             @@@param rootPath:string
                 The highest level source path on which to list.
@@ -170,9 +170,18 @@ class FileUtils(object):
                 An optional list of file extensions to skip. All extensions not in the list are
                 allowed.
 
-            @@@param allowExtensions:list
+            @@@param allowExtensions:list   : None
                 An optional list of file extensions to include. All extensions not on the list
                 are ignored.
+
+            @@@param absolute:boolean > True
+                When true the paths returned are absolute. When false the paths are returned
+                relative to the root path as a slug, i.e. no leading slash separator.
+
+            @@@param pieces:boolean > False
+                When true the paths are returned in folder pieces. The first piece if the absolute
+                path to the root folder (if absolute is true) and subsequent pieces are the
+                elements to the termainal path element.
         """
 
         return cls._listPath(rootPath, recursive, **kwargs)
@@ -428,11 +437,15 @@ class FileUtils(object):
 #___________________________________________________________________________________________________ _listPath
     @classmethod
     def _listPath(cls, rootPath, recursive, **kwargs):
+        rootPath        = cls.cleanupPath(rootPath, isDir=True)
+        topPath         = ArgsUtils.extract('topPath', rootPath, kwargs)
         listDirs        = ArgsUtils.get('listDirs', False, kwargs)
         skipSVN         = ArgsUtils.get('skipSVN', True, kwargs)
         skips           = ArgsUtils.get('skips', None, kwargs)
         allowExtensions = ArgsUtils.getAsList('allowExtensions', kwargs)
         skipExtensions  = ArgsUtils.getAsList('skipExtensions', kwargs)
+        absolute        = ArgsUtils.get('absolute', True, kwargs)
+        pieces          = ArgsUtils.get('pieces', False, kwargs)
 
         out = []
         for item in os.listdir(rootPath):
@@ -446,7 +459,7 @@ class FileUtils(object):
                 absItem = None
 
                 if recursive:
-                    out += cls._listPath(path, recursive, **kwargs)
+                    out += cls._listPath(path, recursive, topPath=topPath, **kwargs)
 
             elif os.path.isfile(absItem):
                 if skipExtensions and StringUtils.ends(item, skipExtensions):
@@ -455,8 +468,21 @@ class FileUtils(object):
                 if allowExtensions and not StringUtils.ends(item, allowExtensions):
                     continue
 
-            if absItem:
+            if not absItem:
+                continue
+
+            if not pieces and not absolute:
                 out.append(absItem)
+                continue
+
+            relativeItem = absItem[len(topPath):].strip(os.sep).split(os.sep)
+            if absolute:
+                relativeItem.insert(0, topPath)
+
+            if pieces:
+                out.append(relativeItem)
+            else:
+                out.append(os.path.join(*relativeItem))
 
         return out
 

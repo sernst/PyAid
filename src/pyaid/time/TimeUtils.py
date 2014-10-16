@@ -1,5 +1,5 @@
 # TimeUtils.py
-# (C)2011-2013
+# (C)2011-2014
 # Scott Ernst and Eric David Wills
 
 import time
@@ -12,6 +12,28 @@ from pyaid.radix.Base64 import Base64
 #___________________________________________________________________________________________________ TimeUtils
 class TimeUtils(object):
     """A class for time utilities."""
+
+    ZULU_PRECISE_FORMAT = '%Y-%m-%dT%H:%M:%S.000Z'
+
+#___________________________________________________________________________________________________ secondsToDurationTimecode
+    @classmethod
+    def secondsToDurationTimecode(cls, seconds):
+        """ Turns the specified number of seconds (including fractional seconds) into a durational
+            timecode of the format HH:MM:SS.000 """
+
+        time    = seconds
+        hours   = int(float(time)/3600.0)
+        time   -= 3600*hours
+        mins    = int(float(time)/60.0)
+        time   -= 60*mins
+        secs    = int(float(time))
+        time   -= secs
+        millis  = int(round(float(time)*1000.0))
+
+        return unicode(hours).zfill(2) + u':' \
+            + unicode(mins).zfill(2) + u':' \
+            + unicode(secs).zfill(2) + u'.' \
+            + unicode(millis).zfill(3)
 
 #___________________________________________________________________________________________________ utcToLocalDatetime
     @classmethod
@@ -84,9 +106,21 @@ class TimeUtils(object):
         return timestamp.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 #___________________________________________________________________________________________________ getAWSTimestamp
-    @staticmethod
-    def getAWSTimestamp(timestamp):
-        return timestamp.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+    @classmethod
+    def getAWSTimestamp(cls, timestamp):
+        return cls.toZuluPreciseTimestamp(timestamp)
+
+#___________________________________________________________________________________________________ toZuluPreciseTimestamp
+    @classmethod
+    def toZuluPreciseTimestamp(cls, source =None):
+        if not source:
+            source = datetime.utcnow()
+        return source.strftime(cls.ZULU_PRECISE_FORMAT)
+
+#___________________________________________________________________________________________________ fromZuluPreciseTimestamp
+    @classmethod
+    def fromZuluPreciseTimestamp(cls, dateString):
+        datetime.strptime(dateString, cls.ZULU_PRECISE_FORMAT)
 
 #___________________________________________________________________________________________________ getNowSeconds
     @staticmethod

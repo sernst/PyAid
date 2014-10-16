@@ -26,7 +26,7 @@ class JSON(object):
 #___________________________________________________________________________________________________ fromString
     @classmethod
     def fromString(cls, src):
-        return jsonint.loads(src)
+        return jsonint.loads(StringUtils.strToUnicode(src))
 
 #___________________________________________________________________________________________________ fromFile
     @classmethod

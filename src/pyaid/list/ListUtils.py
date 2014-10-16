@@ -15,6 +15,25 @@ class ListUtils(object):
 #===================================================================================================
 #                                                                                      C L A S S
 
+#___________________________________________________________________________________________________ asList
+    @classmethod
+    def asList(cls, target, allowTuples =True):
+        """ Doc... """
+        if isinstance(target, list):
+            return target
+        elif isinstance(target, tuple):
+            return target if allowTuples else list(target)
+        return [target]
+
+#___________________________________________________________________________________________________ asTuple
+    @classmethod
+    def asTuple(cls, target, allowLists =True):
+        if isinstance(target, tuple):
+            return target
+        elif isinstance(target, list):
+            return target if allowLists else tuple(target)
+        return target,
+
 #___________________________________________________________________________________________________ itemsToString
     @classmethod
     def itemsToString(cls, target, inPlace =False):
@@ -194,9 +213,11 @@ class ListUtils(object):
 
 #___________________________________________________________________________________________________ sortDictionaryList
     @staticmethod
-    def sortDictionaryList(source, key):
+    def sortDictionaryList(source, key, inPlace =False):
         """Sorts a list of dictionaries by the specified key."""
-
+        if inPlace:
+            source.sort(key=itemgetter(key))
+            return source
         return sorted(source, key=itemgetter(key))
 
 #___________________________________________________________________________________________________ sortObjectList
