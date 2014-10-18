@@ -47,6 +47,10 @@ class ConfigsDict(object):
 
 #___________________________________________________________________________________________________ add
     def add(self, key, value):
+        return self.set(key, value)
+
+#___________________________________________________________________________________________________ set
+    def set(self, key, value):
         if not key:
             return False
 
