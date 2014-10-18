@@ -46,15 +46,15 @@ class ConfigsDict(object):
 #                                                                                     P U B L I C
 
 #___________________________________________________________________________________________________ add
-    def add(self, key, value):
-        return self.set(key, value)
+    def add(self, key, value, defaultValue =None):
+        return self.set(key, value, defaultValue=defaultValue)
 
 #___________________________________________________________________________________________________ set
-    def set(self, key, value):
+    def set(self, key, value, defaultValue =None):
         if not key:
             return False
 
-        if value is None:
+        if value is None or value == defaultValue:
             self.remove(key)
             return True
 
