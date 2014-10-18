@@ -213,22 +213,24 @@ class ListUtils(object):
 
 #___________________________________________________________________________________________________ sortDictionaryList
     @staticmethod
-    def sortDictionaryList(source, key, inPlace =False):
+    def sortDictionaryList(source, key, inPlace =False, reversed =False):
         """Sorts a list of dictionaries by the specified key."""
         if inPlace:
-            source.sort(key=itemgetter(key))
+            source.sort(key=itemgetter(key), reverse=reversed)
             return source
-        return sorted(source, key=itemgetter(key))
+        return sorted(source, key=itemgetter(key), reverse=reversed)
 
 #___________________________________________________________________________________________________ sortObjectList
     @staticmethod
-    def sortObjectList(source, prop):
+    def sortObjectList(source, property, inPlace = False, reversed =False):
         """ Sorts the specified source list of object instances (i.e. new type class instances) by
             the specified property and returns the sorted source list.
         """
+        if inPlace:
+            source.sort(key=attrgetter(property), reverse=reversed)
+            return source
 
-        source.sort(key = attrgetter(prop))
-        return source
+        return sorted(source, key=attrgetter(property), reverse=reversed)
 
 #___________________________________________________________________________________________________ compare
     @classmethod

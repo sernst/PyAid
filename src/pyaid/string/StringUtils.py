@@ -35,6 +35,7 @@ class StringUtils:
         """ Normalizes string, converts to lowercase, removes non-alpha characters,
             and converts spaces to hyphens. Useful in creating safe filenames. """
 
+        source = cls.strToUnicode(source)
         source = unicodedata.normalize('NFKD', source).encode('ascii', 'ignore')
         return unicode(re.sub('[^\w\s-]', '', source).strip().lower())
 
