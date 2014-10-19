@@ -229,7 +229,7 @@ class TimeUtils(object):
 
 #___________________________________________________________________________________________________ secondsToDatetime
     @staticmethod
-    def secondsToDatetime(s):
+    def secondsToDatetime(s, isUtc =True):
         """ Returns a datetime for the specified number of seconds since the Unix Epoch.
 
             @@@param s:int
@@ -237,8 +237,9 @@ class TimeUtils(object):
 
             @@@return datetime
         """
-
-        return datetime.utcfromtimestamp(s)
+        if isUtc:
+            return datetime.utcfromtimestamp(s)
+        return datetime.fromtimestamp(s)
 
 #___________________________________________________________________________________________________ getAWSAccessTimestamp
     @staticmethod
@@ -273,3 +274,51 @@ class TimeUtils(object):
         if not dt:
             dt = datetime.utcnow()
         return dt.strftime('%Y%m%d%H%M%S')
+
+#___________________________________________________________________________________________________ toPrettyTime
+    @classmethod
+    def toPrettyElapsedTime(cls, elapsedMilliseconds):
+        """ Returns a pretty elapsed time based on the number of milliseconds elapsed argument. """
+        t = elapsedMilliseconds
+        if t == 0:
+            return u'0'
+
+        hasMinutes = False
+        hasSeconds = False
+
+        out = u''
+        if t >= 60000:
+            hasMinutes = True
+            cVal  = int(float(t)/60000.0)
+            s     = unicode(cVal)
+            t -= cVal*60000
+
+            if t == 0:
+                return s + u' min' + (u's' if cVal > 1 else u'')
+
+            s = s.zfill(2)
+            out  += s + u':'
+
+        if t >= 1000:
+            hasSeconds = True
+            cVal  = int(float(t)/1000.0)
+            s     = unicode(cVal)
+            t -= cVal*1000
+
+            if t == 0 and not hasMinutes:
+                return s + u' sec' + (u's' if cVal > 1 else u'')
+
+            s = s.zfill(2)
+            out += s
+        elif hasMinutes:
+            out += u'00'
+
+        if t == 0:
+            return out
+
+        s = unicode(round(t))
+        if not hasMinutes and not hasSeconds:
+            return s + u' ms'
+
+        s = s.zfill(2)
+        return out + u'.' + s
