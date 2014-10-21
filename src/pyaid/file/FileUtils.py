@@ -1,5 +1,5 @@
 # FileUtils.py
-# (C)2011-2013
+# (C)2011-2014
 # Scott Ernst
 
 from __future__ import absolute_import
@@ -24,6 +24,19 @@ class FileUtils(object):
 
 #===================================================================================================
 #                                                                                     P U B L I C
+
+#___________________________________________________________________________________________________ getPathToParentFolder
+    @classmethod
+    def getPathToParentFolder(cls, path, parentFolderName, offset =0):
+        """getPathToParentFolder doc..."""
+        parts = path.strip(os.sep).split(os.sep)
+        for i in range(len(parts)):
+            if parts[i] == parentFolderName:
+                parts = parts[:(i + 1 + offset)]
+                if path.startswith(os.sep):
+                    parts[0] = os.sep + parts[0]
+                return FileUtils.createPath(*parts, isDir=True)
+        return None
 
 #___________________________________________________________________________________________________ cleanFilename
     @classmethod
