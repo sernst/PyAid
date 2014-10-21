@@ -279,7 +279,7 @@ class TimeUtils(object):
     @classmethod
     def toPrettyElapsedTime(cls, elapsedMilliseconds):
         """ Returns a pretty elapsed time based on the number of milliseconds elapsed argument. """
-        t = elapsedMilliseconds
+        t = int(elapsedMilliseconds)
         if t == 0:
             return u'0'
 

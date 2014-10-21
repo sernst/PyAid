@@ -184,8 +184,10 @@ class Logger(object):
         """Prints s to standard output and a log file."""
 
         out = self.createLogMessage(
-            s, traceStack, shaveStackTrace,
-            self._htmlEscape if htmlEscape is None else htmlEscape,
+            logValue=s,
+            traceStack=traceStack,
+            shaveStackTrace=shaveStackTrace,
+            htmlEscape=self._htmlEscape if htmlEscape is None else htmlEscape,
             prefix=self.getPrefix() if self.headerless else None)
 
         if self._traceLogs:
@@ -413,7 +415,7 @@ class Logger(object):
                 error = '[[UNABLE TO PARSE]]'
 
         try:
-            es = (cls.formatAsString(message) + "\n    Type: %s\n    Value: %s\nError: %s\n") \
+            es = (cls.formatAsString(message) + "\n    TYPE: %s\n    VALUE: %s\nERROR: %s\n") \
                % (errorType, errorValue, error)
         except Exception, err:
             try:
@@ -462,7 +464,10 @@ class Logger(object):
     @classmethod
     def traceLogMessage(cls, logMessage, callbacks =None, callbackTarget =None):
 
-        out = cls.asAscii(logMessage['log'])
+        log = logMessage['log']
+        if 'stack' in logMessage:
+            log += logMessage['stack']
+        out = cls.asAscii(log)
         print out
 
         try:
