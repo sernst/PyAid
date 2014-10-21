@@ -67,6 +67,7 @@ class SystemUtils(object):
 #___________________________________________________________________________________________________ executeForStatus
     @classmethod
     def executeForStatus(cls, cmd, critical =None, shell =True, raiseExceptions =True):
+        """ Returns true if the command executed successfully. """
         if shell and not isinstance(cmd, basestring):
             cmd = ' '.join(cmd)
 

@@ -84,7 +84,7 @@ class SystemCommandIssuer(object):
         else:
             print 'FAILED'
 
-        if stat:
+        if not stat:
             if critical or (critical is None and self._raiseCommandExceptions):
                 raise Exception, 'Command execution failed'
             else:
