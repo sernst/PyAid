@@ -1,10 +1,13 @@
 # S3Bucket.py
-# (C)2013
+# (C)2013-2014
 # Scott Ernst
 
 import os
 import gzip
 import tempfile
+import base64
+import hmac
+import hashlib
 
 from boto.s3.connection import S3Connection
 from boto.s3.bucket import Bucket
@@ -24,6 +27,15 @@ class S3Bucket(object):
 
     PUBLIC_READ = 'public-read'
     PRIVATE     = 'private'
+
+    _UPLOAD_CONDITIONS = [
+        u'{"bucket":"%(bucket)s"}',
+        u'{"acl":"private"}',
+        u'{"key":"%(key)s"}',
+        u'{"success_action_status":"200"}',
+        u'["content-length-range", 0, %(maxSize)s]' ]
+
+    _UPLOAD_POLICY = u'{"expiration":"%s", "conditions":[%s]}'
 
 #___________________________________________________________________________________________________ __init__
     def __init__(self, bucketName, awsId, awsSecret):
@@ -45,6 +57,11 @@ class S3Bucket(object):
 
 #===================================================================================================
 #                                                                                     P U B L I C
+
+#___________________________________________________________________________________________________ generateUrl
+    def generateUrl(self, key, secure =True):
+        """makeUrl doc..."""
+        return self._bucket.get_key(key_name=key).generate_url(force_http=not secure)
 
 #___________________________________________________________________________________________________ listKeys
     def listKeys(self, path, pathFilter =None, includeDirs =True, includeFiles =True):
@@ -163,9 +180,30 @@ class S3Bucket(object):
         return True
 
 #___________________________________________________________________________________________________ generateExpiresUrl
-    def generateExpiresUrl(self, key, expiresAtDateTime):
+    def generateExpiresUrl(self, key, expiresAtDateTime, secure =True):
         delta = TimeUtils.datetimeToSeconds(expiresAtDateTime) - TimeUtils.getNowSeconds()
-        return self._bucket.get_key(key_name=key).generate_url(expires_in=delta, force_http=True)
+        return self._bucket.get_key(key_name=key).generate_url(
+            expires_in=delta,
+            force_http=not secure)
+
+#___________________________________________________________________________________________________ createUploadPolicy
+    def createUploadPolicy(self, key, durationSeconds, maxSizeBytes):
+        """Returns a S3 upload policy and signature for this bucket with the specified key. """
+
+        expires    = TimeUtils.getAWSTimestamp(TimeUtils.getNowDatetime(durationSeconds))
+        conditions = (', '.join(self._UPLOAD_CONDITIONS) % {
+            'bucket':self.bucketName,
+            'key':key,
+            'maxSize':maxSizeBytes})
+
+        policyDoc = self._UPLOAD_POLICY % (expires, conditions)
+        policy = base64.b64encode(policyDoc.replace('\n', ''))
+
+        return dict(
+            url=self.generateUrl(key, secure=True),
+            policyDoc=policyDoc,
+            policy=policy,
+            signature=base64.b64encode(hmac.new(self._awsSecret, policy, hashlib.sha1).digest()) )
 
 #===================================================================================================
 #                                                                               P R O T E C T E D

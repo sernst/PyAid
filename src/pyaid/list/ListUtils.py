@@ -23,6 +23,8 @@ class ListUtils(object):
             return target
         elif isinstance(target, tuple):
             return target if allowTuples else list(target)
+        elif target is None:
+            return []
         return [target]
 
 #___________________________________________________________________________________________________ asTuple
@@ -32,6 +34,8 @@ class ListUtils(object):
             return target
         elif isinstance(target, list):
             return target if allowLists else tuple(target)
+        elif target is None:
+            return None
         return target,
 
 #___________________________________________________________________________________________________ itemsToString
