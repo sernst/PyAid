@@ -16,6 +16,21 @@ class DictUtils(object):
 #===================================================================================================
 #                                                                                       C L A S S
 
+#___________________________________________________________________________________________________ copyTo
+    @classmethod
+    def copyTo(cls, source, destination, overwrite =False):
+        """copyTop doc..."""
+        if not source:
+            return destination
+        if destination is None:
+            destination = dict()
+
+        for key, value in source.iteritems():
+            if not overwrite and key in destination:
+                continue
+            destination[key] = value
+        return destination
+
 #___________________________________________________________________________________________________ merge
     @classmethod
     def merge(cls, a, b):
