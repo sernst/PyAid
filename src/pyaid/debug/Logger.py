@@ -29,7 +29,6 @@ class Logger(object):
         """Initializes settings."""
         self.timezone            = kwargs.get('timezone', None)
         self.headerless          = kwargs.get('headerless', False)
-        self.logPath             = kwargs.get('logFolder', None)
         self.logFileExtension    = kwargs.get('extension', 'log').lstrip('.')
         self.timestampFileSuffix = kwargs.get('timestampFileSuffix', True)
         self.removeIfExists      = kwargs.get('removeIfExists', False)
@@ -61,6 +60,7 @@ class Logger(object):
             self._printCallbacks = []
 
         self._name = self.createLogName(name)
+        self.loggingPath = kwargs.get('logFolder', None)
 
 #===================================================================================================
 #                                                                                   G E T / S E T

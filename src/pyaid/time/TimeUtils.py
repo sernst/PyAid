@@ -105,6 +105,12 @@ class TimeUtils(object):
     def getSolrTimestamp(timestamp):
         return timestamp.strftime('%Y-%m-%dT%H:%M:%SZ')
 
+#___________________________________________________________________________________________________ getAwsTimestampV4
+    @classmethod
+    def getAwsTimestampV4(cls, timestamp):
+        """getAwsTimestampV4 doc..."""
+        return timestamp.strftime('%Y-%m-%dT%H:%M:%SZ')
+
 #___________________________________________________________________________________________________ getAWSTimestamp
     @classmethod
     def getAWSTimestamp(cls, timestamp):

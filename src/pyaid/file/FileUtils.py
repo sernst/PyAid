@@ -272,6 +272,20 @@ class FileUtils(object):
 
         return fl
 
+#___________________________________________________________________________________________________ makeFilePath
+    @classmethod
+    def makeFilePath(cls, *args, **kwargs):
+        """createFilePath doc..."""
+        kwargs['isFile'] = True
+        return self.createPath(*args, **kwargs)
+
+#___________________________________________________________________________________________________ makeFolderPath
+    @classmethod
+    def makeFolderPath(cls, *args, **kwargs):
+        """createFolderPath doc..."""
+        kwargs['isDir'] = True
+        return self.createPath(*args, **kwargs)
+
 #___________________________________________________________________________________________________ createPath
     @classmethod
     def createPath(cls, *args, **kwargs):

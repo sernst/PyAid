@@ -2,6 +2,7 @@
 # (C)2013-2014
 # Scott Ernst
 
+from datetime import datetime
 import os
 import gzip
 import tempfile
@@ -9,6 +10,8 @@ import base64
 import hmac
 import hashlib
 
+from boto import s3
+from boto.s3.connection import Location
 from boto.s3.connection import S3Connection
 from boto.s3.bucket import Bucket
 from boto.s3.key import Key
@@ -25,6 +28,7 @@ class S3Bucket(object):
 #===================================================================================================
 #                                                                                       C L A S S
 
+    LOCATIONS   = Location
     PUBLIC_READ = 'public-read'
     PRIVATE     = 'private'
 
@@ -33,19 +37,28 @@ class S3Bucket(object):
         u'{"acl":"private"}',
         u'{"key":"%(key)s"}',
         u'{"success_action_status":"200"}',
-        u'["content-length-range", 0, %(maxSize)s]' ]
+        u'["content-length-range", 0, %(maxSize)s]',
+        u'{"x-amz-meta-uuid": "14365123651274"}',
+        u'["starts-with", "$x-amz-meta-tag", ""]',
+        u'{"x-amz-algorithm": "AWS4-HMAC-SHA256"}',
+        u'{"x-amz-credential": "%(awsid)/%{isoDate}/%{region}/s3/aws4_request"}'
+        u'{"x-amz-date": "%{isoDate}T000000Z" }']
 
     _UPLOAD_POLICY = u'{"expiration":"%s", "conditions":[%s]}'
 
 #___________________________________________________________________________________________________ __init__
-    def __init__(self, bucketName, awsId, awsSecret):
+    def __init__(self, bucketName, awsId, awsSecret, location =None):
         """Creates a new instance of S3Bucket."""
         self._bucketName = bucketName
         self._awsId      = awsId
         self._awsSecret  = awsSecret
 
+        if location:
+            self._conn = s3.connect_to_region(location, )
+
         self._conn   = S3Connection(self._awsId, self._awsSecret)
         self._bucket = Bucket(self._conn, bucketName)
+
 
 #===================================================================================================
 #                                                                                   G E T / S E T
@@ -59,9 +72,21 @@ class S3Bucket(object):
 #                                                                                     P U B L I C
 
 #___________________________________________________________________________________________________ generateUrl
-    def generateUrl(self, key, secure =True):
+    def generateUrl(self, key, secure =True, expires =0):
         """makeUrl doc..."""
-        return self._bucket.get_key(key_name=key).generate_url(force_http=not secure)
+        if expires == 0:
+            proto = 'http'
+            if secure:
+                proto += 's'
+            return proto + '://' + self._bucket.get_website_endpoint() + '/' + key
+
+        result = self._bucket.get_key(key_name=key)
+        if not result:
+            return None
+        return result.generate_url(
+            expires_in=expires,
+            query_auth=bool(expires > 0),
+            force_http=not secure)
 
 #___________________________________________________________________________________________________ listKeys
     def listKeys(self, path, pathFilter =None, includeDirs =True, includeFiles =True):
@@ -189,21 +214,12 @@ class S3Bucket(object):
 #___________________________________________________________________________________________________ createUploadPolicy
     def createUploadPolicy(self, key, durationSeconds, maxSizeBytes):
         """Returns a S3 upload policy and signature for this bucket with the specified key. """
-
-        expires    = TimeUtils.getAWSTimestamp(TimeUtils.getNowDatetime(durationSeconds))
-        conditions = (', '.join(self._UPLOAD_CONDITIONS) % {
-            'bucket':self.bucketName,
-            'key':key,
-            'maxSize':maxSizeBytes})
-
-        policyDoc = self._UPLOAD_POLICY % (expires, conditions)
-        policy = base64.b64encode(policyDoc.replace('\n', ''))
-
-        return dict(
-            url=self.generateUrl(key, secure=True),
-            policyDoc=policyDoc,
-            policy=policy,
-            signature=base64.b64encode(hmac.new(self._awsSecret, policy, hashlib.sha1).digest()) )
+        return self._conn.build_post_form_args(
+            bucket_name=self.bucketName,
+            key=key,
+            expires_in=durationSeconds,
+            acl='private',
+            max_content_length=maxSizeBytes)
 
 #===================================================================================================
 #                                                                               P R O T E C T E D
