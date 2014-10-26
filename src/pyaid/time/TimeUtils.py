@@ -13,10 +13,28 @@ from pyaid.radix.Base64 import Base64
 class TimeUtils(object):
     """A class for time utilities."""
 
-    ZULU_PRECISE_FORMAT = '%Y-%m-%dT%H:%M:%S'
-    ZULU_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+    ISO_8601_DATE = '%Y-%m-%d'
+    ISO_8601_WEEK = '%Y-W%W'
+    ISO_8601_WEEK_DATE = '%Y-W%W-%d'
+    ISO_8601_ORDINAL_DATE = '%Y-%j'
 
-    RANGE_FORMAT = '%'
+    ZULU_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+    _ZULU_PRECISE_FORMAT = '%Y-%m-%dT%H:%M:%S'
+
+#___________________________________________________________________________________________________ toFormat
+    @classmethod
+    def toFormat(cls, dateFormat, value =None, dateSeparator ='-', timeSeparator =':'):
+        """toFormat doc..."""
+        if not value:
+            value = datetime.utcnow()
+        return value.strftime(dateFormat.replace('-', dateSeparator).replace(':', timeSeparator))
+
+#___________________________________________________________________________________________________ fromFormat
+    @classmethod
+    def fromFormat(cls, dateFormat, value, dateSeparator ='-', timeSeparator =':'):
+        """fromFormat doc..."""
+        return datetime.strptime(
+            value, dateFormat.replace('-', dateSeparator).replace(':', timeSeparator))
 
 #___________________________________________________________________________________________________ secondsToDurationTimecode
     @classmethod
@@ -138,7 +156,7 @@ class TimeUtils(object):
     def toZuluPreciseTimestamp(cls, source =None):
         if not source:
             source = datetime.utcnow()
-        out = source.strftime(cls.ZULU_PRECISE_FORMAT)
+        out = source.strftime(cls._ZULU_PRECISE_FORMAT)
         out + '.' + str(source.microsecond)[:3] + 'Z'
         return out
 
@@ -147,7 +165,7 @@ class TimeUtils(object):
     def fromZuluPreciseTimestamp(cls, dateString):
         quotient  = dateString[:-5]
         remainder = dateString[-4:-1] + '000'
-        out = datetime.strptime(quotient, cls.ZULU_PRECISE_FORMAT)
+        out = datetime.strptime(quotient, cls._ZULU_PRECISE_FORMAT)
         out.microsecond = int(remainder)
         return out
 
