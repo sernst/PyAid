@@ -13,7 +13,10 @@ from pyaid.radix.Base64 import Base64
 class TimeUtils(object):
     """A class for time utilities."""
 
-    ZULU_PRECISE_FORMAT = '%Y-%m-%dT%H:%M:%S.000Z'
+    ZULU_PRECISE_FORMAT = '%Y-%m-%dT%H:%M:%S'
+    ZULU_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+
+    RANGE_FORMAT = '%'
 
 #___________________________________________________________________________________________________ secondsToDurationTimecode
     @classmethod
@@ -116,17 +119,37 @@ class TimeUtils(object):
     def getAWSTimestamp(cls, timestamp):
         return cls.toZuluPreciseTimestamp(timestamp)
 
+#___________________________________________________________________________________________________ toZuluFormat
+    @classmethod
+    def toZuluFormat(cls, source =None):
+        """toZuluFormat doc..."""
+        if not source:
+            source = datetime.utcnow()
+        return  source.strftime(cls.ZULU_FORMAT)
+
+#___________________________________________________________________________________________________ fromZuluFormat
+    @classmethod
+    def fromZuluFormat(cls, dateString):
+        """fromZuluFormat doc..."""
+        datetime.strptime(dateString, cls.ZULU_FORMAT)
+
 #___________________________________________________________________________________________________ toZuluPreciseTimestamp
     @classmethod
     def toZuluPreciseTimestamp(cls, source =None):
         if not source:
             source = datetime.utcnow()
-        return source.strftime(cls.ZULU_PRECISE_FORMAT)
+        out = source.strftime(cls.ZULU_PRECISE_FORMAT)
+        out + '.' + str(source.microsecond)[:3] + 'Z'
+        return out
 
 #___________________________________________________________________________________________________ fromZuluPreciseTimestamp
     @classmethod
     def fromZuluPreciseTimestamp(cls, dateString):
-        datetime.strptime(dateString, cls.ZULU_PRECISE_FORMAT)
+        quotient  = dateString[:-5]
+        remainder = dateString[-4:-1] + '000'
+        out = datetime.strptime(quotient, cls.ZULU_PRECISE_FORMAT)
+        out.microsecond = int(remainder)
+        return out
 
 #___________________________________________________________________________________________________ getNowSeconds
     @staticmethod
@@ -328,3 +351,35 @@ class TimeUtils(object):
 
         s = s.zfill(2)
         return out + u'.' + s
+
+#___________________________________________________________________________________________________ differsByDays
+    @classmethod
+    def differsByDays(cls, timeA, timeB, dayDelta):
+        """ Computes the difference between the two datetime objects and returns a boolean, which
+            is true if the absolute number of days between the two datetimes is greater than or
+            equal to the specified delta value. """
+        return bool(abs((timeA - timeB).total_seconds()) >= 86400*dayDelta)
+
+#___________________________________________________________________________________________________ differsByHours
+    @classmethod
+    def differsByHours(cls, timeA, timeB, hourDelta):
+        """ Computes the difference between the two datetime objects and returns a boolean, which
+            is true if the absolute number of hours between the two datetimes is greater than or
+            equal to the specified delta value. """
+        return bool(abs((timeA - timeB).total_seconds()) >= 3600*hourDelta)
+
+#___________________________________________________________________________________________________ differsBySeconds
+    @classmethod
+    def differsByMinutes(cls, timeA, timeB, minuteDelta):
+        """ Computes the difference between the two datetime objects and returns a boolean, which
+            is true if the absolute number of minutes between the two datetimes is greater than or
+            equal to the specified delta value. """
+        return bool(abs((timeA - timeB).total_seconds()) >= 60*minuteDelta)
+
+#___________________________________________________________________________________________________ differsBySeconds
+    @classmethod
+    def differsBySeconds(cls, timeA, timeB, secondDelta):
+        """ Computes the difference between the two datetime objects and returns a boolean, which
+            is true if the absolute number of seconds between the two datetimes is greater than or
+            equal to the specified delta value. """
+        return bool(abs((timeA - timeB).total_seconds()) >= secondDelta)
