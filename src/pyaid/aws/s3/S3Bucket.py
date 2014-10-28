@@ -77,7 +77,7 @@ class S3Bucket(object):
             seconds. Alternatively you can specifiy the expiresInHours or expiresInDays for easy
             conversion to alternate time periods. """
         if not expires:
-            if expiresHours:
+            if expiresInHours:
                 expires = int(3600.0*expiresInHours)
             elif expiresInDays:
                 expires = int(24.0*3600.0*expiresInDays)
