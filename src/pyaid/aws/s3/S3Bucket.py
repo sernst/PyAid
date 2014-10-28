@@ -72,16 +72,24 @@ class S3Bucket(object):
 #                                                                                     P U B L I C
 
 #___________________________________________________________________________________________________ generateUrl
-    def generateUrl(self, key, secure =True, expires =0):
-        """makeUrl doc..."""
+    def generateUrl(self, keyName, secure =True, expires =0, expiresInHours =0, expiresInDays =0):
+        """ Creates a url for the specified key name that expires in the specified number of
+            seconds. Alternatively you can specifiy the expiresInHours or expiresInDays for easy
+            conversion to alternate time periods. """
+        if not expires:
+            if expiresHours:
+                expires = int(3600.0*expiresInHours)
+            elif expiresInDays:
+                expires = int(24.0*3600.0*expiresInDays)
+
         if expires == 0:
             proto = 'http'
             if secure:
                 proto += 's'
-            return proto + '://' + self._bucket.get_website_endpoint() + '/' + key
+            return proto + '://' + self._bucket.get_website_endpoint() + '/' + keyName.lstrip('/')
 
-        result = self.getKey(key, createIfMissing=True)
-        return result.generate_url(
+        key = self.getKey(keyName, createIfMissing=True)
+        return key.generate_url(
             expires_in=expires,
             query_auth=bool(expires > 0),
             force_http=not secure)

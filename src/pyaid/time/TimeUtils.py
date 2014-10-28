@@ -158,7 +158,7 @@ class TimeUtils(object):
     @classmethod
     def fromZuluFormat(cls, dateString):
         """fromZuluFormat doc..."""
-        datetime.strptime(dateString, cls.ZULU_FORMAT)
+        return datetime.strptime(dateString, cls.ZULU_FORMAT)
 
 #___________________________________________________________________________________________________ toZuluPreciseTimestamp
     @classmethod
