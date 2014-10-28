@@ -5,6 +5,7 @@
 import time
 import calendar
 from datetime import datetime, timedelta
+from datetime import time as dtTime
 
 from pyaid.radix.Base36 import Base36
 from pyaid.radix.Base64 import Base64
@@ -28,6 +29,14 @@ class TimeUtils(object):
         if not value:
             value = datetime.utcnow()
         return value.strftime(dateFormat.replace('-', dateSeparator).replace(':', timeSeparator))
+
+#___________________________________________________________________________________________________ secondsSinceMidnight
+    @classmethod
+    def secondsSinceMidnight(cls, dt =None):
+        """secondsSinceMidnight doc..."""
+        if dt is None:
+            dt = datetime.utcnow()
+        return (datetime.combine(dt.date(), dtTime(0, 0)) - dt).seconds
 
 #___________________________________________________________________________________________________ fromFormat
     @classmethod

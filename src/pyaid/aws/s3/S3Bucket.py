@@ -80,9 +80,7 @@ class S3Bucket(object):
                 proto += 's'
             return proto + '://' + self._bucket.get_website_endpoint() + '/' + key
 
-        result = self._bucket.get_key(key_name=key)
-        if not result:
-            return None
+        result = self.getKey(key, createIfMissing=True)
         return result.generate_url(
             expires_in=expires,
             query_auth=bool(expires > 0),
