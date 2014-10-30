@@ -29,6 +29,15 @@ class StringUtils:
 
     _SOLO_BACKSLASH_PATTERN = re.compile('(?<!\\\)\\\(?!\\\)')
 
+#___________________________________________________________________________________________________ capitalizeWords
+    @classmethod
+    def capitalizeWords(cls, source):
+        """capitalizeWords doc..."""
+        try:
+            return source.title()
+        except Exception, err:
+            return unicode(source).title()
+
 #___________________________________________________________________________________________________ source
     @classmethod
     def slugify(cls, source):

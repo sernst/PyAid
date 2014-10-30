@@ -7,6 +7,10 @@ import math
 import numbers
 
 #___________________________________________________________________________________________________ ColorValue
+from pyaid.color.ColorNames import ColorNames
+from pyaid.string.StringUtils import StringUtils
+
+
 class ColorValue(object):
     """A class for working with colors in various color spaces."""
 
@@ -369,6 +373,42 @@ class ColorValue(object):
 #===================================================================================================
 #                                                                                     P U B L I C
 
+#___________________________________________________________________________________________________ getColorNameAndValue
+    def getColorNameAndValue(self):
+        """ Finds the nearest named color by comparing all named colors """
+        if self._rawColor == 0:
+            return {
+                'name':'Black',
+                'value':0,
+                'key':'black',
+                'residual':0.0 }
+
+        nearestValue = None
+        nearestName  = None
+        range   = 3.0*511.0
+        myRed   = float((self._rawColor >> 16) & 0xFF)
+        myGreen = float((self._rawColor >> 8) & 0xFF)
+        myBlue  = float(self._rawColor & 0xFF)
+        for name, value in ColorNames.NAMES.iteritems():
+            vRed   = float((value >> 16) & 0xFF)
+            vGreen = float((value >> 8) & 0xFF)
+            vBlue  = float(value & 0xFF)
+            test   = (myRed - vRed)*(myRed - vRed) \
+                + (myGreen - vGreen)*(myGreen - vGreen) \
+                + (myBlue - vBlue)*(myBlue - vBlue)
+            if test < range:
+                nearestValue = value
+                nearestName  = name
+                range        = test
+            if range < 1:
+                break
+
+        return {
+            'name':StringUtils.capitalizeWords(nearestName.replace('_', ' ')),
+            'value':nearestValue,
+            'key':nearestName,
+            'residual':range/(3.0*511.0) }
+
 #___________________________________________________________________________________________________ toDict
     def toDict(self):
         return self.createDict(color=self._rawColor, alpha=self._opacity)
@@ -380,8 +420,18 @@ class ColorValue(object):
 
 #___________________________________________________________________________________________________ fromDict
     def fromDict(self, value):
-        self._rawColor = value['color']
-        self._opacity  = value['alpha']
+        if 'alpha' in value:
+            self._opacity = value.get('alpha', 1.0)
+        elif 'opacity' in value:
+            self._opacity = value.get('opacity', 1.0)
+        else:
+            self._opacity = 1.0
+
+        v = value.get('color')
+        if isinstance(v, (int, long)):
+            self._rawColor = int(v)
+        else:
+            self.load(v)
 
 #___________________________________________________________________________________________________ copyFrom
     def copyFrom(self, color):
@@ -389,7 +439,7 @@ class ColorValue(object):
 
 #___________________________________________________________________________________________________ load
     def load(self, value, normalized =False):
-        return self._setColor(value, normalized =False)
+        return self._setColor(value, normalized=normalized)
 
 #___________________________________________________________________________________________________ __str__
     def __str___(self):
@@ -720,9 +770,17 @@ class ColorValue(object):
 #___________________________________________________________________________________________________ rgbToInt
     @classmethod
     def rgbToInt(cls, rgb, normalized =False):
-        r = float(rgb.get('r', 0.0))
-        g = float(rgb.get('g', 0.0))
-        b = float(rgb.get('b', 0.0))
+        try:
+            r = float(rgb.get('r', 0.0))
+            g = float(rgb.get('g', 0.0))
+            b = float(rgb.get('b', 0.0))
+        except Exception, err:
+            try:
+                r = float(rgb[0])
+                g = float(rgb[1])
+                b = float(rgb[2])
+            except Exception, err:
+                return 0
 
         if normalized:
             r *= 255.0
@@ -915,6 +973,11 @@ class ColorValue(object):
 
         # RGB, HSV, OR HSL DICT COLOR
         elif isinstance(sourceColor, dict):
+            for key in ['a', 'alpha', 'o', 'opacity']:
+                if key in sourceColor:
+                    self._opacity = float(sourceColor[key])
+                    break
+
             if 'l' in sourceColor:
                 self._rawColor = cls.hslToInt(sourceColor, normalized)
             if 'h' in sourceColor or 's' in sourceColor or 'v' in sourceColor:
@@ -1018,6 +1081,6 @@ class ColorValue(object):
     def _parseUnknownColorString(self, value):
         from pyaid.color.ColorNames import ColorNames
         value = value.strip().lower().replace(u' ', u'')
-        if value in ColorNames.NAMES:
-            return ColorNames.NAMES[value]
+        if value in ColorNames.CLEAN_NAMES:
+            return ColorNames.CLEAN_NAMES[value]
         return None
