@@ -1,8 +1,9 @@
 # Base36.py
-# (C)2010-2013
+# (C)2010-2014
 # Scott Ernst and Eric David Wills
 
 import re
+import uuid
 
 #___________________________________________________________________________________________________ Base36
 class Base36(object):
