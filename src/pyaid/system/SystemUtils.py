@@ -301,7 +301,7 @@ class SystemUtils(object):
             try:
                 shutil.rmtree(path)
             except Exception, err1:
-                originalError = err
+                originalError = err1
                 try:
                     os.rmdir(path)
                 except Exception, err2:
