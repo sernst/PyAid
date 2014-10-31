@@ -6,10 +6,9 @@ import sys
 
 # AS NEEDED: from pyaid.list.ListUtils import ListUtils
 
-#___________________________________________________________________________________________________ DictUtils
 from pyaid.string.StringUtils import StringUtils
 
-
+#___________________________________________________________________________________________________ DictUtils
 class DictUtils(object):
     """A class for..."""
 
