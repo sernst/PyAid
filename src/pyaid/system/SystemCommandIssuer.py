@@ -221,4 +221,4 @@ class SystemCommandIssuer(object):
 
 #___________________________________________________________________________________________________ _listDir
     def _listDir(self, path =None, dirs =True, files =True, absolute =True):
-        return SystemUtils.listDir(path=path, dirs=dirs, files=file, absolute=absolute)
+        return SystemUtils.listDir(path=path, dirs=dirs, files=files, absolute=absolute)
