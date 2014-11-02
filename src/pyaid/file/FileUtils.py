@@ -13,6 +13,7 @@ from datetime import datetime
 from collections import namedtuple
 
 from pyaid.ArgsUtils import ArgsUtils
+from pyaid.OsUtils import OsUtils
 from pyaid.file.FileList import FileList
 from pyaid.string.StringUtils import StringUtils
 
@@ -408,6 +409,31 @@ class FileUtils(object):
     @classmethod
     def createWalkData(cls, rootPath =None, folder =None, names =None, data =None):
         return cls.WALK_DATA_NT(rootPath, folder, names, data)
+
+#___________________________________________________________________________________________________ openFolderInSystemDisplay
+    @classmethod
+    def openFolderInSystemDisplay(cls, path):
+        """ Opens the specified folder (or the folder containing the specified file) in Explorer,
+            Finder, or File Viewer depending on the platform. """
+        if not os.path.exists(path):
+            return False
+        if not os.path.isdir(path):
+            path = cls.getDirectoryOf(path)
+        path = path.rstrip(os.sep)
+
+        if OsUtils.isWindows():
+            os.startfile(path)
+            return True
+
+        if OsUtils.isMac():
+            os.system('open "%s"' % path)
+            return True
+
+        try:
+            os.system('xdg-open "%s"' % path)
+            return True
+        except Exception, err:
+            return False
 
 #===================================================================================================
 #                                                                               P R O T E C T E D
