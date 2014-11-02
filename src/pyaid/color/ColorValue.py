@@ -383,19 +383,19 @@ class ColorValue(object):
                 'key':'black',
                 'residual':0.0 }
 
+        maxRange = 560.0
         nearestValue = None
         nearestName  = None
-        range   = 3.0*511.0
-        myRed   = float((self._rawColor >> 16) & 0xFF)
-        myGreen = float((self._rawColor >> 8) & 0xFF)
-        myBlue  = float(self._rawColor & 0xFF)
+        range   = 360
+        myColor = self.asHsl(output=list)
+        poolColor = self.__class__(0)
         for name, value in ColorNames.NAMES.iteritems():
-            vRed   = float((value >> 16) & 0xFF)
-            vGreen = float((value >> 8) & 0xFF)
-            vBlue  = float(value & 0xFF)
-            test   = (myRed - vRed)*(myRed - vRed) \
-                + (myGreen - vGreen)*(myGreen - vGreen) \
-                + (myBlue - vBlue)*(myBlue - vBlue)
+            poolColor.load(value)
+            color = poolColor.asHsl(output=list)
+
+            test = (myColor[0] - color[0])*(myColor[0] - color[0]) \
+                + (myColor[1] - color[1])*(myColor[1] - color[1]) \
+                + (myColor[2] - color[2])*(myColor[2] - color[2])
             if test < range:
                 nearestValue = value
                 nearestName  = name
@@ -407,7 +407,7 @@ class ColorValue(object):
             'name':StringUtils.capitalizeWords(nearestName.replace('_', ' ')),
             'value':nearestValue,
             'key':nearestName,
-            'residual':range/(3.0*511.0) }
+            'residual':100.0*range/maxRange }
 
 #___________________________________________________________________________________________________ toDict
     def toDict(self):

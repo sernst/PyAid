@@ -410,3 +410,18 @@ class TimeUtils(object):
             is true if the absolute number of seconds between the two datetimes is greater than or
             equal to the specified delta value. """
         return bool(abs((timeA - timeB).total_seconds()) >= secondDelta)
+
+#___________________________________________________________________________________________________ utcTodayAt
+    @classmethod
+    def utcTodayAt(cls, hour =0, minute =0, second =0, microsecond =0):
+        """midnightToday doc..."""
+        d = datetime.utcnow()
+        return d.replace(hour=hour, minute=minute, second=second, microsecond=microsecond)
+
+#___________________________________________________________________________________________________ minutesSince
+    @classmethod
+    def minutesSince(cls, referenceTime, nowTime =None):
+        """minutesSince doc..."""
+        if nowTime is None:
+            nowTime = datetime.utcnow()
+        return float((nowTime - referenceTime).total_seconds())/60.0

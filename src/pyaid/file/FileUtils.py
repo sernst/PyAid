@@ -188,6 +188,10 @@ class FileUtils(object):
                 An optional list of file extensions to include. All extensions not on the list
                 are ignored.
 
+            @@@param allowDots |Boolean |True
+                When true, files and folders that begin with a dot (period) will be included.
+                They ignored otherwise.
+
             @@@param absolute:boolean > True
                 When true the paths returned are absolute. When false the paths are returned
                 relative to the root path as a slug, i.e. no leading slash separator.
@@ -278,14 +282,14 @@ class FileUtils(object):
     def makeFilePath(cls, *args, **kwargs):
         """createFilePath doc..."""
         kwargs['isFile'] = True
-        return self.createPath(*args, **kwargs)
+        return cls.createPath(*args, **kwargs)
 
 #___________________________________________________________________________________________________ makeFolderPath
     @classmethod
     def makeFolderPath(cls, *args, **kwargs):
         """createFolderPath doc..."""
         kwargs['isDir'] = True
-        return self.createPath(*args, **kwargs)
+        return cls.createPath(*args, **kwargs)
 
 #___________________________________________________________________________________________________ createPath
     @classmethod
@@ -490,6 +494,7 @@ class FileUtils(object):
 #___________________________________________________________________________________________________ _listPath
     @classmethod
     def _listPath(cls, rootPath, recursive, **kwargs):
+        allowDots       = ArgsUtils.get('allowDots', True, kwargs)
         rootPath        = cls.cleanupPath(rootPath, isDir=True)
         topPath         = ArgsUtils.extract('topPath', rootPath, kwargs)
         listDirs        = ArgsUtils.get('listDirs', False, kwargs)
@@ -502,6 +507,9 @@ class FileUtils(object):
 
         out = []
         for item in os.listdir(rootPath):
+            if not allowDots and item.startswith('.'):
+                continue
+
             if (skipSVN and item == '.svn') or (skips and item in skips):
                 continue
             absItem = os.path.join(rootPath, item)
