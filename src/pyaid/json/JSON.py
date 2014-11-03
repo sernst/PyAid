@@ -33,9 +33,9 @@ class JSON(object):
     def fromFile(cls, path, gzipped =False, throwError =False):
         try:
             if gzipped:
-                f = gzip.open(path, 'r+')
+                f = gzip.open(path, 'rb')
             else:
-                f = open(path, 'r+')
+                f = open(path, 'r')
             res = f.read()
             f.close()
             return cls.fromString(res.decode('utf-8', 'ignore'))
