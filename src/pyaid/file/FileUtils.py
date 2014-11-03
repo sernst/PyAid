@@ -202,6 +202,9 @@ class FileUtils(object):
                 elements to the termainal path element.
         """
 
+        if not os.path.exists(rootPath):
+            return []
+
         return cls._listPath(rootPath, recursive, **kwargs)
 
 #___________________________________________________________________________________________________ getMimeType
