@@ -58,7 +58,7 @@ class TimeUtils(object):
         t      -= 3600.0*float(hours)
 
         mins    = int(t/60.0)
-        secs   -= 60.0*float(mins)
+        secs    = t - 60.0*float(mins)
 
 
         return {'days':days, 'hours':hours, 'minutes':mins, 'seconds':secs}
@@ -393,7 +393,7 @@ class TimeUtils(object):
         if t == 0:
             return out
 
-        s = unicode(round(t))
+        s = unicode(int(round(t)))
         if not hasMinutes and not hasSeconds:
             return s + u' ms'
 
