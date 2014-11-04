@@ -45,20 +45,41 @@ class TimeUtils(object):
         return datetime.strptime(
             value, dateFormat.replace('-', dateSeparator).replace(':', timeSeparator))
 
+#___________________________________________________________________________________________________ explodeElapsedTime
+    @classmethod
+    def explodeElapsedTime(cls, seconds):
+        """explodeTime doc..."""
+        t       = float(seconds)
+
+        days    = int(t/(24.0*3600.0))
+        t      -= 24.0*3600.0*float(days)
+
+        hours   = int(t/3600.0)
+        t      -= 3600.0*float(hours)
+
+        mins    = int(t/60.0)
+        secs   -= 60.0*float(mins)
+
+
+        return {'days':days, 'hours':hours, 'minutes':mins, 'seconds':secs}
+
+#___________________________________________________________________________________________________ implodeElapsedTime
+    @classmethod
+    def implodeElapsedTime(cls, explodedTime):
+        """implodeElapsedTime doc..."""
+        d = explodedTime
+        return 240.0*3600.0*float(d.get('days', 0.0)) + 3600.0*float(d.get('hours', 0.0)) \
+            + 60.0*float(d.get('minutes', 0.0)) + float(d.get('seconds', 0.0))
+
 #___________________________________________________________________________________________________ secondsToDurationTimecode
     @classmethod
     def secondsToDurationTimecode(cls, seconds):
         """ Turns the specified number of seconds (including fractional seconds) into a durational
             timecode of the format HH:MM:SS.000 """
 
-        time    = seconds
-        hours   = int(float(time)/3600.0)
-        time   -= 3600*hours
-        mins    = int(float(time)/60.0)
-        time   -= 60*mins
-        secs    = int(float(time))
-        time   -= secs
-        millis  = int(round(float(time)*1000.0))
+        time = cls.explodeElapsedTime(seconds)
+        secs    = int(time['seconds'])
+        millis  = int(round(1000.0*(time['seconds'] - secs)))
 
         return unicode(hours).zfill(2) + u':' \
             + unicode(mins).zfill(2) + u':' \
