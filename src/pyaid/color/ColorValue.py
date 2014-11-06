@@ -932,7 +932,7 @@ class ColorValue(object):
     def fromIntRgba(cls, value):
         color = int(value) >> 8
         alpha = float(int(value) & 0xFF)/255.0
-        return cls.createDict(color=value, alpha=alpha)
+        return cls.createDict(color=color, alpha=alpha)
 
 #___________________________________________________________________________________________________ fromIntRgb
     @classmethod
