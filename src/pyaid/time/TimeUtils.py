@@ -79,10 +79,10 @@ class TimeUtils(object):
 
         time = cls.explodeElapsedTime(seconds)
         secs    = int(time['seconds'])
-        millis  = int(round(1000.0*(time['seconds'] - secs)))
+        millis  = int(round(1000.0*(time['seconds'] - float(secs))))
 
-        return unicode(hours).zfill(2) + u':' \
-            + unicode(mins).zfill(2) + u':' \
+        return unicode(time['hours']).zfill(2) + u':' \
+            + unicode(time['minutes']).zfill(2) + u':' \
             + unicode(secs).zfill(2) + u'.' \
             + unicode(millis).zfill(3)
 
