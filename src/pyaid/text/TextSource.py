@@ -2,6 +2,8 @@
 # (C)2012
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 from pyaid.ArgsUtils import ArgsUtils
 
 #___________________________________________________________________________________________________ TextSource
@@ -14,7 +16,7 @@ class TextSource(object):
 #___________________________________________________________________________________________________ __init__
     def __init__(self, *args, **kwargs):
         """Creates a new instance of TextSource."""
-        self._raw      = ArgsUtils.get('source', u'', kwargs, args, 0)
+        self._raw      = ArgsUtils.get('source', '', kwargs, args, 0)
         self._analyzer = ArgsUtils.get('analyzer', None, kwargs, args, 1)
         self._blocks   = ArgsUtils.get('blocks', [], kwargs, args, 2)
 

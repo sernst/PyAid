@@ -2,6 +2,8 @@
 # (C)2012-2014
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 import os
 import inspect
 
@@ -30,11 +32,11 @@ class ClassUtils(object):
             return out
 
         shave = abs(shave)
-        parts = out.split(u'.')
+        parts = out.split('.')
         if len(parts) <= shave:
             return ''
 
-        return u'.'.join(parts[:-shave])
+        return '.'.join(parts[:-shave])
 
 #___________________________________________________________________________________________________ getClassDirectoryPath
     @classmethod
@@ -75,7 +77,7 @@ class ClassUtils(object):
             singular = True
             target   = [target]
         elif not target:
-            target   = [package.split(u'.')[-1]]
+            target   = [package.split('.')[-1]]
             singular = True
         else:
             singular = False

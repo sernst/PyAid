@@ -2,6 +2,8 @@
 # (C)2014
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 import math
 
 from pyaid.string.StringUtils import StringUtils
@@ -28,7 +30,7 @@ class IterationCounter(object):
 #___________________________________________________________________________________________________ GS: prettyPrintProgress
     @property
     def prettyPrintProgress(self):
-        return StringUtils.toUnicode(int(self.progress*100.0)) + u'5'
+        return StringUtils.toUnicode(int(self.progress*100.0)) + '5'
 
 #___________________________________________________________________________________________________ GS: progress
     @property

@@ -2,7 +2,7 @@
 # (C)2010-2014
 # Scott Ernst and Thomas Gilray
 
-from __future__ import print_function
+from __future__ import print_function, absolute_import, unicode_literals, division
 
 import sys
 import os
@@ -167,12 +167,12 @@ class Logger(object):
     def getPrefix(self, *args, **kwargs):
         if self._locationPrefix:
             item = self.getStackData()[-1]
-            loc  = u' -> %s #%s]' % (item['file'], StringUtils.toUnicode(item['line']))
+            loc  = ' -> %s #%s]' % (item['file'], StringUtils.toUnicode(item['line']))
         else:
-            loc = u']'
+            loc = ']'
 
         return StringUtils.toUnicode(
-            self.getTime(self.timezone).strftime(u'[%a %H:%M <%S.%f>') + loc)
+            self.getTime(self.timezone).strftime('[%a %H:%M <%S.%f>') + loc)
 
 #___________________________________________________________________________________________________ clear
     def clear(self, storage =False):
@@ -215,7 +215,7 @@ class Logger(object):
 
         if self._traceLogs:
             self.traceLogMessage(out, self._printCallbacks, self)
-        return out['log'] + u'\n' + out['stack']
+        return out['log'] + '\n' + out['stack']
 
 #___________________________________________________________________________________________________ echoError
     def echoError(self, s, err, htmlEscape =False):
@@ -246,7 +246,7 @@ class Logger(object):
 
         items = []
         for logItem in self._buffer:
-            item = self.logMessageToString(logMessage=logItem) + u'\n'
+            item = self.logMessageToString(logMessage=logItem) + '\n'
             try:
                 item = item.encode('utf8', 'ignore')
             except Exception:
@@ -309,17 +309,17 @@ class Logger(object):
         stack = Logger.getStackData(stackSource)
         stop  = len(stack) - skipStackLevels
         start = max(0, stop - maxLevels) if maxLevels > 0 else 0
-        s     = u''
+        s     = ''
         index = start
         for item in stack[start:stop]:
             index    += 1
             if item['internal']:
-                s +=(u'\n    [%s]: %s.%s [#%s]\n         code: %s' % (
+                s +=('\n    [%s]: %s.%s [#%s]\n         code: %s' % (
                     StringUtils.toUnicode(index), item['file'], item['function'],
                     StringUtils.toUnicode(item['line']),
                     item['code'][:100] ))
             else:
-                s += u'\n    [%s] EXT: %s {line: %s}' % (
+                s += '\n    [%s] EXT: %s {line: %s}' % (
                     StringUtils.toUnicode(index), item['file'],
                     StringUtils.toUnicode(item['line']))
 
@@ -365,16 +365,16 @@ class Logger(object):
 #___________________________________________________________________________________________________ prettyPrint
     @staticmethod
     def prettyPrint(target, indentLevel =1):
-        indent = u'\n' + (indentLevel*u'    ')
-        s = u'\n'
+        indent = '\n' + (indentLevel*'    ')
+        s = '\n'
         if isinstance(target, list):
             index = 0
             for t in target:
                 try:
                     v = StringUtils.toUnicode(t)
                 except Exception:
-                    v = u'<UNPRINTABLE>'
-                s += u'%s[%s]: %s' % (indent, index, v)
+                    v = '<UNPRINTABLE>'
+                s += '%s[%s]: %s' % (indent, index, v)
             return s
 
         if isinstance(target, dict):
@@ -382,8 +382,8 @@ class Logger(object):
                 try:
                     v = StringUtils.toUnicode(v)
                 except Exception:
-                    v = u'<UNPRINTABLE>'
-                s += u'%s%s: %s' % (indent, n, v)
+                    v = '<UNPRINTABLE>'
+                s += '%s%s: %s' % (indent, n, v)
             return s
 
         items = dir(target)
@@ -392,8 +392,8 @@ class Logger(object):
             try:
                 v = StringUtils.toUnicode(v)
             except Exception:
-                v = u'<UNPRINTABLE>'
-            s += u'%s%s: %s' % (indent, n, v)
+                v = '<UNPRINTABLE>'
+            s += '%s%s: %s' % (indent, n, v)
         return s
 
 #___________________________________________________________________________________________________ createErrorMessage
@@ -437,10 +437,10 @@ class Logger(object):
 #___________________________________________________________________________________________________ formatAsString
     @classmethod
     def formatAsString(cls, src, indentLevel =0):
-        indents = u'    '*indentLevel
+        indents = '    '*indentLevel
         if isinstance(src, list) or isinstance(src, tuple):
-            out      = [indents + StringUtils.toUnicode(src[0]) + (u'' if src[0].endswith(u':') else u':')]
-            indents += u'    '
+            out      = [indents + StringUtils.toUnicode(src[0]) + ('' if src[0].endswith(':') else ':')]
+            indents += '    '
             lines    = []
             maxIndex = 0
 
@@ -453,10 +453,10 @@ class Logger(object):
 
             for item in lines:
                 if item[0] > 0:
-                    out.append(indents + (u' '*max(0, maxIndex - item[0])) + item[1])
+                    out.append(indents + (' '*max(0, maxIndex - item[0])) + item[1])
                 else:
                     out.append(indents + item[1])
-            return u'\n'.join(out)
+            return '\n'.join(out)
 
         else:
             return indents + StringUtils.toUnicode(src)
@@ -491,21 +491,21 @@ class Logger(object):
 
         logValue = StringUtils.strToUnicode(logValue.replace('\n', '\n    '))
         if not StringUtils.isStringType(logValue):
-            logValue = u'FAILED TO LOG RESPONSE'
+            logValue = 'FAILED TO LOG RESPONSE'
 
         out = {'log':logValue}
 
         if prefix:
             logPrefix = StringUtils.strToUnicode(prefix)
             if not StringUtils.isStringType(logPrefix):
-                logPrefix = u'FAILED TO CREATE PREFIX'
+                logPrefix = 'FAILED TO CREATE PREFIX'
             out['prefix'] = logPrefix
 
         if traceStack:
             logStack = StringUtils.strToUnicode(
                 'Stack Trace:\n' + cls.getFormattedStackTrace(shaveStackTrace))
             if not StringUtils.isStringType(logStack):
-                logStack = u'FAILED TO CREATE STACK'
+                logStack = 'FAILED TO CREATE STACK'
             out['stack'] = logStack
 
         return out
@@ -540,8 +540,8 @@ class Logger(object):
 #___________________________________________________________________________________________________ logMessageToString
     @classmethod
     def logMessageToString(
-            cls, logMessage, includePrefix =True, includeStack =True, prefixSeparator =u'\n    ',
-            stackSeparator =u'\n'
+            cls, logMessage, includePrefix =True, includeStack =True, prefixSeparator ='\n    ',
+            stackSeparator ='\n'
     ):
         out = []
         if includePrefix and 'prefix' in logMessage:
@@ -552,7 +552,7 @@ class Logger(object):
         if includeStack and 'stack' in logMessage:
             out.append(stackSeparator + logMessage['stack'])
 
-        return u''.join(out)
+        return ''.join(out)
 
 #===================================================================================================
 #                                                                               I N T R I N S I C

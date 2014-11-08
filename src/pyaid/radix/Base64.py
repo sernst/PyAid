@@ -2,6 +2,8 @@
 # (C) 2010-2013
 # Eric David Wills and Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 import re
 import uuid
 
@@ -38,9 +40,9 @@ class Base64(object):
         try:
             n = int(n)
         except Exception:
-            return u''
+            return ''
 
-        out = u''
+        out = ''
         while n > 0:
             out = Base64.CHAR_SET[n & 63] + out
             n >>= 6
@@ -56,7 +58,7 @@ class Base64(object):
         """
 
         if clean:
-            n = Base64.ILLEGAL_CHAR_RE.sub(u'', n)
+            n = Base64.ILLEGAL_CHAR_RE.sub('', n)
 
         base = 1
         out  = 0

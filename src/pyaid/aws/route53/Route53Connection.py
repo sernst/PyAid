@@ -2,6 +2,8 @@
 # (C)2012-2013
 # Scott Ernst and Eric D. Wills
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 from boto.route53.connection import Route53Connection as BotoRoute53Connection
 
 #___________________________________________________________________________________________________ Route53Connection

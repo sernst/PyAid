@@ -2,11 +2,12 @@
 # (C)2012-2013
 # Scott Ernst
 
-from __future__ import print_function
+from __future__ import print_function, absolute_import, unicode_literals, division
 
 import os
 
 from pyaid.NullUtils import NullUtils
+from pyaid.dict.DictUtils import DictUtils
 from pyaid.json.JSON import JSON
 from pyaid.string.StringUtils import StringUtils
 
@@ -78,7 +79,7 @@ class SettingsConfig(object):
             return
 
         self._loadSettings()
-        for key, value in keysAndValues.iteritems():
+        for key, value in DictUtils.iter(keysAndValues):
             self._updateSetting(key, value)
         self._saveSettings()
 
@@ -128,7 +129,7 @@ class SettingsConfig(object):
         if not target:
             target = self._settings
 
-        for n,v in target.iteritems():
+        for n,v in DictUtils.iter(target):
             if isinstance(v, dict):
                 self._cleanupSettings(target=v)
                 if not v:

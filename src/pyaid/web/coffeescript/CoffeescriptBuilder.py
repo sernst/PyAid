@@ -2,13 +2,13 @@
 # (C)2011-2013
 # Scott Ernst
 
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import print_function, absolute_import, unicode_literals, division
 
 import sys
 import os
 import re
 import getopt
+from pyaid.dict.DictUtils import DictUtils
 
 from pyaid.interactive.queries import queryYesNoQuit
 from pyaid.debug.Logger import Logger
@@ -155,7 +155,7 @@ class CoffeescriptBuilder(object):
                     force=force, compress=compress
                 )
                 CoffeescriptBuilder._results += out['res']
-                for n,v in out['missing'].iteritems():
+                for n,v in DictUtils.iter(out['missing']):
                     if n in CoffeescriptBuilder._missing:
                         continue
                     CoffeescriptBuilder._missing[n] = v
@@ -165,7 +165,7 @@ class CoffeescriptBuilder(object):
 
             if CoffeescriptBuilder._missing:
                 print('\n\nMISSING IMPORTS:' + '\n\n')
-                for n,v in CoffeescriptBuilder._missing.iteritems():
+                for n,v in DictUtils.iter(CoffeescriptBuilder._missing):
                     print(v['class'] + ' [LINE: #' + str(v['line']) + ' | ' + v['package'] + ']')
         else:
             print('COMPILING DIRECTORY: ' + path)
@@ -769,7 +769,7 @@ class CoffeescriptBuilder(object):
             )
             c.construct()
             count += 1
-            for n,v in c.report.iteritems():
+            for n,v in DictUtils.iter(c.report):
                 num = max(0, 60 - len(n))
                 results += '\n' + n + ':' + ('.'*num)
                 if v == 0:

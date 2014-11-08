@@ -2,8 +2,11 @@
 # (C)2011
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 import json
 import codecs
+from pyaid.dict.DictUtils import DictUtils
 from pyaid.xml.ConfigData import ConfigData
 
 #___________________________________________________________________________________________________ JSONConfigParser
@@ -36,7 +39,7 @@ class JSONConfigParser(object):
 
         cd = ConfigData()
 
-        for n,v in d.iteritems():
+        for n,v in DictUtils.iter(d):
             JSONConfigParser._parseElement(n, v, cd)
 
         if parseToInterchangeFormat:
@@ -58,7 +61,7 @@ class JSONConfigParser(object):
     @staticmethod
     def serialize(interchangeData):
         data = {}
-        for n,v in interchangeData.iteritems():
+        for n,v in DictUtils.iter(interchangeData):
             data[n] = JSONConfigParser._createElement(v)
         return json.dumps(data, separators=(',', ':')).decode('unicode_escape')
 
@@ -80,7 +83,7 @@ class JSONConfigParser(object):
             return [data[0], d]
         elif isinstance(data, dict):
             d = {}
-            for n,v in data.iteritems():
+            for n,v in DictUtils.iter(data):
                 d[n] = JSONConfigParser._createElement(v)
             return d
 
@@ -97,6 +100,6 @@ class JSONConfigParser(object):
             configData.setItem(name, 'n', value)
         elif isinstance(value, dict):
             cd = ConfigData()
-            for n,v in value.iteritems():
+            for n,v in DictUtils.iter(value):
                 JSONConfigParser._parseElement(n, v, cd)
             configData.setItem(name, 'o', cd)

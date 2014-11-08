@@ -2,6 +2,8 @@
 # (C) 2010
 # Thomas Gilray and Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 import os
 import shutil
 from time import time

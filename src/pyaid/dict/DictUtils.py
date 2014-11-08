@@ -2,6 +2,8 @@
 # (C)2012-2013
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 import sys
 
 # AS NEEDED: from pyaid.list.ListUtils import ListUtils
@@ -15,6 +17,14 @@ class DictUtils(object):
 #===================================================================================================
 #                                                                                       C L A S S
 
+#___________________________________________________________________________________________________ iter
+    @classmethod
+    def iter(cls, source):
+        """iter doc..."""
+        if sys.version > '3':
+            return source.iter()
+        return source.iteritems()
+
 #___________________________________________________________________________________________________ copyTo
     @classmethod
     def copyTo(cls, source, destination, overwrite =False):
@@ -24,7 +34,7 @@ class DictUtils(object):
         if destination is None:
             destination = dict()
 
-        for key, value in source.iteritems():
+        for key, value in cls.iter(source):
             if not overwrite and key in destination:
                 continue
             destination[key] = value
@@ -51,7 +61,7 @@ class DictUtils(object):
     @classmethod
     def clone(cls, item):
         out = dict()
-        for key, value in item.iteritems():
+        for key, value in cls.iter(item):
             if isinstance(value, dict):
                 # Clone dict recursively
                 out[key] = cls.clone(value)
@@ -74,7 +84,7 @@ class DictUtils(object):
         vi = sys.version_info
         if force or (vi[0] < 3 and (vi[1] < 7 or vi[2] < 5)):
             out = dict()
-            for n,v in source.iteritems():
+            for n,v in cls.iter(source):
                 out[str(n)] = v
         else:
             return source
@@ -85,7 +95,7 @@ class DictUtils(object):
     @classmethod
     def lowerDictKeys(cls, source):
         out = dict()
-        for key, value in source.iteritems():
+        for key, value in DictUtils.iter(source):
             out[key.lower()] = value
         return out
 
@@ -101,7 +111,7 @@ class DictUtils(object):
         if len(a.keys()) != len(b.keys()):
             return False
 
-        for name, value in a.iteritems():
+        for name, value in DictUtils.iter(a):
             if name not in b:
                 return False
 
@@ -124,16 +134,16 @@ class DictUtils(object):
 
 #___________________________________________________________________________________________________ prettyPrint
     @classmethod
-    def prettyPrint(cls, source, delimiter = u' | ', separator = u': '):
+    def prettyPrint(cls, source, delimiter = ' | ', separator = ': '):
         if not source:
-            return u'[EMPTY]'
+            return '[EMPTY]'
 
         out = []
-        for n,v in source.iteritems():
+        for n,v in DictUtils.iter(source):
             n = StringUtils.toUnicode(n)
 
             if isinstance(v, dict):
-                v = u'{ ' + cls.prettyPrint(v, delimiter=delimiter, separator=separator) + u' }'
+                v = '{ ' + cls.prettyPrint(v, delimiter=delimiter, separator=separator) + ' }'
             elif isinstance(v, str):
                 v = StringUtils.strToUnicode(v)
             else:

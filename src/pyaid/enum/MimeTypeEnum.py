@@ -2,6 +2,8 @@
 # (C)2010-2013
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 #___________________________________________________________________________________________________ MIME_TYPES
 class MIME_TYPES(object):
     """MIME types for content types."""

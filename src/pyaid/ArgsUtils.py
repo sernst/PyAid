@@ -2,6 +2,8 @@
 # (C)2011-2013
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 # AS NEEDED: from pyaid.debug.Logger import Logger
 
 from pyaid.string.StringUtils import StringUtils

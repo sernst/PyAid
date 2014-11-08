@@ -2,6 +2,8 @@
 # (C)2012
 # Eric D. Wills and Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 import base64
 import hashlib
 import hmac

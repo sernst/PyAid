@@ -2,9 +2,10 @@
 # (C)2012
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 from pyaid.NullUtils import NullUtils
 from pyaid.debug.Logger import Logger
-
 from pyaid.string.StringUtils import StringUtils
 
 #___________________________________________________________________________________________________ MakoDataTransporter
@@ -54,6 +55,6 @@ class MakoDataTransporter(object):
     def __getattr__(self, attr):
         if attr not in self._data:
             self._log.write('Missing render template attribute: ' + str(attr))
-            return u''
+            return ''
 
-        return self._data.get(attr, u'')
+        return self._data.get(attr, '')

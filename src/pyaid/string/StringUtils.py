@@ -2,7 +2,7 @@
 # (C)2011-2014
 # Scott Ernst and Eric David Wills
 
-from __future__ import unicode_literals
+from __future__ import print_function, absolute_import, unicode_literals, division
 
 import os
 import re
@@ -37,9 +37,9 @@ class StringUtils(object):
         ('>', '&gt;'),
         ('"', '&quot;'),
         ("'", '&#39;'),
-        (u'$', u'&#36;'),
-        (u'\u201d', u'&quot;'),
-        (u'\u201c', u'&quot;') ]
+        ('$', '&#36;'),
+        ('\u201d', '&quot;'),
+        ('\u201c', '&quot;') ]
 
     _SOLO_BACKSLASH_PATTERN = re.compile('(?<!\\\)\\\(?!\\\)')
 
@@ -194,8 +194,8 @@ class StringUtils(object):
 #___________________________________________________________________________________________________ getRandomString
     @staticmethod
     def getRandomString(length):
-        choices = string.ascii_letters + u'012345689'
-        res     = u''
+        choices = string.ascii_letters + '012345689'
+        res     = ''
 
         for i in range(0, length):
             res += random.choice(choices)
@@ -219,17 +219,17 @@ class StringUtils(object):
                 The source string formatted as a UID.
         """
 
-        out = re.compile('[^A-Za-z0-9_]').sub(u'', source)
+        out = re.compile('[^A-Za-z0-9_]').sub('', source)
         return text_type(out if preserveCase else out.lower())
 
 #___________________________________________________________________________________________________ abbreviate
     @staticmethod
-    def abbreviate(text, length, truncation =u'...', sepChar =u' '):
+    def abbreviate(text, length, truncation ='...', sepChar =' '):
         if len(text) <= length:
             return text
 
         if not truncation:
-            truncation = u''
+            truncation = ''
 
         parts  = text.split(sepChar)
         output = parts[0]
@@ -253,12 +253,12 @@ class StringUtils(object):
 
 #___________________________________________________________________________________________________ abbreviateRight
     @classmethod
-    def abbreviateRight(cls, text, length, truncation =u'...', sepChar =u' '):
+    def abbreviateRight(cls, text, length, truncation ='...', sepChar =' '):
         if len(text) <= length:
             return text
 
         if not truncation:
-            truncation = u''
+            truncation = ''
 
         parts  = text.split(sepChar)
         output = parts[-1]
@@ -281,23 +281,23 @@ class StringUtils(object):
 
 #___________________________________________________________________________________________________ abbreviateCenter
     @classmethod
-    def abbreviateCenter(cls, text, length, truncation =u'...', sepChar =u' '):
+    def abbreviateCenter(cls, text, length, truncation ='...', sepChar =' '):
         if len(text) <= length:
             return text
 
         halfLength = math.floor(0.5*float(length))
-        left  = cls.abbreviate(text, halfLength, u'', sepChar=sepChar)
-        right = cls.abbreviateRight(text, length - halfLength, u'', sepChar=sepChar)
+        left  = cls.abbreviate(text, halfLength, '', sepChar=sepChar)
+        right = cls.abbreviateRight(text, length - halfLength, '', sepChar=sepChar)
 
         return left + truncation + right
 
 #___________________________________________________________________________________________________ abbreviatePath
     @classmethod
-    def abbreviatePath(cls, path, length, truncation =u'...'):
+    def abbreviatePath(cls, path, length, truncation ='...'):
         if len(path) <= length:
             return path
-        p = path.replace(u'\\', u'/')
-        return cls.abbreviateCenter(p, length, truncation, sepChar=u'/').replace(u'/', os.sep)
+        p = path.replace('\\', '/')
+        return cls.abbreviateCenter(p, length, truncation, sepChar='/').replace('/', os.sep)
 
 #___________________________________________________________________________________________________ camelCapsToWords
     @staticmethod
@@ -305,7 +305,7 @@ class StringUtils(object):
         if not source or not isinstance(source, (text_type, binary_type)):
             return ''
 
-        out = source.replace(u'-', u' ').replace(u'_', u' ').strip()
+        out = source.replace('-', ' ').replace('_', ' ').strip()
         out = re.compile('([a-z])([A-Z0-9])').sub('\g<1> \g<2>', out)
         out = re.compile('([A-Z0-9])([A-Z0-9])([a-z])').sub('\g<1> \g<2>\g<3>', out)
         out = out.strip()
@@ -353,7 +353,7 @@ class StringUtils(object):
     @staticmethod
     def getCompleteFragment(source, maxLength =-1, preferSentences =False, addEllipsis =True):
         if not source or not isinstance(source, (text_type, binary_type)):
-            return u''
+            return ''
 
         if maxLength < 0:
             maxLength = len(source)
@@ -363,29 +363,29 @@ class StringUtils(object):
         # SENTENCES
         if preferSentences:
             frag = source[:maxLength]
-            if frag.endswith(u'.') or frag.endswith(u'!') or frag.endswith(u'?'):
+            if frag.endswith('.') or frag.endswith('!') or frag.endswith('?'):
                 return frag
 
             index = max(
-                frag.rfind(u'. ', 0, maxLength),
-                frag.rfind(u'! ', 0, maxLength),
-                frag.rfind(u'? ', 0, maxLength)
+                frag.rfind('. ', 0, maxLength),
+                frag.rfind('! ', 0, maxLength),
+                frag.rfind('? ', 0, maxLength)
             )
             if index != -1 and index > round(0.5*maxLength):
                 return frag[:index+1]
 
         if len(source) <= maxLength:
-            return source + (u'...' if addEllipsis and preferSentences else u'')
+            return source + ('...' if addEllipsis and preferSentences else '')
 
-        if source[maxLength+1] == u' ':
-            return source[:maxLength] + (u'...' if addEllipsis else u'')
+        if source[maxLength+1] == ' ':
+            return source[:maxLength] + ('...' if addEllipsis else '')
 
         # WORDS
-        index = source.rfind(u' ', 0, maxLength)
+        index = source.rfind(' ', 0, maxLength)
         if index != -1:
-            return source[:index] + (u'...' if addEllipsis else u'')
+            return source[:index] + ('...' if addEllipsis else '')
 
-        return source[:maxLength] + (u'...' if addEllipsis else u'')
+        return source[:maxLength] + ('...' if addEllipsis else '')
 
 #___________________________________________________________________________________________________ checkIsEmailAddress
     @classmethod

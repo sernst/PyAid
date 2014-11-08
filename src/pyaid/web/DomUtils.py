@@ -2,6 +2,8 @@
 # (C)2012-2013
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 import re
 from collections import namedtuple
 
@@ -35,14 +37,14 @@ class DomUtils(object):
         if not source:
             return source
 
-        source = source.replace(u'\r', u'').strip()
+        source = source.replace('\r', '').strip()
 
-        if source.startswith(u'<!DOCTYPE'):
-            offset = source.find(u'\n') + 1
+        if source.startswith('<!DOCTYPE'):
+            offset = source.find('\n') + 1
             out    = source[0:offset]
         else:
             offset = 0
-            out    = u''
+            out    = ''
 
         startIndex = offset
         endIndex   = offset
@@ -55,16 +57,16 @@ class DomUtils(object):
             startIndex = max(startIndex, b.start)
             endIndex   = max(endIndex, b.end)
 
-            out += cls._EXTRA_SPACES_PATTERN.sub(u' ',
+            out += cls._EXTRA_SPACES_PATTERN.sub(' ',
                 cls._HTML_WHITESPACE_PATTERN.sub('\g<tag>', source[offset:startIndex])
-            ).replace(u'\n', u'')
+            ).replace('\n', '')
             out    += source[startIndex:endIndex]
             offset  = endIndex
 
         if offset < len(source):
-            out += cls._EXTRA_SPACES_PATTERN.sub(u' ',
+            out += cls._EXTRA_SPACES_PATTERN.sub(' ',
                 cls._HTML_WHITESPACE_PATTERN.sub('\g<tag>', source[offset:len(source)])
-            ).replace(u'\n', u'')
+            ).replace('\n', '')
 
         out = out.strip()
         return out
@@ -78,7 +80,7 @@ class DomUtils(object):
         if res:
             for r in res:
                 match = r.group()
-                if preserveBlocks and match[1] == u'/':
+                if preserveBlocks and match[1] == '/':
                     i = 0
                     while i > -len(preserveBlocks):
                         i -= 1

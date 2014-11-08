@@ -2,6 +2,8 @@
 # (C)2011-2014
 # Scott Ernst and Eric David Wills
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 import time
 import calendar
 from datetime import datetime, timedelta
@@ -84,9 +86,9 @@ class TimeUtils(object):
         secs    = int(time['seconds'])
         millis  = int(round(1000.0*(time['seconds'] - float(secs))))
 
-        return StringUtils.toUnicode(time['hours']).zfill(2) + u':' \
-            + StringUtils.toUnicode(time['minutes']).zfill(2) + u':' \
-            + StringUtils.toUnicode(secs).zfill(2) + u'.' \
+        return StringUtils.toUnicode(time['hours']).zfill(2) + ':' \
+            + StringUtils.toUnicode(time['minutes']).zfill(2) + ':' \
+            + StringUtils.toUnicode(secs).zfill(2) + '.' \
             + StringUtils.toUnicode(millis).zfill(3)
 
 #___________________________________________________________________________________________________ utcToLocalDatetime
@@ -297,10 +299,10 @@ class TimeUtils(object):
     @classmethod
     def getUidTimecode(cls, prefix =None, suffix =None):
         """ Creates a timecode down to the microsecond for use in creating unique UIDs. """
-        out = Base64.to64(cls.getNowSeconds()) + u'-' + Base64.to64(datetime.microsecond)
+        out = Base64.to64(cls.getNowSeconds()) + '-' + Base64.to64(datetime.microsecond)
 
-        return ((StringUtils.toUnicode(prefix) + u'-') if prefix else u'') + out \
-            + ((u'-' + StringUtils.toUnicode(suffix)) if suffix else u'')
+        return ((StringUtils.toUnicode(prefix) + '-') if prefix else '') + out \
+            + (('-' + StringUtils.toUnicode(suffix)) if suffix else '')
 
 #___________________________________________________________________________________________________ timecodeToFriendlyTimestamp
     @classmethod
@@ -361,12 +363,12 @@ class TimeUtils(object):
         """ Returns a pretty elapsed time based on the number of milliseconds elapsed argument. """
         t = int(elapsedMilliseconds)
         if t == 0:
-            return u'0'
+            return '0'
 
         hasMinutes = False
         hasSeconds = False
 
-        out = u''
+        out = ''
         if t >= 60000:
             hasMinutes = True
             cVal  = int(float(t)/60000.0)
@@ -374,10 +376,10 @@ class TimeUtils(object):
             t -= cVal*60000
 
             if t == 0:
-                return s + u' min' + (u's' if cVal > 1 else u'')
+                return s + ' min' + ('s' if cVal > 1 else '')
 
             s = s.zfill(2)
-            out  += s + u':'
+            out  += s + ':'
 
         if t >= 1000:
             hasSeconds = True
@@ -386,22 +388,22 @@ class TimeUtils(object):
             t -= cVal*1000
 
             if t == 0 and not hasMinutes:
-                return s + u' sec' + (u's' if cVal > 1 else u'')
+                return s + ' sec' + ('s' if cVal > 1 else '')
 
             s = s.zfill(2)
             out += s
         elif hasMinutes:
-            out += u'00'
+            out += '00'
 
         if t == 0:
             return out
 
         s = StringUtils.toUnicode(int(round(t)))
         if not hasMinutes and not hasSeconds:
-            return s + u' ms'
+            return s + ' ms'
 
         s = s.zfill(2)
-        return out + u'.' + s
+        return out + '.' + s
 
 #___________________________________________________________________________________________________ differsByDays
     @classmethod

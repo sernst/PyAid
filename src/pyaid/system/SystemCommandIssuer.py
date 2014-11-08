@@ -2,8 +2,7 @@
 # (C)2012-2013
 # Scott Ernst
 
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import print_function, absolute_import, unicode_literals, division
 
 import os
 

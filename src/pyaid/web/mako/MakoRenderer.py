@@ -2,6 +2,8 @@
 # (C)2012-2013
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 from mako import exceptions
 from mako.lookup import TemplateLookup
 from mako.template import Template
@@ -69,7 +71,7 @@ class MakoRenderer(object):
 #___________________________________________________________________________________________________ GS: dom
     @property
     def dom(self):
-        return self._result if self._result else u''
+        return self._result if self._result else ''
 
 #___________________________________________________________________________________________________ GS: result
     @property
@@ -113,7 +115,7 @@ class MakoRenderer(object):
                 self._log.writeError(self._errorMsg, self._error)
                 return self.dom
         else:
-            target = Template(self._source if self._source else u'', lookup=lookup)
+            target = Template(self._source if self._source else '', lookup=lookup)
 
         mr = MakoDataTransporter(data=data, logger=self._log)
         try:
@@ -122,7 +124,7 @@ class MakoRenderer(object):
             d = []
             if data:
                 for n,v in data.items():
-                    d.append(StringUtils.toUnicode(n) + u': ' + StringUtils.toUnicode(v))
+                    d.append(StringUtils.toUnicode(n) + ': ' + StringUtils.toUnicode(v))
 
             try:
                 stack = exceptions.text_error_template().render().replace('%','%%')

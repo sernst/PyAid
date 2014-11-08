@@ -2,6 +2,8 @@
 # (C)2013-2014
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 import os
 import sys
 import re
@@ -77,7 +79,7 @@ class OsUtils(object):
             if index < 0:
                 index = 0
             screenIndex = 0
-            for line in result['out'].split(u'\n'):
+            for line in result['out'].split('\n'):
                 line = line.strip().lower()
                 if not line.startswith('retina:'):
                     continue
@@ -120,7 +122,7 @@ class OsUtils(object):
             if index < 0:
                 index = 0
             screenIndex = 0
-            for line in result['out'].split(u'\n'):
+            for line in result['out'].split('\n'):
                 line = line.strip().lower()
                 if not line.startswith('resolution:'):
                     continue

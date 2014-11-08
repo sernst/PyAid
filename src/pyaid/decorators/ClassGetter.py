@@ -2,6 +2,8 @@
 # (C)2012
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 #___________________________________________________________________________________________________ ClassGetter
 class ClassGetter(object):
     """A decorator which allows definition of a Python descriptor with class-level behavior."""

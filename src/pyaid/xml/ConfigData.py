@@ -2,6 +2,8 @@
 # (C)2011
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 from pyaid.xml.types.ConfigDataType import ConfigDataType
 from pyaid.xml.types.ColorTransformType import ColorTransformType
 
@@ -25,7 +27,7 @@ class ConfigData(object):
         if target is None:
             target = {}
 
-        for n,v in self._data.iteritems():
+        for n,v in self._data.items():
             if isinstance(v, ConfigData):
                 target[n] = v.writeToInterchangeDict()
             elif isinstance(v, ConfigDataType):
@@ -44,7 +46,7 @@ class ConfigData(object):
         if target is None:
             target = {}
 
-        for n,v in self._data.iteritems():
+        for n,v in self._data.items():
             if isinstance(v, ConfigData):
                 target[n] = v.writeToDict()
             elif isinstance(v, ConfigDataType):

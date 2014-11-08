@@ -2,6 +2,8 @@
 # (C)2013
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 import urllib
 
 try:
@@ -19,10 +21,10 @@ class UrlObject(object):
 #___________________________________________________________________________________________________ __init__
     def __init__(self, sourceUrl =None):
         """Creates a new instance of UrlObject."""
-        self._protocol = u''
-        self._hostName = u''
-        self._path     = u''
-        self._fragment = u''
+        self._protocol = ''
+        self._hostName = ''
+        self._path     = ''
+        self._fragment = ''
         self._params = dict()
 
         if sourceUrl:
@@ -66,10 +68,10 @@ class UrlObject(object):
 #___________________________________________________________________________________________________ GS: queryString
     @property
     def queryString(self):
-        return urllib.urlencode(self._params, True) if self._params else u''
+        return urllib.urlencode(self._params, True) if self._params else ''
     @queryString.setter
     def queryString(self, value):
-        self._params = urlparse.parse_qs(value) if value else u''
+        self._params = urlparse.parse_qs(value) if value else ''
 
 #___________________________________________________________________________________________________ GS: fragment
     @property
@@ -90,13 +92,13 @@ class UrlObject(object):
             self._fragment ))
     @url.setter
     def url(self, value):
-        parts = urlparse.urlsplit(value) if value else u''
-        self._protocol = parts.scheme if parts else u''
-        self._hostName = parts.netloc if parts else u''
-        self._path     = parts.path if parts else u''
-        self._fragment = parts.fragment if parts else u''
+        parts = urlparse.urlsplit(value) if value else ''
+        self._protocol = parts.scheme if parts else ''
+        self._hostName = parts.netloc if parts else ''
+        self._path     = parts.path if parts else ''
+        self._fragment = parts.fragment if parts else ''
 
-        query = parts.query if parts else u''
+        query = parts.query if parts else ''
         if query:
             self._params = urlparse.parse_qs(query, True)
         else:

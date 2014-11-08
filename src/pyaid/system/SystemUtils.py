@@ -1,10 +1,10 @@
 # SystemUtils.py
-# (C)2012-2013
+# (C)2012-2014
 # Scott Ernst
 
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import print_function, absolute_import, unicode_literals, division
 
+import sys
 import re
 import os
 import shutil
@@ -15,10 +15,16 @@ import subprocess
 # AS NEEDED: import requests
 # AS NEEDED: from pyaid.list.ListUtils import ListUtils
 
-#___________________________________________________________________________________________________ SystemUtils
+if sys.version > '3':
+    from urllib import request
+    urlopen = request.urlopen
+else:
+    import urllib2
+    urlopen = urllib2.urlopen
+
 from pyaid.string.StringUtils import StringUtils
 
-
+#___________________________________________________________________________________________________ SystemUtils
 class SystemUtils(object):
     """A class for..."""
 
@@ -99,8 +105,7 @@ class SystemUtils(object):
 
         try:
             if url.startswith('ftp') or not hasRequests:
-                import urllib2
-                res = urllib2.urlopen(url)
+                res = urlopen(url)
             else:
                 res = requests.get(url, verify=httpsVerify)
         except Exception as err:
@@ -230,7 +235,7 @@ class SystemUtils(object):
 
         doubleFlags = []
         if overwriteAll:
-            doubleFlags.append(('--overwrite'))
+            doubleFlags.append('--overwrite')
 
         originalDirectory = os.curdir
         d = os.path.dirname(zipSource)
@@ -292,12 +297,12 @@ class SystemUtils(object):
     def move(cls, source, destination):
         try:
             shutil.move(source, destination)
-        except Exception as err:
+        except Exception:
             return False
 
         return True
 
-#___________________________________________________________________________________________________ _remove
+#___________________________________________________________________________________________________ remove
     @classmethod
     def remove(cls, path, throwError =False):
         if not os.path.exists(path):

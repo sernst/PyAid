@@ -2,6 +2,8 @@
 # (C)2012
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 import re
 
 from pyaid.string.StringUtils import StringUtils
@@ -24,7 +26,7 @@ class InsertCapPolicy(object):
         '^(?P<prefix>[\s\t]*)(?P<target>[\n]{1})(?![\s\t\n]*\[#[A-Za-z0-9_]+)' )
 
 #___________________________________________________________________________________________________ __init__
-    def __init__(self, capType, addExp =None, addReplace =u'', removeExp =None, removeReplace =u''):
+    def __init__(self, capType, addExp =None, addReplace ='', removeExp =None, removeReplace =''):
         """Creates a new instance of ClassTemplate."""
         self._addPattern    = re.compile(addExp) if StringUtils.isStringType(addExp) else addExp
         self._removePattern = re.compile(removeExp) if StringUtils.isStringType(removeExp) else removeExp

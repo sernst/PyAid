@@ -2,8 +2,7 @@
 # (C)2012
 # Scott Ernst
 
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import print_function, absolute_import, unicode_literals, division
 
 from pyaid.text.LineMetadata import LineMetadata
 from pyaid.text.RedactionTextAnalyzer import RedactionTextAnalyzer

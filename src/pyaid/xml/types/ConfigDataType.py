@@ -2,6 +2,8 @@
 # (C)2011
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 #___________________________________________________________________________________________________ ConfigDataType
 class ConfigDataType(object):
     """A class for..."""

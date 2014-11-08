@@ -2,6 +2,8 @@
 # (C)2011-2012
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 from collections import namedtuple
 
 NULL_CLASS_NT = namedtuple('NULL_CLASS_NT', ['id'])

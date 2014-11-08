@@ -2,7 +2,7 @@
 # (C)2013-2014
 # Scott Ernst
 
-from __future__ import print_function
+from __future__ import print_function, absolute_import, unicode_literals, division
 
 import os
 import gzip
@@ -32,18 +32,18 @@ class S3Bucket(object):
     PRIVATE     = 'private'
 
     _UPLOAD_CONDITIONS = [
-        u'{"bucket":"%(bucket)s"}',
-        u'{"acl":"private"}',
-        u'{"key":"%(key)s"}',
-        u'{"success_action_status":"200"}',
-        u'["content-length-range", 0, %(maxSize)s]',
-        u'{"x-amz-meta-uuid": "14365123651274"}',
-        u'["starts-with", "$x-amz-meta-tag", ""]',
-        u'{"x-amz-algorithm": "AWS4-HMAC-SHA256"}',
-        u'{"x-amz-credential": "%(awsid)/%{isoDate}/%{region}/s3/aws4_request"}'
-        u'{"x-amz-date": "%{isoDate}T000000Z" }']
+        '{"bucket":"%(bucket)s"}',
+        '{"acl":"private"}',
+        '{"key":"%(key)s"}',
+        '{"success_action_status":"200"}',
+        '["content-length-range", 0, %(maxSize)s]',
+        '{"x-amz-meta-uuid": "14365123651274"}',
+        '["starts-with", "$x-amz-meta-tag", ""]',
+        '{"x-amz-algorithm": "AWS4-HMAC-SHA256"}',
+        '{"x-amz-credential": "%(awsid)/%{isoDate}/%{region}/s3/aws4_request"}'
+        '{"x-amz-date": "%{isoDate}T000000Z" }']
 
-    _UPLOAD_POLICY = u'{"expiration":"%s", "conditions":[%s]}'
+    _UPLOAD_POLICY = '{"expiration":"%s", "conditions":[%s]}'
 
 #___________________________________________________________________________________________________ __init__
     def __init__(self, bucketName, awsId, awsSecret, location =None):
@@ -115,7 +115,7 @@ class S3Bucket(object):
 #___________________________________________________________________________________________________ printBucketContents
     def printBucketContents(self, path, fileFilter, logger =None):
         out = self.listKeys(path, fileFilter)
-        s = u'Displaying %s results for %s/%s.' % (
+        s = 'Displaying %s results for %s/%s.' % (
             StringUtils.toUnicode(len(out)),
             self._bucketName,
             StringUtils.toUnicode(path))
@@ -126,7 +126,7 @@ class S3Bucket(object):
 
         index = 0
         for obj in out:
-            s = u'  ' + StringUtils.toUnicode(index) + u' - ' + obj.name
+            s = '  ' + StringUtils.toUnicode(index) + ' - ' + obj.name
             if logger:
                 logger.write(s)
             else:

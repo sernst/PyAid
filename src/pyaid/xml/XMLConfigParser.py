@@ -2,9 +2,12 @@
 # (C)2011
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 import re
 import xml.dom.minidom as minidom
 import codecs
+from pyaid.dict.DictUtils import DictUtils
 from pyaid.xml.ConfigData import ConfigData
 
 #___________________________________________________________________________________________________ XMLConfigParser
@@ -67,7 +70,7 @@ class XMLConfigParser(object):
     @staticmethod
     def serialize(interchangeData):
         xml = '<vm>\n'
-        for n,v in interchangeData.iteritems():
+        for n,v in DictUtils.iter(interchangeData):
             xml += XMLConfigParser._writeNode(n, v)
         return (xml + '</vm>').decode('unicode_escape')
 
@@ -84,7 +87,7 @@ class XMLConfigParser(object):
             target += data[0] + ' n="' + name + '" v="' + d + '" />\n'
         elif isinstance(data, dict):
             target += 'o n="' + name + '">\n'
-            for n,v in data.iteritems():
+            for n,v in DictUtils.iter(data):
                 target += XMLConfigParser._writeNode(n, v, depth+1)
             target += indent + '</o>'
         elif isinstance(data, str):

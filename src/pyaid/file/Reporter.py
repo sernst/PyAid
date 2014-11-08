@@ -2,8 +2,7 @@
 # (C)2012-2013
 # Scott Ernst
 
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import print_function, absolute_import, unicode_literals, division
 
 import sys
 import os
@@ -94,7 +93,7 @@ class Reporter(object):
         for b in self._buffer:
             try:
                 d    = DictUtils.merge(self._meta, b['data'])
-                item = b['prefix'] + u' ' + JSON.asString(d)
+                item = b['prefix'] + ' ' + JSON.asString(d)
             except Exception as err:
                 item = '>> EXCEPTION: JSON ENCODING FAILED >> ' + str(err).replace('\n', '\t')
 
@@ -125,7 +124,7 @@ class Reporter(object):
                 continue
 
             try:
-                out = StringUtils.toUnicode(u'\n'.join(items) + u'\n')
+                out = StringUtils.toUnicode('\n'.join(items) + '\n')
                 f   = open(p, 'a+')
                 f.write(out.encode('utf8'))
                 f.close()

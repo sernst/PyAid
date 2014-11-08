@@ -2,8 +2,7 @@
 # (C)2011-2014
 # Scott Ernst
 
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import print_function, absolute_import, unicode_literals, division
 
 import os
 import sys
@@ -347,7 +346,7 @@ class FileUtils(object):
             if os.path.isdir(path):
                 if noTail:
                     return path[:-1] if path.endswith(os.sep) else path
-                return path + (u'' if path.endswith(os.sep) else os.sep)
+                return path + ('' if path.endswith(os.sep) else os.sep)
             return path
 
         if ArgsUtils.get('isFile', False, kwargs):

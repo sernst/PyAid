@@ -2,11 +2,14 @@
 # (C)2011-2013
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 import re
 import math
 import numbers
 
 from pyaid.color.ColorNames import ColorNames
+from pyaid.dict.DictUtils import DictUtils
 from pyaid.number.IntUtils import IntUtils
 from pyaid.string.StringUtils import StringUtils
 
@@ -389,7 +392,7 @@ class ColorValue(object):
         range   = 360
         myColor = self.asHsl(output=list)
         poolColor = self.__class__(0)
-        for name, value in ColorNames.NAMES.iteritems():
+        for name, value in DictUtils.iter(ColorNames.NAMES):
             poolColor.load(value)
             color = poolColor.asHsl(output=list)
 
@@ -452,7 +455,7 @@ class ColorValue(object):
 #___________________________________________________________________________________________________ asWebRGBA
     def asWebRGBA(self, opacity =None):
         c = self.asRgb(output=tuple)
-        return u'rgba(%s, %s, %s, %s)' % (
+        return 'rgba(%s, %s, %s, %s)' % (
             StringUtils.toUnicode(c[0]),
             StringUtils.toUnicode(c[1]),
             StringUtils.toUnicode(c[2]),
@@ -461,11 +464,11 @@ class ColorValue(object):
 #___________________________________________________________________________________________________ asWebRgbOpacity
     def asWebRgbOpacity(self, opacity =None):
         c = self.asRgb(output=tuple)
-        return u'rgba(%s, %s, %s, %s)' % (
+        return 'rgba(%s, %s, %s, %s)' % (
             StringUtils.toUnicode(c[0]),
             StringUtils.toUnicode(c[1]),
             StringUtils.toUnicode(c[2]),
-            StringUtils.toUnicode(100.0*(self._opacity if opacity is None else opacity)) + u'%' )
+            StringUtils.toUnicode(100.0*(self._opacity if opacity is None else opacity)) + '%' )
 
 #___________________________________________________________________________________________________ asRgb
     def asRgb(self, normalize =False, output =None):
@@ -1080,7 +1083,7 @@ class ColorValue(object):
 #___________________________________________________________________________________________________ _parseUnknownColorString
     def _parseUnknownColorString(self, value):
         from pyaid.color.ColorNames import ColorNames
-        value = value.strip().lower().replace(u' ', u'')
+        value = value.strip().lower().replace(' ', '')
         if value in ColorNames.CLEAN_NAMES:
             return ColorNames.CLEAN_NAMES[value]
         return None

@@ -2,6 +2,8 @@
 # (C)2010-2014
 # Scott Ernst and Eric David Wills
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 import re
 import uuid
 

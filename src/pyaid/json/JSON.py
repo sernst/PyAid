@@ -2,11 +2,11 @@
 # (C)2011-2013
 # Scott Ernst
 
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import print_function, absolute_import, unicode_literals, division
 
 import json as jsonint
 import gzip
+from pyaid.dict.DictUtils import DictUtils
 
 from pyaid.string.StringUtils import StringUtils
 
@@ -108,7 +108,7 @@ class JSON(object):
     @classmethod
     def _reformat(cls, src):
         out = dict()
-        for n,v in src.iteritems():
+        for n,v in DictUtils.iter(src):
             n = StringUtils.strToUnicode(n)
 
             out[n] = cls._reformatValue(v)

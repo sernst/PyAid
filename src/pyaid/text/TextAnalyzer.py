@@ -2,6 +2,8 @@
 # (C)2012-2013
 # Scott Ernst
 
+from __future__ import print_function, absolute_import, unicode_literals, division
+
 import re
 
 from pyaid.ArgsUtils import ArgsUtils
@@ -29,9 +31,9 @@ class TextAnalyzer(object):
 
         src = StringUtils.toUnicode(src)
 
-        self._raw = src.replace(u'\r',u'')
+        self._raw = src.replace('\r','')
         if ArgsUtils.get('stripSource', True, kwargs):
-            self._raw = self._raw.strip(u'\n')
+            self._raw = self._raw.strip('\n')
 
         self._analyzed  = False
         self._errors    = []
