@@ -39,13 +39,13 @@ class DaemonRunner(object):
 
         try:
             self._verbose = targetClass.VERBOSE
-        except Exception, err:
+        except Exception as err:
             self._logger.write('Failed to acquire VERBOSE from ' + str(targetClass.__name__), err)
             sys.exit(126)
 
         try:
             self._uid = targetClass.SERVICE_UID
-        except Exception, err:
+        except Exception as err:
             self._logger.write('Failed to acquire SERVICE_UID from ' + str(targetClass.__name__), err)
             sys.exit(126)
 
@@ -54,7 +54,7 @@ class DaemonRunner(object):
         else:
             try:
                 self._wait = targetClass.WAIT_INTERVAL
-            except Exception, err:
+            except Exception as err:
                 self._logger.write(
                     'Failed to acquire WAIT_INTERVAL from ' + str(targetClass.__name__), err )
                 sys.exit(126)
@@ -111,7 +111,7 @@ class DaemonRunner(object):
         try:
             if self._target:
                 self._target.cleanup()
-        except Exception, err:
+        except Exception as err:
             pass
 
         sys.exit(0)
@@ -159,7 +159,7 @@ class DaemonRunner(object):
                                 self._targetClass.__name__, str(res),
                                 str(self._target.terminated) ))
                         self.terminate()
-                except Exception, err:
+                except Exception as err:
                     self._logger.writeError(self._uid + ' execution failure', err)
                     self._failCount += 1
                     if self._failCount > DaemonRunner._FAIL_LIMIT:
@@ -184,7 +184,7 @@ class DaemonRunner(object):
                 return self._targetClass(self, self._socketClass)
 
             return self._targetClass(self)
-        except Exception, err:
+        except Exception as err:
             self._logger.writeError('Failed to instantiate Daemon class', err)
 
         return None
@@ -196,7 +196,7 @@ class DaemonRunner(object):
             f.write(str(os.getpid()))
             f.close()
             return True
-        except Exception, err:
+        except Exception as err:
             self._logger.writeError('Failure to write PID service file', err)
             return False
 

@@ -2,7 +2,9 @@
 # (C)2011-2014
 # Scott Ernst
 
+from __future__ import print_function
 from __future__ import absolute_import
+
 import os
 import sys
 import gzip
@@ -78,26 +80,19 @@ class FileUtils(object):
                 f = open(path, 'r+')
             source = f.read()
             f.close()
-            return source.decode('utf-8', 'ignore')
-        except Exception, err:
+            return StringUtils.toUnicode(source)
+        except Exception as err:
             if raiseErrors:
                 raise
-            print err
+            print(err)
             return None
 
 #___________________________________________________________________________________________________ putContents
     @classmethod
     def putContents(cls, content, path, append =False, raiseErrors =False, gzipped =False):
-        if not isinstance(content, basestring):
-            content = u''
-        elif isinstance(content, unicode):
-            try:
-                content = content.encode('utf-8', 'ignore')
-            except Exception, err:
-                if raiseErrors:
-                    raise
-                print err
-                return False
+        if not StringUtils.isStringType(content):
+            content = ''
+        content = StringUtils.toStr2(content)
 
         try:
             mode = 'a+' if append and os.path.exists(path) else 'w+'
@@ -107,10 +102,10 @@ class FileUtils(object):
                 f = open(path, mode)
             f.write(content)
             f.close()
-        except Exception, err:
+        except Exception as err:
             if raiseErrors:
                 raise
-            print err
+            print(err)
             return False
 
         return True
@@ -144,7 +139,7 @@ class FileUtils(object):
                 subprocess.check_call(['gnome-open', '--', target])
             else:
                 subprocess.call(["open", "-R", target])
-        except Exception, err:
+        except Exception:
             return False
 
         return True
@@ -275,7 +270,7 @@ class FileUtils(object):
                 'destination':destination,
                 'overwriteExisting':overwriteExisting,
                 'fileList':fl })
-        except Exception, err:
+        except Exception as err:
             return None
 
         return fl
@@ -439,7 +434,7 @@ class FileUtils(object):
         try:
             os.system('xdg-open "%s"' % path)
             return True
-        except Exception, err:
+        except Exception as err:
             return False
 
 #===================================================================================================

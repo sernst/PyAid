@@ -2,8 +2,11 @@
 # (C)2013-2014
 # Scott Ernst
 
+from __future__ import print_function
+
 from pyaid.ArgsUtils import ArgsUtils
 from pyaid.NullUtils import NullUtils
+from pyaid.string.StringUtils import StringUtils
 
 #___________________________________________________________________________________________________ ConfigsDict
 class ConfigsDict(object):
@@ -68,10 +71,10 @@ class ConfigsDict(object):
             self.remove(key)
             return True
 
-        if not isinstance(key, basestring) and len(key) == 1:
+        if not StringUtils.isStringType(key) and len(key) == 1:
             key = key[0]
 
-        if isinstance(key, basestring):
+        if StringUtils.isStringType(key):
             addKey = self._formatKey(key)
             source = self._data
         else:
@@ -93,10 +96,10 @@ class ConfigsDict(object):
         if not key:
             return False
 
-        if not isinstance(key, basestring) and len(key) == 1:
+        if not StringUtils.isStringType(key) and len(key) == 1:
             key = key[0]
 
-        if isinstance(key, basestring):
+        if StringUtils.isStringType(key):
             k, value  = self._getFrom(self._data, key, includeKey=True)
             if value == self.null:
                 return False
@@ -127,7 +130,7 @@ class ConfigsDict(object):
             return (defaultValue, None) if includeHierarchy else defaultValue
 
         hierarchy = []
-        if isinstance(key, basestring):
+        if StringUtils.isStringType(key):
             key, value = self._getFrom(self._data, key, includeKey=True)
             if value == self.null:
                 return (defaultValue, None) if includeHierarchy else defaultValue
@@ -182,23 +185,23 @@ class ConfigsDict(object):
             ('CASE INSENSITIVE:', False) ]
 
         for trial in trials:
-            print '\n' + 80*'-' + '\n' + trial[0]
+            print('\n' + 80*'-' + '\n' + trial[0])
             cd = ConfigsDict(isCaseSensitive=trial[1])
-            print 'START:\n', cd.data
+            print('START:\n', cd.data)
             cd.add(keys[0], 42)
-            print 'ADDED KEY:\n', keys[0], '\n', cd.data
+            print('ADDED KEY:\n', keys[0], '\n', cd.data)
             cd.remove(keys[0])
-            print 'REMOVED KEY:\n', keys[0], '\n', cd.data
+            print('REMOVED KEY:\n', keys[0], '\n', cd.data)
 
             for key in keys:
                 cd.add(key, 'KEY-' + str(keys.index(key)))
                 value = cd.get(key)
-                print 'ADDED KEY:\n', '%s -> %s' % (key, value), '\n', cd.data
+                print('ADDED KEY:\n', '%s -> %s' % (key, value), '\n', cd.data)
 
             for key in keys:
                 cd.remove(key)
                 value = cd.get(key)
-                print 'REMOVED KEY:\n', '%s -> %s' % (key, value), '\n', cd.data
+                print('REMOVED KEY:\n', '%s -> %s' % (key, value), '\n', cd.data)
 
 #===================================================================================================
 #                                                                               I N T R I N S I C
@@ -206,10 +209,6 @@ class ConfigsDict(object):
 #___________________________________________________________________________________________________ __repr__
     def __repr__(self):
         return self.__str__()
-
-#___________________________________________________________________________________________________ __unicode__
-    def __unicode__(self):
-        return unicode(self.__str__())
 
 #___________________________________________________________________________________________________ __str__
     def __str__(self):

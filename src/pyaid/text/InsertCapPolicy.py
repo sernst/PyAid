@@ -4,6 +4,8 @@
 
 import re
 
+from pyaid.string.StringUtils import StringUtils
+
 #___________________________________________________________________________________________________ InsertCapPolicy
 class InsertCapPolicy(object):
     """A class for..."""
@@ -17,17 +19,15 @@ class InsertCapPolicy(object):
     NEWLINE_BACK = re.compile('(?P<target>[\n]{1})(?P<suffix>[\s\t]*)$')
     NEWLINE_AHEAD = re.compile('^(?P<prefix>[\s\t]*)(?P<target>[\n]{1})')
     NEWLINE_BACK_MULTI_ONLY = re.compile(
-        '(?P<prefix>[\n]+[\s\t]*)(?P<target>[\n]{1})(?P<suffix>[\s\t]*)$'
-    )
+        '(?P<prefix>[\n]+[\s\t]*)(?P<target>[\n]{1})(?P<suffix>[\s\t]*)$' )
     NEWLINE_NO_TAG_AHEAD = re.compile(
-        '^(?P<prefix>[\s\t]*)(?P<target>[\n]{1})(?![\s\t\n]*\[#[A-Za-z0-9_]+)'
-    )
+        '^(?P<prefix>[\s\t]*)(?P<target>[\n]{1})(?![\s\t\n]*\[#[A-Za-z0-9_]+)' )
 
 #___________________________________________________________________________________________________ __init__
     def __init__(self, capType, addExp =None, addReplace =u'', removeExp =None, removeReplace =u''):
         """Creates a new instance of ClassTemplate."""
-        self._addPattern    = re.compile(addExp) if isinstance(addExp, basestring) else addExp
-        self._removePattern = re.compile(removeExp) if isinstance(removeExp, basestring) else removeExp
+        self._addPattern    = re.compile(addExp) if StringUtils.isStringType(addExp) else addExp
+        self._removePattern = re.compile(removeExp) if StringUtils.isStringType(removeExp) else removeExp
         self._addReplace    = addReplace
         self._removeReplace = removeReplace
         self._capType       = capType

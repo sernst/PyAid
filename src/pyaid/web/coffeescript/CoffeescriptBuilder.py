@@ -2,17 +2,20 @@
 # (C)2011-2013
 # Scott Ernst
 
+from __future__ import print_function
+from __future__ import absolute_import
+
 import sys
 import os
 import re
 import getopt
-import commands
 
 from pyaid.interactive.queries import queryYesNoQuit
-
 from pyaid.debug.Logger import Logger
+from pyaid.system.SystemUtils import SystemUtils
 from pyaid.web.coffeescript.CoffeescriptAnalyzer import CoffeescriptAnalyzer
 from pyaid.web.coffeescript.CoffeescriptDependency import CoffeescriptDependency
+
 # AS NEEDED: from pyaid.web.coffeescript.IncludeCompressor import IncludeCompressor
 
 #___________________________________________________________________________________________________ CoffeescriptBuilder
@@ -83,9 +86,9 @@ class CoffeescriptBuilder(object):
                     self._targets.append(testTarget)
 
         if len(self._targets) == 0:
-            print '\n\n'
+            print('\n\n')
             self._log.write('No targets exist for: %s. Compilation aborted.' % targetPackageOrPath)
-            print '\n'
+            print('\n')
 
 #===================================================================================================
 #                                                                                   G E T / S E T
@@ -129,11 +132,11 @@ class CoffeescriptBuilder(object):
                 self._constructTarget(t)
 
             if self._compress:
-                print 'COMPRESSING:',t.package
+                print('COMPRESSING:', t.package)
                 from pyaid.web.coffeescript.IncludeCompressor import IncludeCompressor
                 ic = IncludeCompressor()
                 if not ic.compressFile(t.compiledPath):
-                    print 'COMPRESSION FAILURE:',t.compiledPath
+                    print('COMPRESSION FAILURE:', t.compiledPath)
 
         return self._targets
 
@@ -145,7 +148,7 @@ class CoffeescriptBuilder(object):
         CoffeescriptBuilder._results = ''
         CoffeescriptBuilder._missing = {}
         if recursive:
-            print 'RECURSIVE COMPILE AT: ' + path
+            print('RECURSIVE COMPILE AT: ' + path)
             def walker(paths, dirName, names):
                 out = CoffeescriptBuilder._compileAllInDirectory(
                     os.path.join(paths[0], dirName), paths[1], debug=debug, trace=trace,
@@ -158,14 +161,14 @@ class CoffeescriptBuilder(object):
                     CoffeescriptBuilder._missing[n] = v
 
             os.path.walk(path, walker, [path, rootPath])
-            print '\n\nCOMPILATION RESULTS:' + CoffeescriptBuilder._results
+            print('\n\nCOMPILATION RESULTS:' + CoffeescriptBuilder._results)
 
             if CoffeescriptBuilder._missing:
-                print '\n\nMISSING IMPORTS:' + '\n\n'
+                print('\n\nMISSING IMPORTS:' + '\n\n')
                 for n,v in CoffeescriptBuilder._missing.iteritems():
-                    print v['class'] + ' [LINE: #' + str(v['line']) + ' | ' + v['package'] + ']'
+                    print(v['class'] + ' [LINE: #' + str(v['line']) + ' | ' + v['package'] + ']')
         else:
-            print 'COMPILING DIRECTORY: ' + path
+            print('COMPILING DIRECTORY: ' + path)
             CoffeescriptBuilder._compileAllInDirectory(
                 path, rootPath, debug=debug, trace=trace, force=force, compress=compress)
 
@@ -187,7 +190,7 @@ class CoffeescriptBuilder(object):
     def _constructLibrary(self, target):
         try:
             if self._verbose:
-                print "\n\n" + ('-'*100) + '\n'
+                print("\n\n" + ('-'*100) + '\n')
                 self._log.add(
                     'LIBRARY: %s\n\tsource: %s\n\troot: %s' % (
                         target.package, target.path, target.rootPath))
@@ -258,7 +261,7 @@ class CoffeescriptBuilder(object):
                             libIncludes.append(inc)
 
             if self._verbose:
-                print '\n'
+                print('\n')
                 s = 'IMPORTING:'
                 for imp in libImports:
                     s += '\n\t' + imp.package
@@ -266,7 +269,7 @@ class CoffeescriptBuilder(object):
                     s += '\n\tEXTERNAL: ' + inc.package
                 self._log.add(s)
 
-                print '\n'
+                print('\n')
                 s = 'EXCLUDING:'
                 for imp in sharedImports:
                     s += '\n\t' + imp.package
@@ -289,10 +292,10 @@ class CoffeescriptBuilder(object):
                 self._compileToJavascript(target, assembledFile, libIncludes)
 
             if self._verbose:
-                print "\n" + ('-'*100) + '\n'
+                print("\n" + ('-'*100) + '\n')
 
-        except Exception, err:
-            print "\n\n\n"
+        except Exception as err:
+            print("\n\n\n")
             self._log.writeError(
                 'ERROR: Compilation failure for: %s\n\tsource: %s\n\troot: %s'
                 % (target.package, target.path, target.rootPath), err)
@@ -301,7 +304,7 @@ class CoffeescriptBuilder(object):
     def _constructTarget(self, target):
         try:
             if self._verbose:
-                print "\n\n" + ('-'*100) + '\n'
+                print("\n\n" + ('-'*100) + '\n')
                 self._log.write(
                     'EXECUTABLE: %s\n\tsource: %s\n\troot: %s'
                     % (target.package, target.path, target.rootPath) )
@@ -330,12 +333,13 @@ class CoffeescriptBuilder(object):
                 self._compileToJavascript(target, assembledFile)
 
             if self._verbose:
-                print "\n" + ('-'*100) + '\n'
+                print("\n" + ('-'*100) + '\n')
 
-        except Exception, err:
-            print "\n\n\n"
-            self._log.writeError('ERROR: Compilation failure for: %s\n\tsource: %s\n\troot: %s' \
-                               % (target.package, target.path, target.rootPath), err)
+        except Exception as err:
+            print("\n\n\n")
+            self._log.writeError(
+                'ERROR: Compilation failure for: %s\n\tsource: %s\n\troot: %s' % (
+                    target.package, target.path, target.rootPath), err)
 
 #___________________________________________________________________________________________________ _createOutputFile
     def _createOutputFile(self, target):
@@ -343,8 +347,8 @@ class CoffeescriptBuilder(object):
         outFile = target.assembledPath
         try:
             return open(outFile, 'w')
-        except Exception, err:
-            print "\n\n"
+        except Exception as err:
+            print("\n\n")
             self._log.write('Unable To Open output file: ' + str(outFile) + '\n' \
                             'Check to make sure you have write permissions to that directory.')
             return None
@@ -388,7 +392,7 @@ class CoffeescriptBuilder(object):
 
         #-------------------------------------------------------------------------------------------
         # DEPENDENCY ASSEMBLY LOOP
-        print '\n'
+        print('\n')
         for dep in targetImports:
             dep.open()
 
@@ -404,7 +408,7 @@ class CoffeescriptBuilder(object):
         out.close()
 
         if self._verbose:
-            print '\n'
+            print('\n')
             self._log.add('CONSTRUCTED: ' + out.name)
 
         return out.name
@@ -418,7 +422,7 @@ class CoffeescriptBuilder(object):
         # MISSING DEPENDENCIES
         # Handle missing dependencies
         if not os.path.exists(dep.path):
-            print "\n\n"
+            print("\n\n")
             self._log.write('ERROR: ' + dep.package + ' package does not exist at: ' + dep.path)
             return False
 
@@ -444,7 +448,7 @@ class CoffeescriptBuilder(object):
             try:
                 if os.path.exists(dep.cachePath):
                     os.remove(dep.cachePath)
-            except Exception, err:
+            except Exception as err:
                 pass
 
             cacheOut = None
@@ -515,14 +519,12 @@ class CoffeescriptBuilder(object):
                         'id':CoffeescriptBuilder._WARN_ID_MISSING_IMPORT,
                         'class':cn,
                         'line':l.lineNumber,
-                        'package':dep.package
-                    })
+                        'package':dep.package })
 
-                    print '\n'
+                    print('\n')
                     self._log.write(
                         'WARNING: Possible missing import\n\tmissing: %s\n\tfrom: %s [line #%s]'
-                        % (cn, dep.package, str(l.lineNumber))
-                    )
+                        % (cn, dep.package, str(l.lineNumber)) )
 
             #-----------------------------------------------------------------------------------
             # LINE DEBUGGER ANALYSIS
@@ -620,7 +622,9 @@ class CoffeescriptBuilder(object):
     def _compileToJavascript(self, target, assembledFile, jsIncludeOverrides =None):
 
         # Use the Coffeescript compiler to create a JS compilation of the assembled CS file
-        status, output = commands.getstatusoutput('coffee -c --bare ' + assembledFile)
+        result = SystemUtils.executeCommand(['coffee', '-c', '--bare', assembledFile])
+        status = result['code']
+        output = result['out']
         errors         = 0
         forceVerbose   = False
 
@@ -644,7 +648,7 @@ class CoffeescriptBuilder(object):
 
         self._report[target.package] = errors
         if self._verbose:
-            print "\n\n"
+            print("\n\n")
             if errors == 0 and status == 0:
                 self._log.write('Compilation complete: ' + target.compiledPath)
             else:
@@ -670,10 +674,10 @@ class CoffeescriptBuilder(object):
             self._includes[rootTarget.package] = []
 
         if not os.path.exists(target.path):
-            print "\n"
+            print("\n")
             self._log.add('WARNING: Missing import.\n\tPACKAGE: ' + target.package + '\n\tFILE: ' \
                           + target.path)
-            print "\n"
+            print("\n")
             return
 
         f = open(target.path)
@@ -788,7 +792,7 @@ class CoffeescriptBuilder(object):
                     missing[key] = v
 
         if len(results) > 0:
-            print '\nDIRECTORY ' + path + ' COMPILE RESULTS [' + str(count) + ']:' + results
+            print('\nDIRECTORY ' + path + ' COMPILE RESULTS [' + str(count) + ']:' + results)
         return {'res':results, 'missing':missing}
 
 #___________________________________________________________________________________________________ _parseError
@@ -808,13 +812,13 @@ class CoffeescriptBuilder(object):
         try:
             sep     = error.index(',')
             ccsFile = error[:sep]
-        except Exception, err:
+        except Exception:
             pass
 
         try:
             sep2    = error.index(':')
             out    += error[sep2+1:].strip() + '\n'
-        except Exception, err:
+        except Exception:
             if error and sep:
                 out += error[sep+1:].strip() + '\n'
 
@@ -876,7 +880,7 @@ class CoffeescriptBuilder(object):
 
 #___________________________________________________________________________________________________ usage
 def usage():
-    print """
+    print("""
         Builds a coffee script file of all dependencies and then compiles it to Javascript for
         deployment
 
@@ -889,17 +893,16 @@ def usage():
         -c | --compress  - Compresses each file after it is compiled.
         -v | --verbose   - Verbose mode is used for debugging.
         --force          - Force compilation even if cache entries are valid.
-    """
+    """)
 
 #___________________________________________________________________________________________________ main
 def main():
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:], "hap:t:r:fdvc", [
             "help", "all", "path=","target=", "root=", "full", "debug", "verbose", "force",
-            "compress"
-        ])
-    except getopt.GetoptError, err:
-        print str(err) + "\n"
+            "compress" ])
+    except getopt.GetoptError as err:
+        print(str(err) + "\n")
         usage()
         sys.exit(2)
 
@@ -939,7 +942,7 @@ def main():
         elif o in ("-c", "--compress"):
             compress = True
         else:
-            print "\nUnknown argument: " + o + ". Unable to continue.\n\n"
+            print("\nUnknown argument: " + o + ". Unable to continue.\n\n")
             usage()
             sys.exit(2)
 
@@ -963,7 +966,7 @@ def main():
         CoffeescriptBuilder.compileAllOnPath(
             path, root, recursive, debug, trace, force, compress=compress)
     else:
-        print "\nNo path was specified. Would you like to compile the entire vmi domain?"
+        print("\nNo path was specified. Would you like to compile the entire vmi domain?")
         result = queryYesNoQuit('Yes to continue:')
 
         if result != "yes":
@@ -971,7 +974,7 @@ def main():
 
         CoffeescriptBuilder.compileAllOnPath(path, root, True, debug, trace, force)
 
-    print "\nOperation complete.\n"
+    print("\nOperation complete.\n")
 
 
 ###################################################################################################

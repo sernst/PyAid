@@ -3,7 +3,12 @@
 # Scott Ernst
 
 import os
-import SocketServer
+
+try:
+    import SocketServer
+except Exception:
+    import socketserver
+    SocketServer = socketserver
 
 from pyaid.system.service.systemd.SystemDaemon import SystemDaemon
 from pyaid.debug.Logger import Logger
@@ -58,7 +63,7 @@ class SystemSocketDaemon(SystemDaemon):
             self.logger.write('Cleaning up leftover socket file')
         try:
             os.unlink(self._socket)
-        except Exception, err:
+        except Exception as err:
             pass
 
         if self.verbose:
@@ -69,7 +74,7 @@ class SystemSocketDaemon(SystemDaemon):
             self.logger.write('Executing socket server polling')
         try:
             self._server.serve_forever()
-        except Exception, err:
+        except Exception as err:
             self.logger.write('FAILED: serve_forever', err)
 
         if self.verbose:
@@ -81,7 +86,7 @@ class SystemSocketDaemon(SystemDaemon):
     def cleanup(self):
         try:
             os.unlink(self._socket)
-        except Exception, err:
+        except Exception as err:
             pass
 
 #___________________________________________________________________________________________________ terminate
@@ -93,7 +98,7 @@ class SystemSocketDaemon(SystemDaemon):
 
         try:
             self._server.shutdown()
-        except Exception, err:
+        except Exception as err:
             pass
 
         self.cleanup()

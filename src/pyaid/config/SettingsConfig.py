@@ -2,10 +2,13 @@
 # (C)2012-2013
 # Scott Ernst
 
+from __future__ import print_function
+
 import os
 
 from pyaid.NullUtils import NullUtils
 from pyaid.json.JSON import JSON
+from pyaid.string.StringUtils import StringUtils
 
 #___________________________________________________________________________________________________ SettingsConfig
 class SettingsConfig(object):
@@ -48,7 +51,7 @@ class SettingsConfig(object):
         if not key:
             return self._settings
 
-        if isinstance(key, basestring):
+        if StringUtils.isStringType(key):
             key = key.split('->')
         value = self._settings
         for k in key:
@@ -86,7 +89,7 @@ class SettingsConfig(object):
         if value is nullTest:
             return True
 
-        if isinstance(key, basestring):
+        if StringUtils.isStringType(key):
             key = [key]
         value = self._settings
         for k in key[:-1]:
@@ -110,7 +113,7 @@ class SettingsConfig(object):
 
 #___________________________________________________________________________________________________ _updateSetting
     def _updateSetting(self, key, value):
-        if isinstance(key, basestring):
+        if StringUtils.isStringType(key):
             key = key.split('->')
 
         src = self._settings
@@ -138,7 +141,7 @@ class SettingsConfig(object):
             return
 
         if not JSON.toFile(self._path, self._settings, pretty=self._pretty):
-            print 'ERROR: Unable to save application settings file: ' + self._path
+            print('ERROR: Unable to save application settings file: ' + self._path)
             return False
 
         return True
@@ -165,10 +168,6 @@ class SettingsConfig(object):
 #___________________________________________________________________________________________________ __repr__
     def __repr__(self):
         return self.__str__()
-
-#___________________________________________________________________________________________________ __unicode__
-    def __unicode__(self):
-        return unicode(self.__str__())
 
 #___________________________________________________________________________________________________ __str__
     def __str__(self):

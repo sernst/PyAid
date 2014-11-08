@@ -11,6 +11,9 @@ from pyaid.radix.Base36 import Base36
 from pyaid.radix.Base64 import Base64
 
 #___________________________________________________________________________________________________ TimeUtils
+from pyaid.string.StringUtils import StringUtils
+
+
 class TimeUtils(object):
     """A class for time utilities."""
 
@@ -81,10 +84,10 @@ class TimeUtils(object):
         secs    = int(time['seconds'])
         millis  = int(round(1000.0*(time['seconds'] - float(secs))))
 
-        return unicode(time['hours']).zfill(2) + u':' \
-            + unicode(time['minutes']).zfill(2) + u':' \
-            + unicode(secs).zfill(2) + u'.' \
-            + unicode(millis).zfill(3)
+        return StringUtils.toUnicode(time['hours']).zfill(2) + u':' \
+            + StringUtils.toUnicode(time['minutes']).zfill(2) + u':' \
+            + StringUtils.toUnicode(secs).zfill(2) + u'.' \
+            + StringUtils.toUnicode(millis).zfill(3)
 
 #___________________________________________________________________________________________________ utcToLocalDatetime
     @classmethod
@@ -296,8 +299,8 @@ class TimeUtils(object):
         """ Creates a timecode down to the microsecond for use in creating unique UIDs. """
         out = Base64.to64(cls.getNowSeconds()) + u'-' + Base64.to64(datetime.microsecond)
 
-        return ((unicode(prefix) + u'-') if prefix else u'') + out \
-            + ((u'-' + unicode(suffix)) if suffix else u'')
+        return ((StringUtils.toUnicode(prefix) + u'-') if prefix else u'') + out \
+            + ((u'-' + StringUtils.toUnicode(suffix)) if suffix else u'')
 
 #___________________________________________________________________________________________________ timecodeToFriendlyTimestamp
     @classmethod
@@ -367,7 +370,7 @@ class TimeUtils(object):
         if t >= 60000:
             hasMinutes = True
             cVal  = int(float(t)/60000.0)
-            s     = unicode(cVal)
+            s     = StringUtils.toUnicode(cVal)
             t -= cVal*60000
 
             if t == 0:
@@ -379,7 +382,7 @@ class TimeUtils(object):
         if t >= 1000:
             hasSeconds = True
             cVal  = int(float(t)/1000.0)
-            s     = unicode(cVal)
+            s     = StringUtils.toUnicode(cVal)
             t -= cVal*1000
 
             if t == 0 and not hasMinutes:
@@ -393,7 +396,7 @@ class TimeUtils(object):
         if t == 0:
             return out
 
-        s = unicode(int(round(t)))
+        s = StringUtils.toUnicode(int(round(t)))
         if not hasMinutes and not hasSeconds:
             return s + u' ms'
 

@@ -2,7 +2,9 @@
 # (C)2011-2013
 # Scott Ernst
 
+from __future__ import print_function
 from __future__ import absolute_import
+
 import json as jsonint
 import gzip
 
@@ -38,12 +40,12 @@ class JSON(object):
                 f = open(path, 'r')
             res = f.read()
             f.close()
-            return cls.fromString(res.decode('utf-8', 'ignore'))
-        except Exception, err:
+            return cls.fromString(res)
+        except Exception as err:
             if throwError:
                 raise
             else:
-                print err
+                print(err)
             return None
 
 #___________________________________________________________________________________________________ toFile
@@ -58,11 +60,11 @@ class JSON(object):
             f.write(res)
             f.close()
             return True
-        except Exception, err:
+        except Exception as err:
             if throwError:
                 raise
             else:
-                print err
+                print(err)
             return False
 
 #===================================================================================================
@@ -76,12 +78,12 @@ class JSON(object):
 
         try:
             return jsonint.dumps(src, separators=(',', ':'), encoding=encoding)
-        except Exception, err:
+        except Exception:
             try:
                 src = cls._reformat(src)
                 return jsonint.dumps(src, separators=(',', ':'), encoding=encoding)
-            except Exception, err:
-                print 'JSON Failed to encode:', src
+            except Exception:
+                print('JSON Failed to encode:', src)
                 raise
 
 #___________________________________________________________________________________________________ _dumpsPretty
@@ -93,13 +95,13 @@ class JSON(object):
         try:
             return jsonint.dumps(
                 src, separators=(',', ': '), indent=4, sort_keys=True, encoding=encoding)
-        except Exception, err:
+        except Exception:
             try:
                 src = cls._reformat(src)
                 return jsonint.dumps(
                     src, separators=(',', ': '), sort_keys=True, encoding=encoding)
-            except Exception, err:
-                print 'JSON Failed to encode:', src
+            except Exception:
+                print('JSON Failed to encode:', src)
                 raise
 
 #___________________________________________________________________________________________________ _reformat
@@ -107,10 +109,7 @@ class JSON(object):
     def _reformat(cls, src):
         out = dict()
         for n,v in src.iteritems():
-            if isinstance(n, str):
-                n = StringUtils.strToUnicode(n)
-            else:
-                n = unicode(n)
+            n = StringUtils.strToUnicode(n)
 
             out[n] = cls._reformatValue(v)
         return out

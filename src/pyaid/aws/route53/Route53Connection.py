@@ -2,7 +2,7 @@
 # (C)2012-2013
 # Scott Ernst and Eric D. Wills
 
-from boto.route53.connection import Route53Connection
+from boto.route53.connection import Route53Connection as BotoRoute53Connection
 
 #___________________________________________________________________________________________________ Route53Connection
 class Route53Connection(object):
@@ -14,7 +14,7 @@ class Route53Connection(object):
 #___________________________________________________________________________________________________ __init__
     def __init__(self, awsKey, awsSecret):
         """Creates a new instance of the Route53Connection class"""
-        self._connection  = Route53Connection(awsKey, awsSecret)
+        self._connection  = BotoRoute53Connection(awsKey, awsSecret)
         self._zones       = None
         self._namedZones  = dict()
         self._idZones     = dict()

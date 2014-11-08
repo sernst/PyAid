@@ -2,6 +2,9 @@
 # (C)2010-2013
 # Scott Ernst
 
+from __future__ import print_function
+from __future__ import absolute_import
+
 import re
 import sys
 import os
@@ -52,7 +55,7 @@ class IncludeCompressor(object):
                 from pyaid.web.coffeescript.CoffeescriptBuilder import CoffeescriptBuilder
                 CoffeescriptBuilder.compileAllOnPath(rootPath, os.path.dirname(rootPath), True)
                 self._log.write('Coffeescript compiled.')
-            except Exception, err:
+            except Exception as err:
                 self._log.writeError('Failed to compile coffeescript file.', err)
                 return False
 
@@ -66,7 +69,7 @@ class IncludeCompressor(object):
                 from pyaid.web.coffeescript.CoffeescriptBuilder import CoffeescriptBuilder
                 CoffeescriptBuilder.compileAllOnPath(rootPath, rootPath, True)
                 self._log.write('Coffee scripts compiled.')
-            except Exception, err:
+            except Exception as err:
                 self._log.writeError('Failed to compile coffeescript files.', err)
                 return False
 
@@ -110,7 +113,7 @@ class IncludeCompressor(object):
             fh         = open(inFile, 'r')
             fileString = fh.read()
             fh.close()
-        except Exception, err:
+        except Exception as err:
             self._log.writeError('FAILED: Unable to read ' + str(inFile), err)
             return False
 
@@ -124,7 +127,7 @@ class IncludeCompressor(object):
             fh = open(tempFile, 'w')
             fh.write(fileString)
             fh.close()
-        except Exception, err:
+        except Exception as err:
             self._log.writeError('FAILED: Unable to write temp file ' + str(tempFile), err)
             return False
 
@@ -186,8 +189,8 @@ def usage():
 def main():
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:], "hp:cy", ["help", "path=", "coffee"])
-    except getopt.GetoptError, err:
-        print str(err) + "\n"
+    except getopt.GetoptError as err:
+        print(str(err) + "\n")
         usage()
         sys.exit(2)
 
@@ -203,7 +206,7 @@ def main():
         elif o in ("-c", "--coffee"):
             coffee = True
         else:
-            print "\nUnknown argument: " + o + ". Unable to continue.\n\n"
+            print("\nUnknown argument: " + o + ". Unable to continue.\n\n")
             usage()
             sys.exit(2)
 
@@ -220,7 +223,7 @@ def main():
     inc = IncludeCompressor(coffee)
     inc.compress(path)
 
-    print "Operation complete."
+    print("Operation complete.")
 
 ####################################################################################################
 ####################################################################################################

@@ -2,6 +2,8 @@
 # (C)2010-2014
 # Scott Ernst and Thomas Gilray
 
+from __future__ import print_function
+
 import sys
 import os
 import datetime
@@ -113,10 +115,10 @@ class Logger(object):
 
 #___________________________________________________________________________________________________ resetLogFile
     def resetLogFile(self):
-        if self._logFile is not None and os.path.exists(self._logFile):
+        if self._logFile and os.path.exists(self._logFile):
             try:
-                os.remove(self._logFile)
-            except Exception, err:
+                os.remove(StringUtils.toUnicode(self._logFile))
+            except Exception:
                 pass
 
 #___________________________________________________________________________________________________ addPrintCallback
@@ -165,11 +167,12 @@ class Logger(object):
     def getPrefix(self, *args, **kwargs):
         if self._locationPrefix:
             item = self.getStackData()[-1]
-            loc  = u' -> %s #%s]' % (item['file'], unicode(item['line']))
+            loc  = u' -> %s #%s]' % (item['file'], StringUtils.toUnicode(item['line']))
         else:
             loc = u']'
 
-        return unicode(self.getTime(self.timezone).strftime(u'[%a %H:%M <%S.%f>') + loc)
+        return StringUtils.toUnicode(
+            self.getTime(self.timezone).strftime(u'[%a %H:%M <%S.%f>') + loc)
 
 #___________________________________________________________________________________________________ clear
     def clear(self, storage =False):
@@ -181,8 +184,8 @@ class Logger(object):
 
 #___________________________________________________________________________________________________ clearLogFile
     def clearLogFile(self):
-        if self._logFile and os.path.exists(self._logFile):
-            os.remove(self._logFile)
+        if not self._logFile or not os.path.exists(self._logFile):
+            os.remove(StringUtils.toUnicode(self._logFile))
 
 #___________________________________________________________________________________________________ add
     def add(self, s, traceStack =False, shaveStackTrace =0, htmlEscape =None):
@@ -246,14 +249,14 @@ class Logger(object):
             item = self.logMessageToString(logMessage=logItem) + u'\n'
             try:
                 item = item.encode('utf8', 'ignore')
-            except Exception, err:
+            except Exception:
                 pass
             items.append(item)
 
         for cb in self._writeCallbacks:
             try:
                 cb(self, items)
-            except Exception, err:
+            except Exception:
                 pass
 
         if not self._logPath:
@@ -269,30 +272,30 @@ class Logger(object):
 
                 try:
                     if not exists:
-                        os.system('chmod 775 ' + self._logFile)
-                except Exception, err:
+                        os.system('chmod 775 ' + StringUtils.toUnicode(self._logFile))
+                except Exception:
                     pass
 
-            except Exception, err:
-                print "LOGGER ERROR: Unable to write log file."
-                print err
+            except Exception as err:
+                print("LOGGER ERROR: Unable to write log file.")
+                print(err)
 
         self.clear()
 
 #___________________________________________________________________________________________________ createLogName
     @classmethod
     def createLogName(cls, name):
-        if isinstance(name, basestring) and len(name) > 0:
+        if StringUtils.isStringType(name) and len(name) > 0:
             return name
         elif hasattr(name, '__class__'):
             try:
                 return name.__class__.__name__
-            except Exception, err:
+            except Exception:
                 return 'UnknownObject'
         elif hasattr(name, '__name__'):
             try:
                 return name.__name__
-            except Exception, err:
+            except Exception:
                 return 'UnknownClass'
         else:
             return 'General'
@@ -311,13 +314,14 @@ class Logger(object):
         for item in stack[start:stop]:
             index    += 1
             if item['internal']:
-                s += (u'\n    [%s]: %s.%s [#%s]'
-                      + '\n         code: %s') \
-                  % (unicode(index), item['file'], item['function'], unicode(item['line']),
-                     item['code'][:100])
+                s +=(u'\n    [%s]: %s.%s [#%s]\n         code: %s' % (
+                    StringUtils.toUnicode(index), item['file'], item['function'],
+                    StringUtils.toUnicode(item['line']),
+                    item['code'][:100] ))
             else:
                 s += u'\n    [%s] EXT: %s {line: %s}' % (
-                    unicode(index), item['file'], unicode(item['line']))
+                    StringUtils.toUnicode(index), item['file'],
+                    StringUtils.toUnicode(item['line']))
 
         return s
 
@@ -329,15 +333,15 @@ class Logger(object):
             stackSource = Logger.getRawStack()
 
         for item in stackSource:
-            path = unicode(item[0])
+            path = StringUtils.toUnicode(item[0])
             res.append(dict(
                 path=path,
                 internal=True,
-                dir=unicode(os.path.dirname(path)),
-                file=unicode(os.path.basename(path).replace('.py','')),
+                dir=StringUtils.toUnicode(os.path.dirname(path)),
+                file=StringUtils.toUnicode(os.path.basename(path).replace('.py','')),
                 line=item[1],
-                function=unicode(item[2]),
-                code=unicode(item[3]) ))
+                function=StringUtils.toUnicode(item[2]),
+                code=StringUtils.toUnicode(item[3]) ))
 
         return res
 
@@ -367,17 +371,17 @@ class Logger(object):
             index = 0
             for t in target:
                 try:
-                    v = unicode(t)
-                except Exception, err:
+                    v = StringUtils.toUnicode(t)
+                except Exception:
                     v = u'<UNPRINTABLE>'
                 s += u'%s[%s]: %s' % (indent, index, v)
             return s
 
         if isinstance(target, dict):
-            for n,v in target.iteritems():
+            for n,v in target.items():
                 try:
-                    v = unicode(v)
-                except Exception, err:
+                    v = StringUtils.toUnicode(v)
+                except Exception:
                     v = u'<UNPRINTABLE>'
                 s += u'%s%s: %s' % (indent, n, v)
             return s
@@ -386,46 +390,46 @@ class Logger(object):
         for n in items:
             v = getattr(target, n)
             try:
-                v = unicode(v)
-            except Exception, err:
+                v = StringUtils.toUnicode(v)
+            except Exception:
                 v = u'<UNPRINTABLE>'
             s += u'%s%s: %s' % (indent, n, v)
         return s
 
 #___________________________________________________________________________________________________ createErrorMessage
     @classmethod
-    def createErrorMessage(cls, message, err):
+    def createErrorMessage(cls, message, error):
         try:
-            errorType = unicode(sys.exc_info()[0])
-        except Exception, err:
+            errorType = StringUtils.toUnicode(sys.exc_info()[0])
+        except Exception:
             try:
                 errorType = str(sys.exc_info()[0])
-            except Exception, err:
+            except Exception:
                 errorType = '[[UNABLE TO PARSE]]'
 
         try:
-            errorValue = unicode(sys.exc_info()[1])
-        except Exception, err:
+            errorValue = StringUtils.toUnicode(sys.exc_info()[1])
+        except Exception:
             try:
                 errorValue = str(sys.exc_info()[1])
-            except Exception, err:
+            except Exception:
                 errorValue = '[[UNABLE TO PARSE]]'
 
         try:
-            error = unicode(err)
-        except Exception, err:
+            error = StringUtils.toUnicode(error)
+        except Exception as err:
             try:
                 error = str(err)
-            except Exception, err:
+            except Exception:
                 error = '[[UNABLE TO PARSE]]'
 
         try:
             es = (cls.formatAsString(message) + "\n    TYPE: %s\n    VALUE: %s\nERROR: %s\n") \
                % (errorType, errorValue, error)
-        except Exception, err:
+        except Exception:
             try:
                 es = cls.formatAsString(message) + "\n    [[ERROR ATTRIBUTE PARSING FAILURE]]"
-            except Exception, err:
+            except Exception:
                 es = 'FAILED TO PARSE EXCEPTION'
 
         return es
@@ -435,17 +439,13 @@ class Logger(object):
     def formatAsString(cls, src, indentLevel =0):
         indents = u'    '*indentLevel
         if isinstance(src, list) or isinstance(src, tuple):
-            out      = [indents + unicode(src[0]) + (u'' if src[0].endswith(u':') else u':')]
+            out      = [indents + StringUtils.toUnicode(src[0]) + (u'' if src[0].endswith(u':') else u':')]
             indents += u'    '
             lines    = []
             maxIndex = 0
 
             for item in src[1:]:
-                if not isinstance(item, basestring):
-                    item = unicode(item)
-                elif isinstance(item, str):
-                    item = item.decode('utf-8')
-
+                item     = StringUtils.toUnicode(item)
                 index    = item.find(':')
                 index    = index if index != -1 and index < 12 else 0
                 maxIndex = max(index, maxIndex)
@@ -459,11 +459,7 @@ class Logger(object):
             return u'\n'.join(out)
 
         else:
-            if not isinstance(src, basestring):
-                src = unicode(src)
-            elif isinstance(src, str):
-                src = src.decode('utf-8')
-            return indents + src
+            return indents + StringUtils.toUnicode(src)
 
 #___________________________________________________________________________________________________ traceLogMessage
     @classmethod
@@ -473,15 +469,15 @@ class Logger(object):
         if 'stack' in logMessage:
             log += logMessage['stack']
         out = cls.asAscii(log)
-        print out
+        print(out)
 
         try:
             for cb in callbacks:
                 try:
                     cb(callbackTarget, out)
-                except Exception, err:
+                except Exception:
                     pass
-        except Exception, err:
+        except Exception:
             pass
 
         return out
@@ -494,21 +490,21 @@ class Logger(object):
             logValue = StringUtils.htmlEscape(logValue)
 
         logValue = StringUtils.strToUnicode(logValue.replace('\n', '\n    '))
-        if not isinstance(logValue, unicode):
+        if not StringUtils.isStringType(logValue):
             logValue = u'FAILED TO LOG RESPONSE'
 
         out = {'log':logValue}
 
         if prefix:
             logPrefix = StringUtils.strToUnicode(prefix)
-            if not isinstance(logPrefix, unicode):
+            if not StringUtils.isStringType(logPrefix):
                 logPrefix = u'FAILED TO CREATE PREFIX'
             out['prefix'] = logPrefix
 
         if traceStack:
             logStack = StringUtils.strToUnicode(
                 'Stack Trace:\n' + cls.getFormattedStackTrace(shaveStackTrace))
-            if not isinstance(logStack, unicode):
+            if not StringUtils.isStringType(logStack):
                 logStack = u'FAILED TO CREATE STACK'
             out['stack'] = logStack
 
@@ -524,19 +520,19 @@ class Logger(object):
             import pytz
             dt = datetime.datetime.now(tz=pytz.utc)
             return dt.astimezone(tz=pytz.timezone(timezone))
-        except Exception, err:
+        except Exception:
             return datetime.datetime.utcnow()
 
 #___________________________________________________________________________________________________ asAscii
     @classmethod
     def asAscii(cls, string):
-        if isinstance(string, unicode):
+        if StringUtils.isStringType(string):
             try:
                 return string.encode('utf8', 'ignore')
-            except Exception, err:
+            except Exception:
                 try:
                     return unicodedata.normalize('NFKD', string).encode('ascii', 'ignore')
-                except Exception, err:
+                except Exception:
                     return '[[UNABLE TO DISPLAY LOG ENTRY IN ASCII CHARS]]'
         else:
             return string
@@ -587,5 +583,5 @@ class Logger(object):
         """ Attempt to flush the buffer if not empty as part of the deletion process."""
         try:
             self.flush()
-        except Exception, err:
+        except Exception:
             pass

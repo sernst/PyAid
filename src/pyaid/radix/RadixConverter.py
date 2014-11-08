@@ -2,6 +2,9 @@
 # (C)2012
 # Scott Ernst
 
+from __future__ import print_function
+from __future__ import absolute_import
+
 import sys
 import getopt
 
@@ -17,48 +20,40 @@ class RadixConverter(object):
 
 #___________________________________________________________________________________________________ from64
     @classmethod
-    def from64(self, value):
+    def from64(cls, value):
         """Doc..."""
         return Base64.from64(value, True)
 
 #___________________________________________________________________________________________________ to64
     @classmethod
-    def to64(self, value):
+    def to64(cls, value):
         """Doc..."""
         return Base64.to64(int(value))
 
 #___________________________________________________________________________________________________ from36
     @classmethod
-    def from36(self, value):
+    def from36(cls, value):
         """Doc..."""
         return Base36.from36(value, True)
 
 #___________________________________________________________________________________________________ to36
     @classmethod
-    def to36(self, value):
+    def to36(cls, value):
         """Doc..."""
         return Base36.to36(int(value))
-
-#===================================================================================================
-#                                                                               P R O T E C T E D
-
-#___________________________________________________________________________________________________ _internalMethod
-    def _internalMethod(self):
-        """Doc..."""
-        pass
 
 ####################################################################################################
 ####################################################################################################
 
 #___________________________________________________________________________________________________ usage
 def usage():
-    print """
+    print("""
     Convenience class for calling radix conversion methods.
         --from64        - Prints the specified base 64 string converted into base 10.
         --to64          - Prints the specified base 10 integer converted into base 64.
         --from36        - Prints the specified base 36 string converted into base 10.
         --to36          - Prints the specified base 10 integer converted into base 36.
-    """
+    """)
 
 #___________________________________________________________________________________________________ main
 def main():
@@ -68,8 +63,8 @@ def main():
             "h",
             ["help", 'from64=', 'to64=', 'from36=', 'to36=']
         )
-    except getopt.GetoptError, err:
-        print str(err) + "\n"
+    except getopt.GetoptError as err:
+        print(str(err) + "\n")
         usage()
         sys.exit(2)
 
@@ -103,14 +98,14 @@ def main():
             outRadix = '36'
             out = RadixConverter.to36(int(input))
         else:
-            print "\nUnknown argument: " + o + ". Unable to continue.\n\n"
+            print("\nUnknown argument: " + o + ". Unable to continue.\n\n")
             usage()
             sys.exit(2)
 
-    print '\n\tConverted from base %s to base %s:' % (inRadix, outRadix)
-    print '\t  INPUT: ' + str(input)
-    print '\t  VALUE: ' + str(out)
-    print ''
+    print('\n\tConverted from base %s to base %s:' % (inRadix, outRadix))
+    print('\t  INPUT: ' + str(input))
+    print('\t  VALUE: ' + str(out))
+    print('')
 
 ####################################################################################################
 ####################################################################################################

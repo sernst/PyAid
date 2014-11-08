@@ -85,17 +85,17 @@ class LineMetadata(object):
 
         try:
             return self._analyzer.lines.index(self)
-        except Exception, err:
+        except Exception:
             pass
 
         try:
             return 1 + self._analyzer.lines.index(self.previousLine)
-        except Exception, err:
+        except Exception:
             pass
 
         try:
             return self._analyzer.lines.index(self.nextLine) - 1
-        except Exception, err:
+        except Exception:
             pass
 
         return -1

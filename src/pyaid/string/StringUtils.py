@@ -2,17 +2,31 @@
 # (C)2011-2014
 # Scott Ernst and Eric David Wills
 
+from __future__ import unicode_literals
+
 import os
 import re
+import sys
 import string
 import random
 import math
 import unicodedata
 
+if sys.version < '3':
+    # noinspection PyUnresolvedReferences
+    text_type = unicode
+    binary_type = str
+else:
+    text_type = str
+    binary_type = bytes
+
 #___________________________________________________________________________________________________ StringUtils
-class StringUtils:
+class StringUtils(object):
     """ A class for string related operations, targeting both byte and unicode strings, but
         focusing primarily on unicode strings for forward compatibility. """
+
+    TEXT_TYPE   = text_type
+    BINARY_TYPE = binary_type
 
 #===================================================================================================
 #                                                                                     P U B L I C
@@ -29,14 +43,22 @@ class StringUtils:
 
     _SOLO_BACKSLASH_PATTERN = re.compile('(?<!\\\)\\\(?!\\\)')
 
+#___________________________________________________________________________________________________ isStringType
+    @classmethod
+    def isStringType(cls, value, strict =False):
+        """isString doc..."""
+        if strict:
+            return isinstance(value, text_type)
+        return isinstance(value, (text_type, binary_type))
+
 #___________________________________________________________________________________________________ capitalizeWords
     @classmethod
     def capitalizeWords(cls, source):
         """capitalizeWords doc..."""
         try:
             return source.title()
-        except Exception, err:
-            return unicode(source).title()
+        except Exception as err:
+            return text_type(source).title()
 
 #___________________________________________________________________________________________________ source
     @classmethod
@@ -46,7 +68,7 @@ class StringUtils:
 
         source = cls.strToUnicode(source)
         source = unicodedata.normalize('NFKD', source).encode('ascii', 'ignore')
-        return unicode(re.sub('[^\w\s-]', '', source).strip().lower())
+        return text_type(re.sub('[^\w\s-]', '', source).strip().lower())
 
 #___________________________________________________________________________________________________ matches
     @classmethod
@@ -54,7 +76,11 @@ class StringUtils:
         """ Returns whether or not the source string matches the test string or any of the elements
             in a list of test strings. """
 
-        if isinstance(test, basestring):
+        if isinstance(test, binary_type):
+            test = text_type(test)
+            return source == test
+
+        if isinstance(test, text_type):
             return source == test
 
         for item in test:
@@ -80,7 +106,7 @@ class StringUtils:
                 Whether or not the string contains the test.
         """
 
-        if isinstance(test, basestring):
+        if isinstance(test, (text_type, binary_type)):
             return source.find(test, offset) != -1
 
         for t in test:
@@ -104,7 +130,7 @@ class StringUtils:
                 Whether or not the string contains the test.
         """
 
-        if isinstance(test, basestring):
+        if isinstance(test, (text_type, binary_type)):
             return source.find(test, offset) != -1
 
         for t in test:
@@ -130,7 +156,7 @@ class StringUtils:
                 Whether or not the string begins with the test.
         """
 
-        if isinstance(test, basestring):
+        if isinstance(test, (text_type, binary_type)):
             return source.startswith(test)
 
         for t in test:
@@ -156,7 +182,7 @@ class StringUtils:
                 Whether or not the string ends with the test.
         """
 
-        if isinstance(test, basestring):
+        if isinstance(test, (text_type, binary_type)):
             return source.endswith(test)
 
         for t in test:
@@ -194,7 +220,7 @@ class StringUtils:
         """
 
         out = re.compile('[^A-Za-z0-9_]').sub(u'', source)
-        return unicode(out if preserveCase else out.lower())
+        return text_type(out if preserveCase else out.lower())
 
 #___________________________________________________________________________________________________ abbreviate
     @staticmethod
@@ -260,8 +286,8 @@ class StringUtils:
             return text
 
         halfLength = math.floor(0.5*float(length))
-        left  = cls.abbreviate(text, halfLength, None, sepChar=sepChar)
-        right = cls.abbreviateRight(text, length - halfLength, None, sepChar=sepChar)
+        left  = cls.abbreviate(text, halfLength, u'', sepChar=sepChar)
+        right = cls.abbreviateRight(text, length - halfLength, u'', sepChar=sepChar)
 
         return left + truncation + right
 
@@ -276,7 +302,7 @@ class StringUtils:
 #___________________________________________________________________________________________________ camelCapsToWords
     @staticmethod
     def camelCapsToWords(source, capitalize =False):
-        if not source or not isinstance(source, basestring):
+        if not source or not isinstance(source, (text_type, binary_type)):
             return ''
 
         out = source.replace(u'-', u' ').replace(u'_', u' ').strip()
@@ -326,7 +352,7 @@ class StringUtils:
 #___________________________________________________________________________________________________ getCompleteFragment
     @staticmethod
     def getCompleteFragment(source, maxLength =-1, preferSentences =False, addEllipsis =True):
-        if not source or not isinstance(source, basestring):
+        if not source or not isinstance(source, (text_type, binary_type)):
             return u''
 
         if maxLength < 0:
@@ -373,29 +399,49 @@ class StringUtils:
     @classmethod
     def strToUnicode(cls, value, force =True):
         try:
-            if not isinstance(value, unicode):
-                return value.decode('utf8', 'ignore')
-        except Exception, err:
+            if not isinstance(value, text_type):
+                if sys.version < '3':
+                    return value.decode('utf8', 'ignore')
+                else:
+                    return text_type(value)
+        except Exception:
             pass
 
         if not force:
             return value
-        return value if value is None else unicode(value)
+        return value if value is None else text_type(value)
 
 #___________________________________________________________________________________________________ unicodeToStr
     @classmethod
     def unicodeToStr(cls, value, force =True):
         try:
-            if not isinstance(value, str):
-                return value.encode('utf8', 'ignore')
-        except Exception, err:
+            if not isinstance(value, binary_type):
+                if sys.version < '3':
+                    return value.encode('utf8', 'ignore')
+                else:
+                    return binary_type(value)
+        except Exception:
             pass
 
         if not force:
             return value
-        return value if value is None else str(value)
+        return value if value is None else binary_type(value)
 
 #___________________________________________________________________________________________________ zeroFill
     @classmethod
     def zeroFill(cls, source, length):
         return source.zfill(length)
+
+#___________________________________________________________________________________________________ toUnicode
+    @classmethod
+    def toUnicode(cls, value):
+        """toUnicode doc..."""
+        return cls.strToUnicode(value, True)
+
+#___________________________________________________________________________________________________ toStr2
+    @classmethod
+    def toStr2(cls, value):
+        """toStr2 doc..."""
+        if sys.version < '3':
+            return cls.unicodeToStr(value)
+        return text_type(value)

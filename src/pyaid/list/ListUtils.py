@@ -51,7 +51,7 @@ class ListUtils(object):
 
         while index < len(target):
             source = target[index]
-            if isinstance(source, basestring):
+            if StringUtils.isStringType(source):
                 output[index] = StringUtils.unicodeToStr(source)
             else:
                 output[index] = str(source)
@@ -72,10 +72,10 @@ class ListUtils(object):
 
         while index < len(target):
             source = target[index]
-            if isinstance(source, basestring):
+            if StringUtils.isStringType(source):
                 output[index] = StringUtils.strToUnicode(source)
             else:
-                output[index] = unicode(source)
+                output[index] = StringUtils.toUnicode(source)
 
         return output
 
@@ -103,7 +103,7 @@ class ListUtils(object):
         for item in options:
             try:
                 index = target.find(item)
-            except Exception, err:
+            except Exception:
                 continue
             return index
 
@@ -206,7 +206,8 @@ class ListUtils(object):
     @staticmethod
     def contains(source, search):
 
-        if isinstance(search, basestring):
+        from pyaid.string.StringUtils import StringUtils
+        if StringUtils.isStringType(search):
             return search in source
 
         for s in search:

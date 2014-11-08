@@ -2,6 +2,9 @@
 # (C)2012-2013
 # Scott Ernst
 
+from __future__ import print_function
+from __future__ import absolute_import
+
 import os
 
 from pyaid.file.FileUtils import FileUtils
@@ -33,7 +36,7 @@ class SystemCommandIssuer(object):
 
 #___________________________________________________________________________________________________ _download
     def _download(self, url, target, httpsVerify =False, critical =None):
-        print 'Downloading %s -> %s' % (url, target)
+        print('Downloading %s -> %s' % (url, target))
         try:
             result = SystemUtils.download(
                 url=url,
@@ -41,52 +44,52 @@ class SystemCommandIssuer(object):
                 httpsVerify=httpsVerify,
                 critical=critical,
                 raiseExceptions=self._raiseCommandExceptions)
-        except Exception, err:
-            print 'DOWNLOAD FAILED\n', err
+        except Exception as err:
+            print('DOWNLOAD FAILED\n', err)
             if critical or (critical is None and self._raiseCommandExceptions):
                 raise err
             else:
-                print err
+                print(err)
                 return False
 
         if not result:
             if critical or (critical is None and self._raiseCommandExceptions):
-                raise Exception, 'Download failed'
+                raise Exception('Download failed')
             else:
-                print 'DOWNLOAD FAILED'
+                print('DOWNLOAD FAILED')
                 return False
 
-        print 'SUCCESS'
+        print('SUCCESS')
         return True
 
 #___________________________________________________________________________________________________ _getOutput
     def _getOutput(self, cmd, critical =None):
         self._commandIndex += 1
-        print '\n[%s EXECUTE<OUTPUT>]: %s' % (str(self._commandIndex), cmd)
+        print('\n[%s EXECUTE<OUTPUT>]: %s' % (str(self._commandIndex), cmd))
         try:
             out = SystemUtils.executeForOutput(cmd, critical=critical)
-        except Exception, err:
-            print 'FAILED'
+        except Exception as err:
+            print('FAILED')
             if critical or (critical is None and self._raiseCommandExceptions):
                 raise err
             return None
 
-        print 'SUCCESS'
+        print('SUCCESS')
         return out
 
 #___________________________________________________________________________________________________ _run
     def _run(self, cmd, critical =None):
         self._commandIndex  += 1
-        print '\n[%s EXECUTE]: %s' % (str(self._commandIndex), cmd)
+        print('\n[%s EXECUTE]: %s' % (str(self._commandIndex), cmd))
         stat = SystemUtils.executeForStatus(cmd, critical=critical)
         if not stat:
-            print 'SUCCESS'
+            print('SUCCESS')
         else:
-            print 'FAILED'
+            print('FAILED')
 
         if not stat:
             if critical or (critical is None and self._raiseCommandExceptions):
-                raise Exception, 'Command execution failed with status: %s' % stat
+                raise Exception('Command execution failed with status: %s' % stat)
             else:
                 return False
 
@@ -95,21 +98,21 @@ class SystemCommandIssuer(object):
 #___________________________________________________________________________________________________ _createPath
     def _createPath(self, path):
         if os.path.exists(path):
-            print 'PATH ALREADY EXISTS: ' + path
+            print('PATH ALREADY EXISTS: ' + path)
             return None
 
         path = FileUtils.generatePath(path)
-        print 'CREATED PATH: ' + path
+        print('CREATED PATH: ' + path)
         return path
 
 #___________________________________________________________________________________________________ _copy
     def _copy(self, source, destination):
         result = SystemUtils.copy(source, destination)
         if not result:
-            print 'FAILED TO COPY: %s -> %s' % (source, destination)
+            print('FAILED TO COPY: %s -> %s' % (source, destination))
             return False
 
-        print 'COPIED: %s -> %s' % (source, destination)
+        print('COPIED: %s -> %s' % (source, destination))
         return True
 
 #___________________________________________________________________________________________________ _gzip
@@ -130,10 +133,10 @@ class SystemCommandIssuer(object):
             gzip=gzip)
 
         if out is None:
-            print 'FAILED TO TAR: ' + str(zipTarget)
+            print('FAILED TO TAR: ' + str(zipTarget))
             return None
 
-        print 'TARRED: ' + str(zipTarget)
+        print('TARRED: ' + str(zipTarget))
         return out
 
 #___________________________________________________________________________________________________ _untar
@@ -144,10 +147,10 @@ class SystemCommandIssuer(object):
             gzip=gzip)
 
         if not result:
-            print 'FAILED TO UNTAR: ' + str(zipSource)
+            print('FAILED TO UNTAR: ' + str(zipSource))
             return False
 
-        print 'UNTARRED: ' + str(zipSource)
+        print('UNTARRED: ' + str(zipSource))
         return True
 
 #___________________________________________________________________________________________________ _7zip
@@ -156,10 +159,10 @@ class SystemCommandIssuer(object):
         result = SystemUtils.do7zip(zipTarget=zipTarget, fileList=fileList, append=append)
 
         if not result:
-            print 'FAILED TO ZIP: ' + str(zipTarget)
+            print('FAILED TO ZIP: ' + str(zipTarget))
             return False
 
-        print 'ZIPPED: ' + str(zipTarget)
+        print('ZIPPED: ' + str(zipTarget))
         return True
 
 #___________________________________________________________________________________________________ _un7zip
@@ -170,33 +173,33 @@ class SystemCommandIssuer(object):
             overwriteAll=overwriteAll)
 
         if not result:
-            print 'FAILED TO UN7ZIP: ' + str(zipSource)
+            print('FAILED TO UN7ZIP: ' + str(zipSource))
             return False
 
-        print 'UN7ZIPPED: ' + str(zipSource)
+        print('UN7ZIPPED: ' + str(zipSource))
         return True
 
 #___________________________________________________________________________________________________ _move
     def _move(self, source, destination):
         if not SystemUtils.move(source, destination):
-            print 'FAILED TO MOVE: %s -> %s' % (source, destination)
+            print('FAILED TO MOVE: %s -> %s' % (source, destination))
             return False
 
-        print 'MOVED: %s -> %s' % (source, destination)
+        print('MOVED: %s -> %s' % (source, destination))
         return True
 
 #___________________________________________________________________________________________________ _remove
     def _remove(self, path):
         if not os.path.exists(path):
-            print 'NOTHING TO REMOVE: ' + path
+            print('NOTHING TO REMOVE: ' + path)
             return False
 
         result = SystemUtils.remove(path)
         if not result:
-            print 'FAILED TO REMOVE: ' + path
+            print('FAILED TO REMOVE: ' + path)
             return False
 
-        print 'REMOVED PATH: ' + path
+        print('REMOVED PATH: ' + path)
         return True
 
 #___________________________________________________________________________________________________ _findMatchingDir
@@ -217,7 +220,7 @@ class SystemCommandIssuer(object):
 #___________________________________________________________________________________________________ _changeDir
     def _changeDir(self, path):
         os.chdir(path)
-        print 'CURRENT DIRECTORY: %s [%s]' % (os.curdir, path)
+        print('CURRENT DIRECTORY: %s [%s]' % (os.curdir, path))
 
 #___________________________________________________________________________________________________ _listDir
     def _listDir(self, path =None, dirs =True, files =True, absolute =True):

@@ -2,6 +2,9 @@
 # (C)2012-2013
 # Scott Ernst
 
+from __future__ import print_function
+from __future__ import absolute_import
+
 import re
 import os
 import shutil
@@ -13,6 +16,9 @@ import subprocess
 # AS NEEDED: from pyaid.list.ListUtils import ListUtils
 
 #___________________________________________________________________________________________________ SystemUtils
+from pyaid.string.StringUtils import StringUtils
+
+
 class SystemUtils(object):
     """A class for..."""
 
@@ -22,7 +28,7 @@ class SystemUtils(object):
 #___________________________________________________________________________________________________ executeCommand
     @classmethod
     def executeCommand(cls, cmd, remote =False, shell =True, wait =False):
-        if shell and not isinstance(cmd, basestring):
+        if shell and not StringUtils.isStringType(cmd):
             from pyaid.list.ListUtils import ListUtils
             cmd = ' '.join(ListUtils.itemsToString(cmd))
 
@@ -52,12 +58,12 @@ class SystemUtils(object):
 #___________________________________________________________________________________________________ executeForOutput
     @classmethod
     def executeForOutput(cls, cmd, critical =None, shell =True, raiseExceptions =True):
-        if shell and not isinstance(cmd, basestring):
+        if shell and not StringUtils.isStringType(cmd):
             cmd = ' '.join(cmd)
 
         try:
             out = subprocess.check_output(cmd, shell=shell)
-        except Exception, err:
+        except Exception as err:
             if critical or (critical is None and raiseExceptions):
                 raise err
             return None
@@ -68,14 +74,14 @@ class SystemUtils(object):
     @classmethod
     def executeForStatus(cls, cmd, critical =None, shell =True, raiseExceptions =True):
         """ Returns true if the command executed successfully. """
-        if shell and not isinstance(cmd, basestring):
+        if shell and not StringUtils.isStringType(cmd):
             cmd = ' '.join(cmd)
 
         stat = subprocess.call(cmd, shell=shell)
 
         if stat:
             if critical or (critical is None and raiseExceptions):
-                raise Exception, 'Command execution failed'
+                raise Exception('Command execution failed')
             else:
                 return False
 
@@ -87,7 +93,7 @@ class SystemUtils(object):
         try:
             import requests
             hasRequests = True
-        except Exception, err:
+        except Exception:
             requests    = None
             hasRequests = False
 
@@ -97,17 +103,17 @@ class SystemUtils(object):
                 res = urllib2.urlopen(url)
             else:
                 res = requests.get(url, verify=httpsVerify)
-        except Exception, err:
+        except Exception as err:
             if critical or (critical is None and raiseExceptions):
                 raise err
             else:
-                print err
+                print(err)
                 return False
 
         failed = not res or (hasattr(res, 'status_code') and res.status_code != 200)
         if failed:
             if critical or (critical is None and raiseExceptions):
-                raise Exception, 'Download failed'
+                raise Exception('Download failed')
             else:
                 return False
 
@@ -123,24 +129,24 @@ class SystemUtils(object):
         if os.path.isdir(source):
             try:
                 shutil.copytree(source, destination)
-            except Exception, err:
+            except Exception:
                 try:
                     shutil.copy2(source, destination)
-                except Exception, err:
-                    print 'FAILED TO COPY:\n    FROM: %s\n      TO: %s' % (source, destination)
+                except Exception:
+                    print('FAILED TO COPY:\n    FROM: %s\n      TO: %s' % (source, destination))
                     return False
         else:
             try:
                 shutil.copy2(source, destination)
-            except Exception, err:
+            except Exception:
                 try:
                     shutil.copytree(source, destination)
-                except Exception, err:
-                    print 'FAILED TO COPY:\n    FROM: %s\n      TO: %s' % (source, destination)
+                except Exception:
+                    print('FAILED TO COPY:\n    FROM: %s\n      TO: %s' % (source, destination))
                     return False
 
         if echo:
-            print 'COPIED:\n    FROM: %s\n      TO: %s' % (source, destination)
+            print('COPIED:\n    FROM: %s\n      TO: %s' % (source, destination))
         return True
 
 #___________________________________________________________________________________________________ gzip
@@ -205,7 +211,7 @@ class SystemUtils(object):
         try:
             cmd = 'tar -%spvf %s %s' % (flags, zipTarget, ' '.join(fileList))
             cls.executeForStatus(cmd)
-        except Exception, err:
+        except Exception:
             cls.changeDir(originalDirectory)
             return None
 
@@ -234,7 +240,7 @@ class SystemUtils(object):
         try:
             cmd = 'tar -%sxpvf %s %s' % (flags, ' '.join(doubleFlags), zipSource)
             cls.executeForStatus(cmd)
-        except Exception, err:
+        except Exception:
             cls.changeDir(originalDirectory)
             return False
 
@@ -256,8 +262,8 @@ class SystemUtils(object):
 
             cmd = '7za a %s %s' % (zipTarget, ' '.join(fileList))
             cls.executeForStatus(cmd)
-        except Exception, err:
-            print err
+        except Exception as err:
+            print(err)
             return False
 
         return True
@@ -275,8 +281,8 @@ class SystemUtils(object):
 
             cmd = '7za e %s %s' % (' '.join(flags), zipSource)
             cls.executeForStatus(cmd)
-        except Exception, err:
-            print err
+        except Exception as err:
+            print(err)
             return False
 
         return True
@@ -286,7 +292,7 @@ class SystemUtils(object):
     def move(cls, source, destination):
         try:
             shutil.move(source, destination)
-        except Exception, err:
+        except Exception as err:
             return False
 
         return True
@@ -300,31 +306,30 @@ class SystemUtils(object):
         if os.path.isdir(path):
             try:
                 shutil.rmtree(path)
-            except Exception, err1:
-                originalError = err1
+            except Exception as err1:
                 try:
                     os.rmdir(path)
-                except Exception, err2:
+                except Exception as err2:
                     if throwError:
-                        print 'ERROR:', err1
+                        print('ERROR:', err1)
                         raise err2
                     return False
         elif os.path.islink(path):
             try:
                 os.unlink(path)
-            except Exception, err:
+            except Exception as err:
                 if throwError:
                     raise err
                 return False
         else:
             try:
                 os.remove(path)
-            except OSError, err1:
+            except OSError as err1:
                 try:
                     os.rmdir(path)
-                except Exception, err2:
+                except Exception as err2:
                     if throwError:
-                        print 'ERROR:', err1
+                        print('ERROR:', err1)
                         raise err2
                     return False
 
@@ -359,7 +364,7 @@ class SystemUtils(object):
         try:
             if not cls.executeForStatus('chmod %s %s %s' % (flags, str(permissions), path)):
                 return False
-        except Exception, err:
+        except Exception:
             return False
 
         if owner and group:

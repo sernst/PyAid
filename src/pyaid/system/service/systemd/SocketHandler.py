@@ -2,8 +2,18 @@
 # (C)2012-2014
 # Scott Ernst
 
-import urllib2
-import SocketServer
+try:
+    import urllib2
+    unquote = urllib2.unquote
+except Exception:
+    import urllib.parse as urllib_parse
+    unquote = urllib_parse.unquote
+
+try:
+    import SocketServer
+except Exception:
+    import socketserver
+    SocketServer = socketserver
 
 from pyaid.debug.Logger import Logger
 from pyaid.json.JSON import JSON
@@ -45,8 +55,8 @@ class SocketHandler(SocketServer.StreamRequestHandler):
             data = self.rfile.readline().strip()
             self._log.write('HANDLE: ' + str(data))
             try:
-                result = self._respondImpl(JSON.fromString(urllib2.unquote(data)))
-            except Exception, err:
+                result = self._respondImpl(JSON.fromString(unquote(data)))
+            except Exception as err:
                 self._log.writeError('RESPOND FAILURE', err)
                 if self.returnResponse:
                     self.wfile.write(JSON.asString({'error':1}))
@@ -57,7 +67,7 @@ class SocketHandler(SocketServer.StreamRequestHandler):
                 if result:
                     out['payload'] = result
                 self.wfile.write(out)
-        except Exception, err:
+        except Exception as err:
             self._log.write('HANDLE FAILURE', err)
 
         return

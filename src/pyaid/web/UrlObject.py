@@ -3,7 +3,11 @@
 # Scott Ernst
 
 import urllib
-import urlparse
+
+try:
+    import urlparse
+except Exception:
+    import urllib.parse as urlparse
 
 #___________________________________________________________________________________________________ UrlObject
 class UrlObject(object):
@@ -83,8 +87,7 @@ class UrlObject(object):
             self._hostName,
             self._path,
             self.queryString,
-            self._fragment
-        ))
+            self._fragment ))
     @url.setter
     def url(self, value):
         parts = urlparse.urlsplit(value) if value else u''
@@ -105,10 +108,6 @@ class UrlObject(object):
 #___________________________________________________________________________________________________ __repr__
     def __repr__(self):
         return self.__str__()
-
-#___________________________________________________________________________________________________ __unicode__
-    def __unicode__(self):
-        return unicode(self.__str__())
 
 #___________________________________________________________________________________________________ __str__
     def __str__(self):

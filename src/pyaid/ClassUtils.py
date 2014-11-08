@@ -1,9 +1,11 @@
 # ClassUtils.py
-# (C)2012-2013
+# (C)2012-2014
 # Scott Ernst
 
 import os
 import inspect
+
+from pyaid.string.StringUtils import StringUtils
 
 #___________________________________________________________________________________________________ ClassUtils
 class ClassUtils(object):
@@ -21,7 +23,7 @@ class ClassUtils(object):
         """
         try:
             out = targetClass.__module__
-        except Exception, err:
+        except Exception:
             out = inspect.getmodule(targetClass).__name__
 
         if shave == 0:
@@ -69,7 +71,7 @@ class ClassUtils(object):
 #___________________________________________________________________________________________________ dynamicImport
     @classmethod
     def dynamicImport(cls, package, target =None):
-        if isinstance(target, basestring):
+        if StringUtils.isStringType(target):
             singular = True
             target   = [target]
         elif not target:

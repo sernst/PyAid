@@ -5,6 +5,8 @@
 from pyaid.NullUtils import NullUtils
 from pyaid.debug.Logger import Logger
 
+from pyaid.string.StringUtils import StringUtils
+
 #___________________________________________________________________________________________________ MakoDataTransporter
 class MakoDataTransporter(object):
     """A class for..."""
@@ -37,8 +39,8 @@ class MakoDataTransporter(object):
 #___________________________________________________________________________________________________ trace
     def trace(self, message):
         try:
-            self._traces.append(unicode(message))
-        except Exception, err:
+            self._traces.append(StringUtils.toUnicode(message))
+        except Exception as err:
             self._log.writeError('Unable to trace message', err)
 
 #___________________________________________________________________________________________________ registerRootData

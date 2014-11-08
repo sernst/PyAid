@@ -6,11 +6,11 @@ import re
 import math
 import numbers
 
-#___________________________________________________________________________________________________ ColorValue
 from pyaid.color.ColorNames import ColorNames
+from pyaid.number.IntUtils import IntUtils
 from pyaid.string.StringUtils import StringUtils
 
-
+#___________________________________________________________________________________________________ ColorValue
 class ColorValue(object):
     """A class for working with colors in various color spaces."""
 
@@ -428,7 +428,7 @@ class ColorValue(object):
             self._opacity = 1.0
 
         v = value.get('color')
-        if isinstance(v, (int, long)):
+        if IntUtils.isInt(v):
             self._rawColor = int(v)
         else:
             self.load(v)
@@ -453,19 +453,19 @@ class ColorValue(object):
     def asWebRGBA(self, opacity =None):
         c = self.asRgb(output=tuple)
         return u'rgba(%s, %s, %s, %s)' % (
-            unicode(c[0]),
-            unicode(c[1]),
-            unicode(c[2]),
-            unicode(self._opacity if opacity is None else opacity) )
+            StringUtils.toUnicode(c[0]),
+            StringUtils.toUnicode(c[1]),
+            StringUtils.toUnicode(c[2]),
+            StringUtils.toUnicode(self._opacity if opacity is None else opacity) )
 
 #___________________________________________________________________________________________________ asWebRgbOpacity
     def asWebRgbOpacity(self, opacity =None):
         c = self.asRgb(output=tuple)
         return u'rgba(%s, %s, %s, %s)' % (
-            unicode(c[0]),
-            unicode(c[1]),
-            unicode(c[2]),
-            unicode(100.0*(self._opacity if opacity is None else opacity)) + u'%' )
+            StringUtils.toUnicode(c[0]),
+            StringUtils.toUnicode(c[1]),
+            StringUtils.toUnicode(c[2]),
+            StringUtils.toUnicode(100.0*(self._opacity if opacity is None else opacity)) + u'%' )
 
 #___________________________________________________________________________________________________ asRgb
     def asRgb(self, normalize =False, output =None):
@@ -774,12 +774,12 @@ class ColorValue(object):
             r = float(rgb.get('r', 0.0))
             g = float(rgb.get('g', 0.0))
             b = float(rgb.get('b', 0.0))
-        except Exception, err:
+        except Exception:
             try:
                 r = float(rgb[0])
                 g = float(rgb[1])
                 b = float(rgb[2])
-            except Exception, err:
+            except Exception:
                 return 0
 
         if normalized:
@@ -964,7 +964,7 @@ class ColorValue(object):
             self.fromDict(sourceColor)
 
         # INTEGER COLOR
-        elif isinstance(sourceColor, int) or isinstance(sourceColor, long):
+        elif IntUtils.isInt(sourceColor):
             self._rawColor = int(sourceColor)
 
         # FLOAT LUMA COLOR
@@ -998,7 +998,7 @@ class ColorValue(object):
                 self._opacity = float(sourceColor[3])
 
         # STRING-BASED COLORS
-        elif isinstance(sourceColor, basestring):
+        elif StringUtils.isStringType(sourceColor):
             bendCount   = cls.getBendCount(sourceColor)
             sourceColor = sourceColor.rstrip('+-')
 

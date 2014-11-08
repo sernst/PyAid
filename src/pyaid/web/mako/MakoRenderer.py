@@ -7,6 +7,8 @@ from mako.lookup import TemplateLookup
 from mako.template import Template
 
 from pyaid.debug.Logger import Logger
+from pyaid.dict.DictUtils import DictUtils
+from pyaid.string.StringUtils import StringUtils
 from pyaid.web.DomUtils import DomUtils
 from pyaid.web.mako.MakoDataTransporter import MakoDataTransporter
 
@@ -83,11 +85,11 @@ class MakoRenderer(object):
 
         # ADD KWARGS TO TEMPLATE RENDER PROPERTIES
         if kwargs:
-            data = dict(self._data.items() + kwargs.items())
+            data = DictUtils.merge(self._data, kwargs)
         else:
             data = self._data
 
-        td = [self._rootDir] if isinstance(self._rootDir, basestring) else self._rootDir
+        td = [self._rootDir] if StringUtils.isStringType(self._rootDir) else self._rootDir
 
         lookup = TemplateLookup(
             directories=td,
@@ -102,7 +104,7 @@ class MakoRenderer(object):
 
             try:
                 target = lookup.get_template(template)
-            except Exception, err:
+            except Exception as err:
                 self._result   = None
                 self._error    = err
                 self._errorMsg = 'Failed to get template (%s):\n%s' % (
@@ -116,15 +118,15 @@ class MakoRenderer(object):
         mr = MakoDataTransporter(data=data, logger=self._log)
         try:
             self._result = target.render_unicode(mr=mr).replace('\r', '')
-        except Exception, err:
+        except Exception:
             d = []
             if data:
-                for n,v in data.iteritems():
-                    d.append(unicode(n) + u': ' + unicode(v))
+                for n,v in data.items():
+                    d.append(StringUtils.toUnicode(n) + u': ' + StringUtils.toUnicode(v))
 
             try:
                 stack = exceptions.text_error_template().render().replace('%','%%')
-            except Exception, err2:
+            except Exception as err2:
                 stack = ''
                 self._log.writeError('Unable to build mako exception stack', err2)
 

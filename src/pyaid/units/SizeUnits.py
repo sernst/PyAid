@@ -42,7 +42,7 @@ class SizeConversion(object):
         if toSizeEnum is None:
             toSizeEnum = SIZES.BYTES
 
-        if isinstance(sizeOrFile, file) or isinstance(sizeOrFile, str):
+        if hasattr(sizeOrFile, 'read') or isinstance(sizeOrFile, str):
             size         = SizeConversion.getSizeOfFile(sizeOrFile)
             fromSizeEnum = SIZES.BYTES
         else:
@@ -57,7 +57,7 @@ class SizeConversion(object):
 #___________________________________________________________________________________________________ prettyPrint
     @staticmethod
     def prettyPrint(size, sizeEnum =None, precision =-1):
-        if isinstance(size, file) or isinstance(size, str):
+        if hasattr(size, 'read') or isinstance(size, str):
             size = SizeConversion.getSizeOfFile(size)
 
         if size == 0:
@@ -104,7 +104,7 @@ class SizeConversion(object):
 #___________________________________________________________________________________________________ getSizeOfFile
     @staticmethod
     def getSizeOfFile(fileOrFilename):
-        if isinstance(fileOrFilename, file):
+        if hasattr(fileOrFilename, 'read'):
             return os.path.getsize(fileOrFilename.name)
         elif isinstance(fileOrFilename, str):
             return os.path.getsize(fileOrFilename) if os.path.exists(fileOrFilename) else 0

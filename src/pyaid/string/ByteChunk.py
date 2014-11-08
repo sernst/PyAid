@@ -2,6 +2,9 @@
 # (C)2013-2014
 # Scott Ernst
 
+from __future__ import print_function
+from __future__ import absolute_import
+
 import math
 import struct
 import zlib
@@ -168,7 +171,7 @@ class ByteChunk(object):
 
 #___________________________________________________________________________________________________ writFourCC
     def writeFourCC(self, fourCC):
-        if isinstance(fourCC, basestring):
+        if StringUtils.isStringType(fourCC):
             fourCC = ByteUtils.getAsFourCC(fourCC, self.isLittleEndian)
         self.writeUint32(fourCC)
 
@@ -237,13 +240,13 @@ class ByteChunk(object):
 
         assert len(data) == length, \
             u"[UNPACK ERROR]: Unexpected end of stream [%s | %s]" % (
-                unicode(len(data)), unicode(length))
+                StringUtils.toUnicode(len(data)), StringUtils.toUnicode(length))
 
         try:
             return struct.unpack(self.endianess + dataType, data)[0]
         except struct.error:
-            print len(data)
-            print u"Unable to unpack '%r'" % data
+            print(len(data))
+            print(u"Unable to unpack '%r'" % data)
             raise
 
 #___________________________________________________________________________________________________ readFloat32
@@ -348,8 +351,8 @@ class ByteChunk(object):
             f = open(path, 'wb')
             f.write(self._data)
             f.close()
-        except Exception, err:
-            print 'FAILED: Write ByteChunk to file'
+        except Exception:
+            print('FAILED: Write ByteChunk to file')
             raise
 
 #___________________________________________________________________________________________________ compress
@@ -369,7 +372,7 @@ class ByteChunk(object):
 
 #___________________________________________________________________________________________________ __unicode__
     def __unicode__(self):
-        return unicode(self.__str__())
+        return StringUtils.toUnicode(self.__str__())
 
 #___________________________________________________________________________________________________ __str__
     def __str__(self):

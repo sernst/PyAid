@@ -2,11 +2,17 @@
 # (C)2011-2012
 # Scott Ernst
 
+from __future__ import print_function
+from __future__ import absolute_import
+
 import os
 import re
 import inspect
 
 #___________________________________________________________________________________________________ CoffeescriptDependency
+from pyaid.string.StringUtils import StringUtils
+
+
 class CoffeescriptDependency(object):
 
 #===================================================================================================
@@ -256,8 +262,8 @@ class CoffeescriptDependency(object):
         #-------------------------------------------------------------------------------------------
         # REPLACE COMPILE VARIABLES
         reps = {} # NONE AT THE MOMENT
-        for n,v in reps.iteritems():
-            raw = raw.replace(n, unicode(v))
+        for n,v in reps.items():
+            raw = raw.replace(n, StringUtils.toUnicode(v))
 
         self._source = raw + '\n'
         return raw
@@ -309,9 +315,9 @@ class CoffeescriptDependency(object):
                 if inspect.ismethod(getattr(self, p)):
                     continue
 
-                print p + ': ' + str(getattr(self, p, 'NOT AVAILABLE'))
-            except Exception, err:
-                print 'FAILED TO ACCESS: ' + str(p)
+                print(p + ': ' + str(getattr(self, p, 'NOT AVAILABLE')))
+            except Exception:
+                print('FAILED TO ACCESS: ' + str(p))
                 continue
 
 #___________________________________________________________________________________________________ create

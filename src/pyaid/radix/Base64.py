@@ -37,10 +37,10 @@ class Base64(object):
 
         try:
             n = int(n)
-        except Exception, ex:
-            return ''
+        except Exception:
+            return u''
 
-        out = ''
+        out = u''
         while n > 0:
             out = Base64.CHAR_SET[n & 63] + out
             n >>= 6
@@ -56,7 +56,7 @@ class Base64(object):
         """
 
         if clean:
-            n = Base64.ILLEGAL_CHAR_RE.sub('', n)
+            n = Base64.ILLEGAL_CHAR_RE.sub(u'', n)
 
         base = 1
         out  = 0
@@ -128,8 +128,8 @@ class Base64(object):
 #___________________________________________________________________________________________________ _getRandom
     @staticmethod
     def _getRandom(n):
-        min   = 64**(n - 1)
-        range = 64**n - 1 - min
+        mins   = 64**(n - 1)
+        ranger = 64**n - 1 - mins
         seed  = int(uuid.uuid1())/2 + int(uuid.uuid4())/2
-        return Base64.to64((seed % range) + min)
+        return Base64.to64((seed % ranger) + mins)
 

@@ -110,7 +110,7 @@ class OsUtils(object):
                         continue
                     return screen.frame().size.width, screen.frame().size.height
                 return None
-            except Exception, err:
+            except Exception:
                 pass
 
             result = cls._getOsxDisplayInfo()
@@ -135,7 +135,7 @@ class OsUtils(object):
         if cls.isWindows():
             try:
                 import ctypes
-            except Exception, err:
+            except Exception:
                 return None
             user32 = ctypes.windll.user32
             return int(user32.GetSystemMetrics(0)), int(user32.GetSystemMetrics(1))

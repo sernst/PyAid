@@ -5,6 +5,9 @@
 # AS NEEDED: from pyaid.debug.Logger import Logger
 
 #___________________________________________________________________________________________________ ArgsUtils
+from pyaid.string.StringUtils import StringUtils
+
+
 class ArgsUtils(object):
 
 #===================================================================================================
@@ -31,7 +34,7 @@ class ArgsUtils(object):
             return out
 
         try:
-            if isinstance(name, basestring):
+            if StringUtils.isStringType(name):
                 if name in kwargs:
                     out = kwargs[name]
                     if not allowNone and out is None:
@@ -44,7 +47,7 @@ class ArgsUtils(object):
                         if not allowNone and out is None:
                             return defaultValue
                         return out
-        except Exception, err:
+        except Exception as err:
             pass
 
         return defaultValue

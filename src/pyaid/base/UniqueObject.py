@@ -20,7 +20,8 @@ class UniqueObject(object):
         self._INSTANCE_INDEX += 1
         self._instanceUid = TimeUtils.getUidTimecode(
             prefix=self.__class__.__name__,
-            suffix=unicode(self._INSTANCE_INDEX) + '-' + StringUtils.getRandomString(8) )
+            suffix=StringUtils.toUnicode(
+                self._INSTANCE_INDEX) + '-' + StringUtils.getRandomString(8) )
 
 #===================================================================================================
 #                                                                                   G E T / S E T
@@ -39,7 +40,7 @@ class UniqueObject(object):
 
 #___________________________________________________________________________________________________ __unicode__
     def __unicode__(self):
-        return unicode(self.__str__())
+        return StringUtils.toUnicode(self.__str__())
 
 #___________________________________________________________________________________________________ __str__
     def __str__(self):

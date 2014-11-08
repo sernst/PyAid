@@ -2,9 +2,12 @@
 # (C)2012
 # Scott Ernst
 
+from __future__ import print_function
+
 import os
 
 from pyaid.list.ListUtils import ListUtils
+from pyaid.string.StringUtils import StringUtils
 
 #___________________________________________________________________________________________________ FileList
 class FileList(object):
@@ -56,17 +59,17 @@ class FileList(object):
                     os.removedirs(item)
                 elif files:
                     os.remove(item)
-            except Exception, err:
-                print 'FileUtils copy failure:'
-                print '\tITEM: ' + str(item)
-                print '\tITEMS: ' + str(item)
+            except Exception:
+                print('FileUtils copy failure:')
+                print('\tITEM: ' + str(item))
+                print('\tITEMS: ' + str(item))
                 raise
 
         return True
 
 #___________________________________________________________________________________________________ getFilteredByFlags
     def getFilteredByFlags(self, flags, files =True, directories =True):
-        if isinstance(flags, basestring):
+        if StringUtils.isStringType(flags):
             flags = [flags]
 
         sources = []
@@ -125,14 +128,13 @@ class FileList(object):
 
         if not flags:
             flags = []
-        elif isinstance(flags, basestring):
+        elif StringUtils.isStringType(flags):
             flags = [flags]
 
         os.path.walk(path, cls._rootPathWalker, {
             'rootPath':path,
             'out':out,
-            'flags':flags
-        })
+            'flags':flags })
         return out
 
 #===================================================================================================
@@ -162,10 +164,6 @@ class FileList(object):
 #___________________________________________________________________________________________________ __repr__
     def __repr__(self):
         return self.__str__()
-
-#___________________________________________________________________________________________________ __unicode__
-    def __unicode__(self):
-        return unicode(self.__str__())
 
 #___________________________________________________________________________________________________ __str__
     def __str__(self):

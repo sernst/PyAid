@@ -27,7 +27,7 @@ class ServiceUtils(object):
 
         try:
             out = subprocess.check_output(['systemctl', 'status', serviceUID])
-        except Exception, err:
+        except Exception:
             return cls.INACTIVE_STATE
 
         res = cls._STATE_REGEX.search(out)

@@ -4,6 +4,8 @@
 
 import math
 
+from pyaid.string.StringUtils import StringUtils
+
 #___________________________________________________________________________________________________ IterationCounter
 class IterationCounter(object):
     """A class for..."""
@@ -26,7 +28,7 @@ class IterationCounter(object):
 #___________________________________________________________________________________________________ GS: prettyPrintProgress
     @property
     def prettyPrintProgress(self):
-        return unicode(int(self.progress*100.0)) + u'5'
+        return StringUtils.toUnicode(int(self.progress*100.0)) + u'5'
 
 #___________________________________________________________________________________________________ GS: progress
     @property
@@ -118,7 +120,7 @@ class IterationCounter(object):
 
 #___________________________________________________________________________________________________ __unicode__
     def __unicode__(self):
-        return unicode(self.__str__())
+        return StringUtils.toUnicode(self.__str__())
 
 #___________________________________________________________________________________________________ __str__
     def __str__(self):

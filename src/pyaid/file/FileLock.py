@@ -66,13 +66,13 @@ class FileLock(object):
                 self._lockFile = os.open(self._lockFileName, os.O_CREAT|os.O_EXCL|os.O_RDWR)
                 try:
                     self._file = open(self._fileName, self._ioMode)
-                except Exception, err:
+                except Exception:
                     continue
                 break
 
             except OSError as e:
                 if e.errno != errno.EEXIST:
-                    raise 
+                    raise
                 if (time.time() - start) >= self._timeout:
                     raise FileLockException('Lock acquisition exceeded specified timeout.')
                 time.sleep(self._delay)
@@ -81,8 +81,8 @@ class FileLock(object):
 
 #___________________________________________________________________________________________________ release
     def release(self):
-        """ Get rid of the lock by deleting the _lockFileName. 
-            When working in a `with` statement, this gets automatically 
+        """ Get rid of the lock by deleting the _lockFileName.
+            When working in a `with` statement, this gets automatically
             called at the end.
         """
         if self._isLocked:
@@ -90,7 +90,7 @@ class FileLock(object):
                 try:
                     self._file.close()
                     self._file = None
-                except Exception as err:
+                except Exception:
                     pass
 
             try:

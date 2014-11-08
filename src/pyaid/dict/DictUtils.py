@@ -130,21 +130,18 @@ class DictUtils(object):
 
         out = []
         for n,v in source.iteritems():
-            if isinstance(n, str):
-                n = StringUtils.strToUnicode(n)
-            else:
-                n = unicode(n)
+            n = StringUtils.toUnicode(n)
 
             if isinstance(v, dict):
                 v = u'{ ' + cls.prettyPrint(v, delimiter=delimiter, separator=separator) + u' }'
             elif isinstance(v, str):
                 v = StringUtils.strToUnicode(v)
             else:
-                v = unicode(v)
+                v = StringUtils.toUnicode(v)
 
             out.append(n + separator + v)
 
-        out.sort(key=unicode.lower)
+        out.sort(key=StringUtils.TEXT_TYPE.lower)
         return delimiter.join(out)
 
 #===================================================================================================
@@ -153,8 +150,9 @@ class DictUtils(object):
 #___________________________________________________________________________________________________ _cloneValue
     @classmethod
     def _cloneValue(cls, value):
+        from pyaid.list.ListUtils import ListUtils
+
         if isinstance(value, list):
-            from pyaid.list.ListUtils import ListUtils
             return ListUtils.clone(value)
         elif isinstance(value, tuple):
             return tuple(ListUtils.clone(value))

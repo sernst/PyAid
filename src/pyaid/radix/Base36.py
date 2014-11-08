@@ -5,6 +5,8 @@
 import re
 import uuid
 
+from pyaid.number.IntUtils import IntUtils
+
 #___________________________________________________________________________________________________ Base36
 class Base36(object):
 
@@ -23,7 +25,7 @@ class Base36(object):
 
         out     = ''
         while n != 0:
-            n, m = divmod(long(n), 36)
+            n, m = divmod(IntUtils.LONG(n), 36)
             out  = Base36.CHAR_SET[int(m)] + out
         return out
 
@@ -62,7 +64,7 @@ class Base36(object):
 #___________________________________________________________________________________________________ _getRandom
     @classmethod
     def _getRandom(cls, n):
-        min   = 36**(n - 1)
-        range = 36**n - 1 - min
+        mins   = 36**(n - 1)
+        ranger = 36**n - 1 - mins
         seed  = int(uuid.uuid1())/2 + int(uuid.uuid4())/2
-        return cls.to36((seed % range) + min)
+        return cls.to36((seed % ranger) + mins)

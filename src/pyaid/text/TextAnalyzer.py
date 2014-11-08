@@ -5,7 +5,7 @@
 import re
 
 from pyaid.ArgsUtils import ArgsUtils
-from pyaid.debug.Logger import Logger
+from pyaid.string.StringUtils import StringUtils
 from pyaid.text.BlockDefinition import BlockDefinition
 from pyaid.text.BlockSyntaxEnum import BlockSyntaxEnum
 from pyaid.text.TextBlock import TextBlock
@@ -27,8 +27,7 @@ class TextAnalyzer(object):
         self._debugData = debugData
         self._debug     = debug
 
-        if not isinstance(src, unicode):
-            src = src.decode('utf8', 'ignore')
+        src = StringUtils.toUnicode(src)
 
         self._raw = src.replace(u'\r',u'')
         if ArgsUtils.get('stripSource', True, kwargs):
@@ -236,12 +235,12 @@ class TextAnalyzer(object):
         if afterBlock:
             try:
                 self._blocks.insert(self._blocks.index(afterBlock) + 1, block)
-            except Exception, err:
+            except Exception:
                 pass
         elif beforeBlock:
             try:
                 self._blocks.insert(self._blocks.index(beforeBlock) + 1, block)
-            except Exception, err:
+            except Exception:
                 pass
 
         if index != -1:
@@ -365,7 +364,7 @@ class TextAnalyzer(object):
         if index >= len(src):
             return index
 
-        stringPattern = isinstance(pattern, basestring)
+        stringPattern = StringUtils.isStringType(pattern)
 
         if stringPattern:
             endIndex = src.find(pattern, index)
@@ -378,7 +377,7 @@ class TextAnalyzer(object):
                 else:
                     endIndex = patternMatch.start()
                     offset   = patternMatch.end() - patternMatch.start()
-            except Exception, err:
+            except Exception:
                 return index
 
         if endIndex == -1:
@@ -445,7 +444,7 @@ class TextAnalyzer(object):
 
 #___________________________________________________________________________________________________ _matches
     def _matches(self, src, index, pattern, matchReqs =None):
-        stringPattern = isinstance(pattern, basestring)
+        stringPattern = StringUtils.isStringType(pattern)
 
         if stringPattern:
             offset = len(pattern)
@@ -457,7 +456,7 @@ class TextAnalyzer(object):
                 if patternMatch is None:
                     return False
                 offset = patternMatch.end() - patternMatch.start()
-            except Exception, err:
+            except Exception:
                 return False
 
         # Check match requirements

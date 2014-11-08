@@ -2,6 +2,9 @@
 # (C)2011
 # Scott Ernst
 
+from __future__ import print_function
+from __future__ import absolute_import
+
 import sys
 import os
 import getopt
@@ -9,6 +12,7 @@ import codecs
 
 from pyaid.debug.Logger import Logger
 from pyaid.interactive.queries import queryGeneralValue, queryFromList
+from pyaid.string.StringUtils import StringUtils
 from pyaid.xml.XMLConfigParser import XMLConfigParser
 from pyaid.xml.JSONConfigParser import JSONConfigParser
 
@@ -50,7 +54,7 @@ class DataFormatConverter(object):
             fh.close()
             enc = res.encode('utf-8')
             self.loads(enc, fileType)
-        except Exception, err:
+        except Exception as err:
             self._log.writeError('Failed to load source file [%s].' % path, err)
             return False
 
@@ -63,8 +67,7 @@ class DataFormatConverter(object):
             self._log.write('ERROR: Source string is empty or invalid.')
             return False
 
-        if isinstance(srcString, unicode):
-            srcString = srcString.encode('utf-8')
+        srcString = StringUtils.toStr2(srcString)
 
         self._path = None
         self._src  = srcString
@@ -117,15 +120,15 @@ class DataFormatConverter(object):
             os.makedirs(d)
 
         try:
-            print len(self._src)
+            print(len(self._src))
             src = reader.parse(self._src, None, True)
-        except Exception, err:
+        except Exception as err:
             self._log.writeError('ERROR: Failed to parse source. Conversion aborted.', err)
             return False
 
         try:
             res = writer.serialize(src)
-        except Exception, err:
+        except Exception as err:
             self._log.writeError('ERROR: Failed to serialized data. Conversion aborted.', err)
             return False
 
@@ -134,7 +137,7 @@ class DataFormatConverter(object):
             fh = codecs.open(out, 'wb', 'utf-8')
             fh.write(res)
             fh.close()
-        except Exception, err:
+        except Exception as err:
             self._log.writeError('ERROR: Failed to write file [%s]. Conversion aborted.' \
                                  % str(out), err)
             return False
@@ -237,22 +240,21 @@ class DataFormatConverter(object):
 
 #___________________________________________________________________________________________________ usage
 def usage():
-    print "Converts between various data formats (e.g. XML and JSON)"
-    print "-o | --ouput       - Output type (either 'xml' or 'json')"
-    print "-i | --input       - Input type (either 'xml' or 'json')"
-    print "-s | --source      - Source file or path to convert all source files within a path."
-    print "-t | --target      - Target (output) path to write converted files to. By default they"
-    print "                     will be written in the same folder as the source file."
-    print "-r | --recursive   - Recurse into subdirectories."
+    print("""Converts between various data formats (e.g. XML and JSON)
+        -o | --ouput       - Output type (either 'xml' or 'json')
+        -i | --input       - Input type (either 'xml' or 'json')
+        -s | --source      - Source file or path to convert all source files within a path.
+        -t | --target      - Target (output) path to write converted files to. By default they
+                             will be written in the same folder as the source file.
+        -r | --recursive   - Recurse into subdirectories.""")
 
 #___________________________________________________________________________________________________ main
 def main():
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:], "ho:i:s:rt:", [
-            "help", "output=", "input=", "source=", "recursive", "target="
-        ])
-    except getopt.GetoptError, err:
-        print str(err) + "\n"
+            "help", "output=", "input=", "source=", "recursive", "target=" ])
+    except getopt.GetoptError as err:
+        print(str(err) + "\n")
         usage()
         sys.exit(2)
 
@@ -277,12 +279,12 @@ def main():
         elif o in ("-r", "--recursive"):
             recursive = True
         else:
-            print "\nUnknown argument: " + o + ". Unable to continue.\n\n"
+            print("\nUnknown argument: " + o + ". Unable to continue.\n\n")
             usage()
             sys.exit(2)
 
     DataFormatConverter.executeConversion(source, srcType, targetType, target, recursive)
-    print "\n\nConversion operation complete.\n"
+    print("\n\nConversion operation complete.\n")
 
 ####################################################################################################
 ####################################################################################################

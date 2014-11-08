@@ -2,9 +2,15 @@
 # (C)2010-2012
 # Scott Ernst
 
+from __future__ import print_function
+from __future__ import absolute_import
+
 import sys
 
 from pyaid.reflection.Reflection import Reflection
+
+if sys.version > '3':
+    raw_input = input
 
 #___________________________________________________________________________________________________ queryForInteger
 def queryForInteger(question, minimum=None, maximum=None):
@@ -20,7 +26,7 @@ def queryForInteger(question, minimum=None, maximum=None):
                 sys.stdout.write("Value must be an integer.\n")
         else:
             sys.stdout.write("Value must be an integer.\n")
-        print "\n"
+        print("\n")
 
 #___________________________________________________________________________________________________ queryGeneralValue
 def queryGeneralValue(question, default =None, allowEmpty =False):
@@ -41,7 +47,7 @@ def queryGeneralValue(question, default =None, allowEmpty =False):
             check = queryYesNo("Confirm your input of: " + result, "yes")
             if check == "yes":
                 return result
-        print "\n"
+        print("\n")
 
 #___________________________________________________________________________________________________ queryFromList
 def queryFromLargeList(question, choices, data =None, pageSize =30, default =None):
@@ -123,9 +129,9 @@ def queryFromList(question, choices, data=None, indexOffset=1, confirm =True,
     if defaultChoice and data and not defaultData:
         defaultData = data[choices.index(defaultChoice)]
 
-    print "Select a choice from the following list:"
+    print('Choose from the following list:')
     for item in choices:
-        print '\t' + str(index) + ': ' + item
+        print('\t' + str(index) + ': ' + item)
         index += 1
 
     while 1:
@@ -164,7 +170,7 @@ def queryFromList(question, choices, data=None, indexOffset=1, confirm =True,
                     sys.stdout.write("Please respond with a valid number.\n")
         except ValueError:
             sys.stdout.write("Entry appears invalid. Please try again.\n")
-        print "\n"
+        print("\n")
 
 #___________________________________________________________________________________________________ queryByReflection
 def queryByReflection(question, reflectionSource, default =None):
@@ -194,7 +200,7 @@ def queryYesNo(question, default="yes"):
             return valid[result]
         else:
             sys.stdout.write("Please respond with 'yes' or 'no'.\n")
-        print "\n"
+        print("\n")
 
 #___________________________________________________________________________________________________ queryContinueSkipQuit
 def queryContinueSkipQuit(question, default="continue"):
@@ -224,7 +230,7 @@ def queryContinueSkipQuit(question, default="continue"):
             return valid[result]
         else:
             sys.stdout.write("Please respond with 'continue', 'skip' or 'quit'.\n")
-        print "\n"
+        print("\n")
 
 #___________________________________________________________________________________________________ queryYesNoQuit
 def queryYesNoQuit(question, default="yes"):
@@ -251,7 +257,7 @@ def queryYesNoQuit(question, default="yes"):
             return valid[result]
         else:
             sys.stdout.write("Please respond with 'yes', 'no' or 'quit'.\n")
-        print "\n"
+        print("\n")
 
 #___________________________________________________________________________________________________ queryMasterOrSlave
 def queryMasterOrSlave(question):
@@ -267,4 +273,4 @@ def queryMasterOrSlave(question):
             return valid[result]
         else:
             sys.stdout.write("Please respond with 'master', 'slave' or 'quit'.\n")
-        print "\n"
+        print("\n")

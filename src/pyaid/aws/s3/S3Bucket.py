@@ -2,13 +2,11 @@
 # (C)2013-2014
 # Scott Ernst
 
-from datetime import datetime
+from __future__ import print_function
+
 import os
 import gzip
 import tempfile
-import base64
-import hmac
-import hashlib
 
 from boto import s3
 from boto.s3.connection import Location
@@ -20,6 +18,7 @@ from pyaid.enum.MimeTypeEnum import MIME_TYPES
 from pyaid.file.FileUtils import FileUtils
 from pyaid.string.StringUtils import StringUtils
 from pyaid.time.TimeUtils import TimeUtils
+
 
 #___________________________________________________________________________________________________ S3Bucket
 class S3Bucket(object):
@@ -117,26 +116,26 @@ class S3Bucket(object):
     def printBucketContents(self, path, fileFilter, logger =None):
         out = self.listKeys(path, fileFilter)
         s = u'Displaying %s results for %s/%s.' % (
-            unicode(len(out)),
+            StringUtils.toUnicode(len(out)),
             self._bucketName,
-            unicode(path))
+            StringUtils.toUnicode(path))
         if logger:
             logger.write(s)
         else:
-            print s
+            print(s)
 
         index = 0
         for obj in out:
-            s = u'  ' + unicode(index) + u' - ' + obj.name
+            s = u'  ' + StringUtils.toUnicode(index) + u' - ' + obj.name
             if logger:
                 logger.write(s)
             else:
-                print s
+                print(s)
             index += 1
 
 #___________________________________________________________________________________________________ getKey
     def getKey(self, key, createIfMissing =True):
-        if isinstance(key, basestring):
+        if StringUtils.isStringType(key):
             out = self._bucket.get_key(key_name=key)
             if createIfMissing and not out:
                 out = Key(self._bucket, key)
@@ -157,8 +156,7 @@ class S3Bucket(object):
 
         headers = self._generateHeaders(k.name, expires=expires, eTag=eTag, maxAge=maxAge)
 
-        if not isinstance(contents, unicode):
-            contents = contents.decode('utf-8', 'ignore')
+        contents = StringUtils.toUnicode(contents)
 
         if zipContents:
             fd, tempPath = tempfile.mkstemp()
@@ -231,22 +229,23 @@ class S3Bucket(object):
 #                                                                               P R O T E C T E D
 
 #___________________________________________________________________________________________________ _generateHeaders
-    def _generateHeaders(self, keyName, expires =None, eTag =None, maxAge =-1):
+    @classmethod
+    def _generateHeaders(cls, keyName, expires =None, eTag =None, maxAge =-1):
         """Doc..."""
         headers = dict()
 
         if expires:
-            if isinstance(expires, unicode):
-                headers['Expires'] = expires.encode('utf-8', 'ignore')
+            if StringUtils.isStringType(expires):
+                headers['Expires'] = StringUtils.toStr2(expires)
             elif isinstance(expires, str):
                 headers['Expires'] = expires
             else:
                 headers['Expires'] = TimeUtils.dateTimeToWebTimestamp(expires)
         elif eTag:
-            headers['ETag'] = unicode(eTag)
+            headers['ETag'] = StringUtils.toUnicode(eTag)
 
         if maxAge > -1:
-            headers['Cache-Control'] = 'public, max-age=' + unicode(maxAge)
+            headers['Cache-Control'] = 'public, max-age=' + StringUtils.toUnicode(maxAge)
 
         if keyName.endswith('.jpg'):
             contentType = MIME_TYPES.JPEG_IMAGE
@@ -264,7 +263,8 @@ class S3Bucket(object):
         return headers
 
 #___________________________________________________________________________________________________ _localIsNewer
-    def _localIsNewer(self, key, newerThanDate):
+    @classmethod
+    def _localIsNewer(cls, key, newerThanDate):
         if not newerThanDate or not key.last_modified:
             return True
         return TimeUtils.webTimestampToDateTime(key.last_modified) < newerThanDate
@@ -278,7 +278,7 @@ class S3Bucket(object):
 
 #___________________________________________________________________________________________________ __unicode__
     def __unicode__(self):
-        return unicode(self.__str__())
+        return StringUtils.toUnicode(self.__str__())
 
 #___________________________________________________________________________________________________ __str__
     def __str__(self):

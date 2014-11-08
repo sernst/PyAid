@@ -2,6 +2,8 @@
 # (C)2012
 # Scott Ernst
 
+from __future__ import print_function
+
 #################################################################################################### ClassInstanceMethod
 class ClassInstanceMethod(object):
     """ A method that behaves as both a class method when called from a class and as an instance
@@ -41,16 +43,15 @@ class _MethodWrapper(object):
 #___________________________________________________________________________________________________ __call__
     def __call__(self, *args, **kwargs):
         assert 'self' not in kwargs and 'cls' not in kwargs, (
-            "You cannot use 'self' or 'cls' arguments to a ClassInstanceMethod"
-        )
+            "You cannot use 'self' or 'cls' arguments to a ClassInstanceMethod")
         try:
             return self.func(self.obj, self.type, *args, **kwargs)
-        except Exception, err:
-            print 'ClassInstanceMethod execution failure:'
-            print '\tOBJECT:', self.obj
-            print '\tTYPE:', self.type
-            print '\tARGS:', args
-            print '\tKWARGS:', kwargs
+        except Exception:
+            print('ClassInstanceMethod execution failure:')
+            print('\tOBJECT:', self.obj)
+            print('\tTYPE:', self.type)
+            print('\tARGS:', args)
+            print('\tKWARGS:', kwargs)
             raise
 
 #___________________________________________________________________________________________________ __repr__

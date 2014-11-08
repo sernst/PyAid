@@ -2,6 +2,9 @@
 # (C)2012
 # Scott Ernst
 
+from __future__ import print_function
+from __future__ import absolute_import
+
 from pyaid.text.LineMetadata import LineMetadata
 from pyaid.text.RedactionTextAnalyzer import RedactionTextAnalyzer
 
@@ -22,7 +25,7 @@ class LineTextAnalyzer(RedactionTextAnalyzer):
         self._startIndices = None
         self.refreshStartIndices()
         if debug:
-            print 'START INDICES:', self._startIndices
+            print('START INDICES:', self._startIndices)
 
         prev = None
         while True:
@@ -34,7 +37,7 @@ class LineTextAnalyzer(RedactionTextAnalyzer):
             self._lines.append(line)
 
             if debug:
-                print 'LINE: ',line.startIndex,line.endIndex,'of',len(self._raw)
+                print('LINE: ',line.startIndex,line.endIndex,'of',len(self._raw))
 
             if not line.endIndex < len(self._raw) - 1:
                 break
