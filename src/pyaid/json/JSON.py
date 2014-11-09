@@ -4,6 +4,7 @@
 
 from __future__ import print_function, absolute_import, unicode_literals, division
 
+import sys
 import json as jsonint
 import gzip
 from pyaid.dict.DictUtils import DictUtils
@@ -21,14 +22,32 @@ class JSON(object):
     @classmethod
     def asString(cls, src, pretty =False, encoding =None):
         """Doc..."""
+        if encoding is None:
+            encoding = 'utf-8'
+
         if pretty:
-            return cls._dumpsPretty(src, encoding=encoding)
-        return cls._dumpsCompact(src, encoding=encoding)
+            kwargs = dict(separators=(',', ': '), indent=4, sort_keys=True)
+        else:
+            kwargs = dict(separators=(',', ':'))
+
+        if sys.version < '3':
+            kwargs['encoding'] = encoding
+
+        try:
+            return jsonint.dumps(src, **kwargs)
+        except Exception:
+            try:
+                return jsonint.dumps(cls._reformat(src), **kwargs)
+            except Exception:
+                print('JSON Failed to encode:', src)
+                raise
 
 #___________________________________________________________________________________________________ fromString
     @classmethod
     def fromString(cls, src):
-        return jsonint.loads(StringUtils.strToUnicode(src))
+        if not src:
+            return None
+        return jsonint.loads(StringUtils.toUnicode(src))
 
 #___________________________________________________________________________________________________ fromFile
     @classmethod
@@ -52,9 +71,9 @@ class JSON(object):
     @classmethod
     def toFile(cls, path, value, pretty =False, gzipped =False, throwError =False):
         try:
-            res = cls.asString(value, pretty=pretty).encode('utf-8', 'ignore')
+            res = StringUtils.toStr2(cls.asString(value, pretty=pretty))
             if gzipped:
-                f = gzip.open(path, 'w+')
+                f = gzip.open(path, 'wb')
             else:
                 f = open(path, 'w+')
             f.write(res)
@@ -70,47 +89,12 @@ class JSON(object):
 #===================================================================================================
 #                                                                               P R O T E C T E D
 
-#___________________________________________________________________________________________________ _dumpsCompact
-    @classmethod
-    def _dumpsCompact(cls, src, encoding =None):
-        if encoding is None:
-            encoding = 'utf-8'
-
-        try:
-            return jsonint.dumps(src, separators=(',', ':'), encoding=encoding)
-        except Exception:
-            try:
-                src = cls._reformat(src)
-                return jsonint.dumps(src, separators=(',', ':'), encoding=encoding)
-            except Exception:
-                print('JSON Failed to encode:', src)
-                raise
-
-#___________________________________________________________________________________________________ _dumpsPretty
-    @classmethod
-    def _dumpsPretty(cls, src, encoding =None):
-        if encoding is None:
-            encoding = 'utf-8'
-
-        try:
-            return jsonint.dumps(
-                src, separators=(',', ': '), indent=4, sort_keys=True, encoding=encoding)
-        except Exception:
-            try:
-                src = cls._reformat(src)
-                return jsonint.dumps(
-                    src, separators=(',', ': '), sort_keys=True, encoding=encoding)
-            except Exception:
-                print('JSON Failed to encode:', src)
-                raise
-
 #___________________________________________________________________________________________________ _reformat
     @classmethod
     def _reformat(cls, src):
         out = dict()
         for n,v in DictUtils.iter(src):
             n = StringUtils.strToUnicode(n)
-
             out[n] = cls._reformatValue(v)
         return out
 
@@ -119,9 +103,9 @@ class JSON(object):
     def _reformatValue(cls, value):
         if isinstance(value, dict):
             value = cls._reformat(value)
-        elif isinstance(value, str):
-            value = StringUtils.strToUnicode(value)
-        elif isinstance(value, list) or isinstance(value, tuple):
+        elif StringUtils.isStringType(value):
+            value = StringUtils.toUnicode(value)
+        elif isinstance(value, (list, tuple)):
             vout = []
             for item in value:
                 vout.append(cls._reformatValue(item))

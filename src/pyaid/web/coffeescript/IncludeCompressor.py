@@ -10,6 +10,7 @@ import os
 import getopt
 
 from pyaid.debug.Logger import Logger
+from pyaid.file.FileUtils import FileUtils
 from pyaid.interactive.queries import queryGeneralValue, queryFromList
 from pyaid.system.SystemUtils import SystemUtils
 import pyaid.units.SizeUnits as SizeUnits
@@ -72,7 +73,7 @@ class IncludeCompressor(object):
                 self._log.writeError('Failed to compile coffeescript files.', err)
                 return False
 
-        os.path.walk(rootPath, self._compressInFolder, None)
+        FileUtils.walkPath(rootPath, self._compressInFolder, None)
         self._log.write('Compression operation complete.')
         return True
 

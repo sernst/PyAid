@@ -58,7 +58,11 @@ class SystemUtils(object):
         if wait:
             pipe.wait()
         out, error = pipe.communicate()
-        result = {'error':error, 'out':out, 'code':pipe.returncode, 'command':cmd}
+        result = {
+            'error':StringUtils.toUnicode(error),
+            'out':StringUtils.toUnicode(out),
+            'code':pipe.returncode,
+            'command':cmd}
         return result
 
 #___________________________________________________________________________________________________ executeForOutput

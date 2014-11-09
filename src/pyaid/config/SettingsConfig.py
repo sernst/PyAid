@@ -159,7 +159,8 @@ class SettingsConfig(object):
 
         self._settings = JSON.fromFile(self._path)
         if self._settings is None:
-            return dict()
+            self._settings = dict()
+            return self._settings
 
         return self._settings
 

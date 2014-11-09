@@ -5,6 +5,7 @@
 from __future__ import print_function, absolute_import, unicode_literals, division
 
 import os
+import sys
 
 from pyaid.list.ListUtils import ListUtils
 from pyaid.string.StringUtils import StringUtils
@@ -131,7 +132,8 @@ class FileList(object):
         elif StringUtils.isStringType(flags):
             flags = [flags]
 
-        os.path.walk(path, cls._rootPathWalker, {
+        walk = os.path.walk if sys.version < '3' else os.walk
+        walk(path, cls._rootPathWalker, {
             'rootPath':path,
             'out':out,
             'flags':flags })

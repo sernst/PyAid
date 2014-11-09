@@ -43,6 +43,14 @@ class StringUtils(object):
 
     _SOLO_BACKSLASH_PATTERN = re.compile('(?<!\\\)\\\(?!\\\)')
 
+#___________________________________________________________________________________________________ unichr
+    @classmethod
+    def unichr(cls, source):
+        """unichr doc..."""
+        if sys.version > '3':
+            return chr(source)
+        return unichr(source)
+
 #___________________________________________________________________________________________________ isStringType
     @classmethod
     def isStringType(cls, value, strict =False):
@@ -66,9 +74,9 @@ class StringUtils(object):
         """ Normalizes string, converts to lowercase, removes non-alpha characters,
             and converts spaces to hyphens. Useful in creating safe filenames. """
 
-        source = cls.strToUnicode(source)
-        source = unicodedata.normalize('NFKD', source).encode('ascii', 'ignore')
-        return text_type(re.sub('[^\w\s-]', '', source).strip().lower())
+        source = cls.toUnicode(
+            unicodedata.normalize('NFKD', cls.toUnicode(source)).encode('ascii', 'ignore'))
+        return cls.toUnicode(re.sub('[^\w\s-]', '', source).strip().lower())
 
 #___________________________________________________________________________________________________ matches
     @classmethod
@@ -398,34 +406,41 @@ class StringUtils(object):
 #___________________________________________________________________________________________________ strToUnicode
     @classmethod
     def strToUnicode(cls, value, force =True):
+        if isinstance(value, text_type):
+            return value
+
+        if not isinstance(value, binary_type):
+            if not force:
+                return value
+            value = binary_type(value)
+
         try:
             if not isinstance(value, text_type):
                 if sys.version < '3':
                     return value.decode('utf8', 'ignore')
                 else:
-                    return text_type(value)
+                    return value.decode('utf8')
         except Exception:
-            pass
-
-        if not force:
             return value
-        return value if value is None else text_type(value)
 
 #___________________________________________________________________________________________________ unicodeToStr
     @classmethod
     def unicodeToStr(cls, value, force =True):
-        try:
-            if not isinstance(value, binary_type):
-                if sys.version < '3':
-                    return value.encode('utf8', 'ignore')
-                else:
-                    return binary_type(value)
-        except Exception:
-            pass
-
-        if not force:
+        if isinstance(value, binary_type):
             return value
-        return value if value is None else binary_type(value)
+
+        if not isinstance(value, text_type):
+            if not force:
+                return value
+            value = text_type(value)
+
+        try:
+            if sys.version < '3':
+                return value.encode('utf8', 'ignore')
+            else:
+                return binary_type(value, 'utf8')
+        except Exception:
+            return value
 
 #___________________________________________________________________________________________________ zeroFill
     @classmethod

@@ -19,7 +19,7 @@ class ArgsUtils(object):
     def addIfMissing(name, value, kwargs, overwriteNone =False):
         """Adds the value to the kwargs dictionary if the key does not exist."""
 
-        if kwargs.has_key(name) and not (overwriteNone and kwargs.get(name) is None):
+        if name in kwargs and not (overwriteNone and kwargs.get(name) is None):
             return False
 
         kwargs[name] = value

@@ -9,6 +9,7 @@ import os
 import re
 import getopt
 from pyaid.dict.DictUtils import DictUtils
+from pyaid.file.FileUtils import FileUtils
 
 from pyaid.interactive.queries import queryYesNoQuit
 from pyaid.debug.Logger import Logger
@@ -160,7 +161,7 @@ class CoffeescriptBuilder(object):
                         continue
                     CoffeescriptBuilder._missing[n] = v
 
-            os.path.walk(path, walker, [path, rootPath])
+            FileUtils.walkPath(path, walker, [path, rootPath])
             print('\n\nCOMPILATION RESULTS:' + CoffeescriptBuilder._results)
 
             if CoffeescriptBuilder._missing:

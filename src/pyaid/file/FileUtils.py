@@ -22,7 +22,7 @@ from pyaid.string.StringUtils import StringUtils
 class FileUtils(object):
     """A class for..."""
 
-    WALK_DATA_NT = namedtuple('WALK_DATA_NT', ['rootPath', 'folder', 'names', 'data'])
+    WALK_DATA_NT = namedtuple('WALK_DATA_NT', ['rootPath', 'folder', 'names', 'data', 'files', 'folders'])
 
 #===================================================================================================
 #                                                                                     P U B L I C
@@ -264,7 +264,7 @@ class FileUtils(object):
             destination += os.sep
 
         try:
-            os.path.walk(source, cls._recursiveCopy, {
+            cls.walkPath(source, cls._recursiveCopy, {
                 'source':source,
                 'destination':destination,
                 'overwriteExisting':overwriteExisting,
@@ -396,20 +396,23 @@ class FileUtils(object):
 
 #___________________________________________________________________________________________________ walkPath
     @classmethod
-    def walkPath(cls, rootPath, callback, data =None):
+    def walkPath(cls, rootPath, callback, data =None, recursive =True):
         """ Walks the specified root path, calling the specified callback in each folder
             recursively. The signature of the callback should be callback(walkData), a single
             argument that is an instance of FileUtils.WALK_DATA_NT. """
 
-        os.path.walk(rootPath, cls._handleWalkPath, {
-            'rootPath':rootPath,
-            'callback':callback,
-            'data':data })
+        for pathData in os.walk(rootPath):
+            callback(cls.WALK_DATA_NT(
+                rootPath=rootPath,
+                folder=pathData[0],
+                folders=pathData[1],
+                files=pathData[2],
+                names=pathData[1] + pathData[2],
+                data=data ))
 
-#___________________________________________________________________________________________________ createWalkData
-    @classmethod
-    def createWalkData(cls, rootPath =None, folder =None, names =None, data =None):
-        return cls.WALK_DATA_NT(rootPath, folder, names, data)
+            # Break out after the first loop if not running in recursive mode
+            if not recursive:
+                return
 
 #___________________________________________________________________________________________________ openFolderInSystemDisplay
     @classmethod
@@ -464,10 +467,12 @@ class FileUtils(object):
 
 #___________________________________________________________________________________________________ _recursiveCopy
     @classmethod
-    def _recursiveCopy(cls, args, directory, items):
-        if directory in ['.svn']:
+    def _recursiveCopy(cls, data):
+        if data.folder in ['.svn']:
             return
 
+        args        = data.data
+        directory   = data.folder
         directory   = cls.cleanupPath(directory, isDir=True)
         source      = cls.cleanupPath(args['source'], isDir=True)
         destination = cls.cleanupPath(args['destination'], isDir=True)
@@ -482,7 +487,7 @@ class FileUtils(object):
             fileList.addDirectory(dest, flags=FileList.CREATED)
             os.makedirs(dest)
 
-        for item in items:
+        for item in data.files:
             srcPath  = os.path.join(directory, item)
             destPath = os.path.join(dest, item)
             if os.path.isfile(srcPath):
@@ -544,14 +549,3 @@ class FileUtils(object):
 
         return out
 
-#===================================================================================================
-#                                                                                 H A N D L E R S
-
-#___________________________________________________________________________________________________ _handleWalkPath
-    @classmethod
-    def _handleWalkPath(cls, args, dirname, names):
-            args['callback'](cls.createWalkData(
-                rootPath=args['rootPath'],
-                folder=dirname,
-                names=names,
-                data=args['data'] ))

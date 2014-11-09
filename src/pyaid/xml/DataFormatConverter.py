@@ -10,6 +10,7 @@ import getopt
 import codecs
 
 from pyaid.debug.Logger import Logger
+from pyaid.file.FileUtils import FileUtils
 from pyaid.interactive.queries import queryGeneralValue, queryFromList
 from pyaid.string.StringUtils import StringUtils
 from pyaid.xml.XMLConfigParser import XMLConfigParser
@@ -85,7 +86,7 @@ class DataFormatConverter(object):
             return False
 
         if recursive:
-            os.path.walk(path, self._convertInDirectory, [srcType, targetType])
+            FileUtils.walkPath(path, self._convertInDirectory, [srcType, targetType])
         else:
             self._convertInDirectory([srcType, targetType], path, os.listdir(path))
 

@@ -22,7 +22,7 @@ class DictUtils(object):
     def iter(cls, source):
         """iter doc..."""
         if sys.version > '3':
-            return source.iter()
+            return source.items()
         return source.iteritems()
 
 #___________________________________________________________________________________________________ copyTo

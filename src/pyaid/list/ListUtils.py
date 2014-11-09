@@ -42,7 +42,7 @@ class ListUtils(object):
 
 #___________________________________________________________________________________________________ itemsToString
     @classmethod
-    def itemsToString(cls, target, inPlace =False):
+    def itemsToString(cls, target, inPlace =False, toUnicode =True):
         """ Iterates through the elements of the target list and converts each of them to binary
             strings, including decoding unicode strings to byte strings."""
 
@@ -54,7 +54,10 @@ class ListUtils(object):
         while index < len(target):
             source = target[index]
             if StringUtils.isStringType(source):
-                output[index] = StringUtils.unicodeToStr(source)
+                if toUnicode:
+                    output[index] = StringUtils.strToUnicode(source)
+                else:
+                    output[index] = StringUtils.unicodeToStr(source, force=True)
             else:
                 output[index] = str(source)
             index += 1
