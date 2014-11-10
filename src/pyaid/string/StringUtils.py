@@ -406,39 +406,42 @@ class StringUtils(object):
 #___________________________________________________________________________________________________ strToUnicode
     @classmethod
     def strToUnicode(cls, value, force =True):
-        if isinstance(value, text_type):
+        if isinstance(value, cls.TEXT_TYPE):
             return value
 
-        if not isinstance(value, binary_type):
+        if not isinstance(value, cls.BINARY_TYPE):
             if not force:
                 return value
-            value = binary_type(value)
+            if value is None:
+                return 'None'
+            value = cls.TEXT_TYPE(value)
 
         try:
-            if not isinstance(value, text_type):
-                if sys.version < '3':
-                    return value.decode('utf8', 'ignore')
-                else:
-                    return value.decode('utf8')
+            if sys.version < '3':
+                return value.decode('utf8', 'ignore')
+            else:
+                return value.decode('utf8')
         except Exception:
             return value
 
 #___________________________________________________________________________________________________ unicodeToStr
     @classmethod
     def unicodeToStr(cls, value, force =True):
-        if isinstance(value, binary_type):
+        if isinstance(value, cls.BINARY_TYPE):
             return value
 
-        if not isinstance(value, text_type):
+        if not isinstance(value, cls.TEXT_TYPE):
             if not force:
                 return value
-            value = text_type(value)
+            if value is None:
+                return cls.BINARY_TYPE('None')
+            value = cls.BINARY_TYPE(value)
 
         try:
             if sys.version < '3':
                 return value.encode('utf8', 'ignore')
             else:
-                return binary_type(value, 'utf8')
+                return cls.BINARY_TYPE(value, 'utf8')
         except Exception:
             return value
 

@@ -456,7 +456,7 @@ class Logger(object):
                     out.append(indents + (' '*max(0, maxIndex - item[0])) + item[1])
                 else:
                     out.append(indents + item[1])
-            return '\n'.join(out)
+            return StringUtils.toUnicode('\n'.join(out))
 
         else:
             return indents + StringUtils.toUnicode(src)
