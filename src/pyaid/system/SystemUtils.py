@@ -126,8 +126,12 @@ class SystemUtils(object):
             else:
                 return False
 
-        f = open(target, 'w')
-        f.write(res.content if hasattr(res, 'content') else res.read())
+        data = res.content if hasattr(res, 'content') else res.read()
+        if isinstance(data, StringUtils.TEXT_TYPE):
+            f = open(target, 'w+')
+        else:
+            f = open(target, 'wb')
+        f.write(data)
         f.close()
 
         return True
