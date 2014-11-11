@@ -7,9 +7,10 @@ from __future__ import print_function, absolute_import, unicode_literals, divisi
 import sys
 import json as jsonint
 import gzip
-from pyaid.dict.DictUtils import DictUtils
 
+from pyaid.dict.DictUtils import DictUtils
 from pyaid.string.StringUtils import StringUtils
+
 
 #___________________________________________________________________________________________________ JSON
 class JSON(object):

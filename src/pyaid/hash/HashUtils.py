@@ -1,5 +1,5 @@
 # HashUtils.py
-# (C)2012
+# (C)2012-2014
 # Eric D. Wills and Scott Ernst
 
 from __future__ import print_function, absolute_import, unicode_literals, division
@@ -8,7 +8,9 @@ import base64
 import hashlib
 import hmac
 
-# AS NEEDED: from pyaid.json.JSON import JSON
+from pyaid.json.JSON import JSON
+from pyaid.string.StringUtils import StringUtils
+
 
 #___________________________________________________________________________________________________ HashUtils
 class HashUtils(object):
@@ -20,28 +22,24 @@ class HashUtils(object):
 #___________________________________________________________________________________________________ base64Encode
     @staticmethod
     def base64Encode(text):
-        return base64.b64encode(text, '-~').replace('=', '_')
+        b = StringUtils.toBytes
+        return base64.b64encode(b(text), b('-~')).replace(b('='), b('_'))
 
 #___________________________________________________________________________________________________ sha256hmac
-    @staticmethod
-    def sha256hmac(key, text):
+    @classmethod
+    def sha256hmac(cls, key, text):
         """Returns a HMAC-SHA256 hex hash of the specified text based on the specified key."""
 
-        msg  = HashUtils.base64Encode(text.encode('utf8', 'ignore'))
-        hash = hmac.new(str(key), msg=msg, digestmod=hashlib.sha256).digest()
-        return HashUtils.base64Encode(hash)
+        msg  = cls.base64Encode(text)
+        hash = hmac.new(StringUtils.toBytes(key), msg=msg, digestmod=hashlib.sha256).digest()
+        return cls.base64Encode(hash)
 
 #___________________________________________________________________________________________________ sha256hmacSign
-
-    @staticmethod
-    def sha256hmacSign(key, **kwargs):
-        from pyaid.json.JSON import JSON
-
-        return HashUtils.sha256hmac(key, JSON.asString(kwargs))
+    @classmethod
+    def sha256hmacSign(cls, key, **kwargs):
+        return cls.sha256hmac(key, JSON.asString(kwargs))
 
 #___________________________________________________________________________________________________ sha256hmacSignObject
-    @staticmethod
-    def sha256hmacSignObject(key, obj):
-        from pyaid.json.JSON import JSON
-
-        return HashUtils.sha256hmac(key, JSON.asString(obj))
+    @classmethod
+    def sha256hmacSignObject(cls, key, obj):
+        return cls.sha256hmac(key, JSON.asString(obj))

@@ -454,7 +454,7 @@ class StringUtils(object):
     @classmethod
     def toUnicode(cls, value):
         """toUnicode doc..."""
-        return cls.strToUnicode(value, True)
+        return cls.strToUnicode(value, force=True)
 
 #___________________________________________________________________________________________________ toStr2
     @classmethod
@@ -464,3 +464,21 @@ class StringUtils(object):
             return value
 
         return cls.unicodeToStr(value, force=force)
+
+#___________________________________________________________________________________________________ toStr
+    @classmethod
+    def toStr(cls, value):
+        """toStr doc..."""
+        return cls.unicodeToStr(value, force=True)
+
+#___________________________________________________________________________________________________ toBytes
+    @classmethod
+    def toBytes(cls, value):
+        """toBytes doc..."""
+        return cls.unicodeToStr(value, force=True)
+
+#___________________________________________________________________________________________________ toText
+    @classmethod
+    def toText(cls, value):
+        """toText doc..."""
+        return cls.strToUnicode(value, force=True)
