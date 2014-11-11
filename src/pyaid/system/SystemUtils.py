@@ -33,10 +33,15 @@ class SystemUtils(object):
 
 #___________________________________________________________________________________________________ executeCommand
     @classmethod
-    def executeCommand(cls, cmd, remote =False, shell =True, wait =False):
+    def executeCommand(cls, cmd, remote =False, shell =True, wait =False, background =False):
         if shell and not StringUtils.isStringType(cmd):
             from pyaid.list.ListUtils import ListUtils
             cmd = ' '.join(ListUtils.itemsToString(cmd))
+
+        # Background nohup processes shouldn't PIPE and once run should immediately return
+        if background:
+            subprocess.Popen(cmd, shell=shell)
+            return {'error':'', 'out':'', 'code':0, 'command':cmd}
 
         if remote:
             pipe = subprocess.Popen(

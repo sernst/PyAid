@@ -11,6 +11,7 @@ import string
 import random
 import math
 import unicodedata
+import textwrap
 
 if sys.version < '3':
     # noinspection PyUnresolvedReferences
@@ -42,6 +43,12 @@ class StringUtils(object):
         ('\u201c', '&quot;') ]
 
     _SOLO_BACKSLASH_PATTERN = re.compile('(?<!\\\)\\\(?!\\\)')
+
+#___________________________________________________________________________________________________ dedent
+    @classmethod
+    def dedent(cls, source):
+        """dedent doc..."""
+        return textwrap.dedent(source)
 
 #___________________________________________________________________________________________________ unichr
     @classmethod

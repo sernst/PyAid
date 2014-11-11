@@ -424,11 +424,11 @@ class Logger(object):
                 error = '[[UNABLE TO PARSE]]'
 
         try:
-            es = (cls.formatAsString(message) + "\n    TYPE: %s\n    VALUE: %s\nERROR: %s\n") \
-               % (errorType, errorValue, error)
+            es = '%s\n    TYPE: %s\n    VALUE: %s\nERROR: %s\n' % (
+                cls.formatAsString(message), errorType, errorValue, error)
         except Exception:
             try:
-                es = cls.formatAsString(message) + "\n    [[ERROR ATTRIBUTE PARSING FAILURE]]"
+                es = '%s\n    [[ERROR ATTRIBUTE PARSING FAILURE]]' % cls.formatAsString(message)
             except Exception:
                 es = 'FAILED TO PARSE EXCEPTION'
 
@@ -438,8 +438,10 @@ class Logger(object):
     @classmethod
     def formatAsString(cls, src, indentLevel =0):
         indents = '    '*indentLevel
-        if isinstance(src, list) or isinstance(src, tuple):
-            out      = [indents + StringUtils.toUnicode(src[0]) + ('' if src[0].endswith(':') else ':')]
+        if isinstance(src, (list, tuple)):
+            out = [StringUtils.toUnicode('%s%s%s' % (
+                indents, src[0], '' if src[0].endswith(':') else ':'))]
+
             indents += '    '
             lines    = []
             maxIndex = 0
@@ -459,7 +461,7 @@ class Logger(object):
             return StringUtils.toUnicode('\n'.join(out))
 
         else:
-            return indents + StringUtils.toUnicode(src)
+            return StringUtils.toUnicode(indents + src)
 
 #___________________________________________________________________________________________________ traceLogMessage
     @classmethod
@@ -469,7 +471,7 @@ class Logger(object):
         if 'stack' in logMessage:
             log += logMessage['stack']
         out = cls.asAscii(log)
-        print(out)
+        print(StringUtils.toText(out))
 
         try:
             for cb in callbacks:
