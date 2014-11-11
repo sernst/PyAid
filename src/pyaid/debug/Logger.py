@@ -526,6 +526,9 @@ class Logger(object):
 #___________________________________________________________________________________________________ asAscii
     @classmethod
     def asAscii(cls, string):
+        if sys.version > '3':
+            return StringUtils.toUnicode(string)
+
         if StringUtils.isStringType(string):
             try:
                 return string.encode('utf8', 'ignore')

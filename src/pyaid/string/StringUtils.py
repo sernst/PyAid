@@ -458,8 +458,9 @@ class StringUtils(object):
 
 #___________________________________________________________________________________________________ toStr2
     @classmethod
-    def toStr2(cls, value):
+    def toStr2(cls, value, force =False):
         """toStr2 doc..."""
-        if sys.version < '3':
-            return cls.unicodeToStr(value)
-        return text_type(value)
+        if sys.version > '3':
+            return value
+
+        return cls.unicodeToStr(value, force=force)

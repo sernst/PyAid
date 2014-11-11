@@ -46,7 +46,7 @@ class ByteChunk(object):
 #___________________________________________________________________________________________________ GS: length
     @property
     def length(self):
-        return len(self._data)
+        return len(self._data) if self._data else 0
 
 #___________________________________________________________________________________________________ GS: bytesLeft
     @property
@@ -112,7 +112,7 @@ class ByteChunk(object):
             self._position += 1
 #___________________________________________________________________________________________________ writeNullByte
     def writeNullByte(self):
-        self.writeByte(struct.pack('x'))
+        self.writeByte(struct.pack(StringUtils.unicodeToStr('x')))
 
 #___________________________________________________________________________________________________ writeChunk
     def writeChunk(self, chunk):
@@ -121,7 +121,6 @@ class ByteChunk(object):
 #___________________________________________________________________________________________________ writeString
     def writeString(self, value):
         self.writeBytes(bytes(StringUtils.unicodeToStr(value)))
-        # self.writeBytes(struct.pack(self.endianess + 's', StringUtils.unicodeToStr(value)))
 
 #___________________________________________________________________________________________________ writeUint8
     def writeUint8(self, value):
@@ -131,15 +130,15 @@ class ByteChunk(object):
 #___________________________________________________________________________________________________ writeInt8
     def writeInt8(self, value):
         """ Read a signed 8bit integer."""
-        self.writeByte(struct.pack('b', int(value)))
+        self.writeByte(struct.pack(StringUtils.unicodeToStr('b'), int(value)))
 
 #___________________________________________________________________________________________________ writeInt16
     def writeInt16(self, value):
-        self.writeBytes(struct.pack(self.endianess + 'h', int(value)))
+        self.writeBytes(self.pack('h', int(value)))
 
 #___________________________________________________________________________________________________ writeUint16
     def writeUint16(self, value):
-        self.writeBytes(struct.pack(self.endianess + 'H', int(value)))
+        self.writeBytes(self.pack('H', int(value)))
 
 #___________________________________________________________________________________________________ writeUint24
     def writeUint24(self, value):
@@ -154,19 +153,19 @@ class ByteChunk(object):
 
 #___________________________________________________________________________________________________ writeInt32
     def writeInt32(self, value):
-        self.writeBytes(struct.pack(self.endianess + 'i', int(value)))
+        self.writeBytes(self.pack('i', int(value)))
 
 #___________________________________________________________________________________________________ writeUint32
     def writeUint32(self, value):
-        self.writeBytes(struct.pack(self.endianess + 'I', int(value)))
+        self.writeBytes(self.pack('I', int(value)))
 
 #___________________________________________________________________________________________________ writeInt64
     def writeInt64(self, value):
-        self.writeBytes(struct.pack(self.endianess + 'q', int(value)))
+        self.writeBytes(self.pack('q', int(value)))
 
 #___________________________________________________________________________________________________ writeUint64
     def writeUint64(self, value):
-        self.writeBytes(struct.pack(self.endianess + 'Q', int(value)))
+        self.writeBytes(self.pack('Q', int(value)))
 
 #___________________________________________________________________________________________________ writFourCC
     def writeFourCC(self, fourCC):
@@ -233,16 +232,21 @@ class ByteChunk(object):
     def seek(self, position):
         self.position = min(len(self._data) - 1, max(0, position))
 
+#___________________________________________________________________________________________________ pack
+    def pack(self, dataType, value):
+        """pack doc..."""
+        return struct.pack(StringUtils.unicodeToStr(self.endianess + dataType), value)
+
 #___________________________________________________________________________________________________ unpack
     def unpack(self, dataType, length):
-        data = self.read(length)
+        data = StringUtils.unicodeToStr(self.read(length))
 
         assert len(data) == length, \
             u"[UNPACK ERROR]: Unexpected end of stream [%s | %s]" % (
                 StringUtils.toUnicode(len(data)), StringUtils.toUnicode(length))
 
         try:
-            return struct.unpack(self.endianess + dataType, data)[0]
+            return struct.unpack(StringUtils.unicodeToStr(self.endianess + dataType), data)[0]
         except struct.error:
             print(len(data))
             print(u"Unable to unpack '%r'" % data)
@@ -375,5 +379,6 @@ class ByteChunk(object):
 
 #___________________________________________________________________________________________________ __str__
     def __str__(self):
-        return '<%s>' % self.__class__.__name__
+        """__str__ doc..."""
+        return '<%s: %s>' % (self.__class__.__name__, self.length)
 
