@@ -321,7 +321,14 @@ class SystemUtils(object):
         if not os.path.exists(path):
             return True
 
-        if os.path.isdir(path):
+        if os.path.islink(path):
+            try:
+                os.unlink(path)
+            except Exception as err:
+                if throwError:
+                    raise err
+                return False
+        elif os.path.isdir(path):
             try:
                 shutil.rmtree(path)
             except Exception as err1:
@@ -332,13 +339,6 @@ class SystemUtils(object):
                         print('ERROR:', err1)
                         raise err2
                     return False
-        elif os.path.islink(path):
-            try:
-                os.unlink(path)
-            except Exception as err:
-                if throwError:
-                    raise err
-                return False
         else:
             try:
                 os.remove(path)

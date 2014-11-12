@@ -91,6 +91,25 @@ class DictUtils(object):
 
         return out
 
+#___________________________________________________________________________________________________ cleanBytesToText
+    @classmethod
+    def cleanBytesToText(cls, source, inPlace =True):
+        """cleanBytesToText doc..."""
+
+        out = source if inPlace else dict()
+        from pyaid.list.ListUtils import ListUtils
+        for n, v in cls.iter(source):
+            if isinstance(v, (tuple, list)):
+                v = ListUtils.cleanBytesToText(v, inPlace=inPlace)
+            elif isinstance(v, dict):
+                v = cls.cleanBytesToText(v)
+            else:
+                v = StringUtils.strToUnicode(v, force=False)
+
+            out[StringUtils.toStrStr(n)] = v
+
+        return out
+
 #___________________________________________________________________________________________________ lowerDictKeys
     @classmethod
     def lowerDictKeys(cls, source):
@@ -138,14 +157,17 @@ class DictUtils(object):
         if not source:
             return '[EMPTY]'
 
+        from pyaid.list.ListUtils import ListUtils
         out = []
         for n,v in DictUtils.iter(source):
             n = StringUtils.toUnicode(n)
 
             if isinstance(v, dict):
                 v = '{ ' + cls.prettyPrint(v, delimiter=delimiter, separator=separator) + ' }'
-            elif isinstance(v, str):
+            elif isinstance(v, StringUtils.BINARY_TYPE):
                 v = StringUtils.strToUnicode(v)
+            elif isinstance(v, (list, tuple)):
+                v = ListUtils.prettyPrint(v)
             else:
                 v = StringUtils.toUnicode(v)
 

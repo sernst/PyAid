@@ -7,8 +7,10 @@ from __future__ import print_function, absolute_import, unicode_literals, divisi
 from operator import itemgetter
 from operator import attrgetter
 
+from pyaid.string.StringUtils import StringUtils
+
+
 # AS NEEDED: from pyaid.dict.DictUtils import DictUtils
-# As NEEDED: from pyaid.string.StringUtils import StringUtils
 
 #___________________________________________________________________________________________________ ListUtils
 class ListUtils(object):
@@ -16,6 +18,50 @@ class ListUtils(object):
 
 #===================================================================================================
 #                                                                                      C L A S S
+
+#___________________________________________________________________________________________________ prettyPrint
+    @classmethod
+    def prettyPrint(cls, source, separator = ', '):
+        """prettyPrint doc..."""
+        out = []
+
+        from pyaid.dict.DictUtils import DictUtils
+
+        for v in source:
+            if isinstance(v, (list, tuple)):
+                v = cls.prettyPrint(v, separator=',')
+            if isinstance(v, dict):
+                v = DictUtils.prettyPrint(v)
+            elif isinstance(v, StringUtils.BINARY_TYPE):
+                v = StringUtils.strToUnicode(v)
+            else:
+                v = StringUtils.toUnicode(v)
+            out.append(v)
+
+        return '[%s]' % separator.join(out)
+
+#___________________________________________________________________________________________________ cleanBytesToText
+    @classmethod
+    def cleanBytesToText(cls, source, inPlace =True):
+        """cleanBytesToText doc..."""
+
+        out = source if inPlace else []
+        from pyaid.dict.DictUtils import DictUtils
+        for i in range(len(source)):
+            v = source[i]
+            if isinstance(v, (tuple, list)):
+                v = cls.cleanBytesToText(v, inPlace=inPlace)
+            elif isinstance(v, dict):
+                v = DictUtils.cleanBytesToText(v, inPlace=inPlace)
+            else:
+                v = StringUtils.strToUnicode(v, force=False)
+
+            if inPlace:
+                out[i] = v
+            else:
+                out.append(v)
+
+        return out
 
 #___________________________________________________________________________________________________ asList
     @classmethod

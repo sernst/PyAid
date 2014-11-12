@@ -219,10 +219,10 @@ class S3Bucket(object):
     def createUploadPolicy(self, key, durationSeconds, maxSizeBytes):
         """Returns a S3 upload policy and signature for this bucket with the specified key. """
         return self._conn.build_post_form_args(
-            bucket_name=self.bucketName,
-            key=key,
+            bucket_name=StringUtils.toUnicode(self.bucketName),
+            key=StringUtils.toUnicode(key),
             expires_in=durationSeconds,
-            acl='private',
+            acl=StringUtils.toUnicode('private'),
             max_content_length=maxSizeBytes)
 
 #===================================================================================================

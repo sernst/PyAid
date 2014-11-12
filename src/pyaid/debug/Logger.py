@@ -247,10 +247,7 @@ class Logger(object):
         items = []
         for logItem in self._buffer:
             item = self.logMessageToString(logMessage=logItem) + '\n'
-            try:
-                item = item.encode('utf8', 'ignore')
-            except Exception:
-                pass
+            item = StringUtils.toStr2(item)
             items.append(item)
 
         for cb in self._writeCallbacks:
@@ -550,12 +547,12 @@ class Logger(object):
     ):
         out = []
         if includePrefix and 'prefix' in logMessage:
-            out.append(logMessage['prefix'] + prefixSeparator)
+            out.append(StringUtils.toUnicode(logMessage['prefix']) + prefixSeparator)
 
-        out.append(logMessage['log'])
+        out.append(StringUtils.toUnicode(logMessage['log']))
 
         if includeStack and 'stack' in logMessage:
-            out.append(stackSeparator + logMessage['stack'])
+            out.append(stackSeparator + StringUtils.toUnicode(logMessage['stack']))
 
         return ''.join(out)
 

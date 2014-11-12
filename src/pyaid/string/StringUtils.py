@@ -412,7 +412,7 @@ class StringUtils(object):
 
 #___________________________________________________________________________________________________ strToUnicode
     @classmethod
-    def strToUnicode(cls, value, force =True):
+    def strToUnicode(cls, value, force =False):
         if isinstance(value, cls.TEXT_TYPE):
             return value
 
@@ -433,7 +433,7 @@ class StringUtils(object):
 
 #___________________________________________________________________________________________________ unicodeToStr
     @classmethod
-    def unicodeToStr(cls, value, force =True):
+    def unicodeToStr(cls, value, force =False):
         if isinstance(value, cls.BINARY_TYPE):
             return value
 
@@ -489,3 +489,15 @@ class StringUtils(object):
     def toText(cls, value):
         """toText doc..."""
         return cls.strToUnicode(value, force=True)
+
+#___________________________________________________________________________________________________ toStrStr
+    @classmethod
+    def toStrStr(cls, value, force =False):
+        """ In Python 2 this will convert unicodes to strings and in Python 3 it will convert
+            bytes to strings. Either way you get a str(). If not force then non text/binary
+            types will be returned unchanged. Otherwise, they will be converted to a text/binary
+            type. """
+
+        if sys.version > '3':
+            return cls.strToUnicode(value, force=force)
+        return cls.unicodeToStr(value, force=force)
