@@ -46,9 +46,9 @@ class StringUtils(object):
 
 #___________________________________________________________________________________________________ dedent
     @classmethod
-    def dedent(cls, source):
+    def dedent(cls, source, collapse =True):
         """dedent doc..."""
-        return textwrap.dedent(source)
+        return textwrap.dedent(source.strip()).replace('\r', '').replace('\n', '')
 
 #___________________________________________________________________________________________________ unichr
     @classmethod

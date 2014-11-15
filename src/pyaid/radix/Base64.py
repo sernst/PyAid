@@ -6,6 +6,7 @@ from __future__ import print_function, absolute_import, unicode_literals, divisi
 
 import re
 import uuid
+import base64 as b64
 
 #___________________________________________________________________________________________________ Base64
 class Base64(object):

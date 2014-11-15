@@ -50,11 +50,21 @@ class OsUtils(object):
         else:
             return linux
 
+#___________________________________________________________________________________________________ getHomePath
+    @classmethod
+    def getHomePath(cls):
+        """getHomePath doc..."""
+        return os.path.abspath(os.path.expanduser('~'))
+
 #___________________________________________________________________________________________________ getDocumentsPath
     @classmethod
     def getDocumentsPath(cls):
         if not cls.isWindows():
-            return os.path.expanduser('~')
+            homePath = cls.getHomePath()
+            path = os.path.join(homePath, 'Documents')
+            if os.path.exists(path):
+                return path
+            return homePath
 
         if cls._WIN_DOCS_PATH:
             return cls._WIN_DOCS_PATH

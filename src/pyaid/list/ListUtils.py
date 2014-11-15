@@ -19,6 +19,14 @@ class ListUtils(object):
 #===================================================================================================
 #                                                                                      C L A S S
 
+#___________________________________________________________________________________________________ prettyPrintBullets
+    @classmethod
+    def prettyPrintBullets(cls, source, indent ='  ', indentLevel =0, bullet ='*'):
+        """prettyPrintBullets doc..."""
+        source = cls.prettyPrint(source, separator='\n').strip('[]').split('\n')
+        prefix = indentLevel*indent + bullet + ' '
+        return prefix + prefix.join(source)
+
 #___________________________________________________________________________________________________ prettyPrint
     @classmethod
     def prettyPrint(cls, source, separator = ', '):

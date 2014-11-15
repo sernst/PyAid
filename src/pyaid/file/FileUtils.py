@@ -27,6 +27,24 @@ class FileUtils(object):
 #===================================================================================================
 #                                                                                     P U B L I C
 
+#___________________________________________________________________________________________________ checkPathIsValid
+    @classmethod
+    def checkPathIsValid(cls, path, exists=True, writable =False):
+        """checkPathIsValid doc..."""
+
+        path   = cls.cleanupPath(path)
+        parent = os.path.dirname(path)
+        folder = parent if not os.path.isdir(path) else path
+
+        if exists and not os.path.exists(parent) or not os.path.exists(path):
+            return False, 'NO_PATH', 'No such path'
+
+        if not os.access(folder, os.R_OK):
+            return False, 'NO_READ', 'Read access denied'
+
+        if writable and not os.access(folder, os.W_OK):
+            return False, 'NO_WRITE', 'Write access denied'
+
 #___________________________________________________________________________________________________ getPathToParentFolder
     @classmethod
     def getPathToParentFolder(cls, path, parentFolderName, offset =0):

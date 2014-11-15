@@ -4,12 +4,23 @@
 
 from __future__ import print_function, absolute_import, unicode_literals, division
 
+import sys
+
+if sys.version > '3':
+    long = int
+
 #___________________________________________________________________________________________________ NumericUtils
 class NumericUtils(object):
     """A class for..."""
 
 #===================================================================================================
 #                                                                                       C L A S S
+
+#___________________________________________________________________________________________________ isNumber
+    @classmethod
+    def isNumber(cls, value):
+        """isNumber doc..."""
+        return isinstance(value, (int, long, float))
 
 #___________________________________________________________________________________________________ linearSpace
     @classmethod
