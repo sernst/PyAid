@@ -11,13 +11,22 @@ from datetime import time as dtTime
 
 from pyaid.radix.Base36 import Base36
 from pyaid.radix.Base64 import Base64
-
-#___________________________________________________________________________________________________ TimeUtils
 from pyaid.string.StringUtils import StringUtils
 
 
+#___________________________________________________________________________________________________ TimeUtils
 class TimeUtils(object):
     """A class for time utilities."""
+
+    YEARS           = 'years'
+    MONTHS          = 'months'
+    WEEKS           = 'weeks'
+    DAYS            = 'days'
+    HOURS           = 'hours'
+    MINUTES         = 'mins'
+    SECONDS         = 'secs'
+    MILLISECONDS    = 'msecs'
+    MICROSECONDS    = 'micros'
 
     ISO_8601_DATE = '%Y-%m-%d'
     ISO_8601_WEEK = '%Y-W%W'
@@ -26,6 +35,82 @@ class TimeUtils(object):
 
     ZULU_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
     _ZULU_PRECISE_FORMAT = '%Y-%m-%dT%H:%M:%S'
+
+#___________________________________________________________________________________________________ toSeconds
+    @classmethod
+    def toSeconds(cls, value, fromUnit):
+        """toSeconds doc..."""
+        value = float(value)
+        if fromUnit == cls.SECONDS:
+            return value
+        elif fromUnit == cls.MICROSECONDS:
+            return value/1.0e6
+        elif fromUnit == cls.MILLISECONDS:
+            return value/1.0e3
+
+        value *= 60.0
+        if fromUnit == cls.MINUTES:
+            return value
+
+        value *= 60.0
+        if fromUnit == cls.HOURS:
+            return value
+
+        value *= 24.0
+        if fromUnit == cls.DAYS:
+            return value
+
+        if fromUnit == cls.WEEKS:
+            return value*7.0
+
+        elif fromUnit == cls.MONTHS:
+            return value*(365.25/12.0)
+
+        elif fromUnit == cls.YEARS:
+            return value*365.25
+
+        raise ValueError('Unrecognized fromUnit "%s"' % fromUnit)
+
+#___________________________________________________________________________________________________ fromSeconds
+    @classmethod
+    def fromSeconds(cls, value, toUnit):
+        """fromSeconds doc..."""
+        value = float(value)
+        if toUnit == cls.SECONDS:
+            return value
+        elif toUnit == cls.MICROSECONDS:
+            return value*1.0e6
+        elif toUnit == cls.MILLISECONDS:
+            return value*1.0e3
+
+        value /= 60.0
+        if toUnit == cls.MINUTES:
+            return value
+
+        value /= 60.0
+        if toUnit == cls.HOURS:
+            return value
+
+        value /= 24.0
+        if toUnit == cls.DAYS:
+            return value
+
+        if toUnit == cls.WEEKS:
+            return value/7.0
+
+        elif toUnit == cls.MONTHS:
+            return value/(365.25/12.0)
+
+        elif toUnit == cls.YEARS:
+            return value/365.25
+
+        raise ValueError('Unrecognized toUnit "%s"' % toUnit)
+
+#___________________________________________________________________________________________________ convert
+    @classmethod
+    def convert(cls, value, fromUnit, toUnit):
+        """convert doc..."""
+        return cls.fromSeconds(cls.toSeconds(value, fromUnit), toUnit)
 
 #___________________________________________________________________________________________________ toFormat
     @classmethod

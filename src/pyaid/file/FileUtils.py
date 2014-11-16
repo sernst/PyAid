@@ -45,6 +45,8 @@ class FileUtils(object):
         if writable and not os.access(folder, os.W_OK):
             return False, 'NO_WRITE', 'Write access denied'
 
+        return True, 'VALID', 'Path is valid'
+
 #___________________________________________________________________________________________________ getPathToParentFolder
     @classmethod
     def getPathToParentFolder(cls, path, parentFolderName, offset =0):
