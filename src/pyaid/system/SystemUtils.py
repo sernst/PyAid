@@ -318,7 +318,7 @@ class SystemUtils(object):
 #___________________________________________________________________________________________________ remove
     @classmethod
     def remove(cls, path, throwError =False):
-        if not os.path.exists(path):
+        if not path or not os.path.exists(path):
             return True
 
         if os.path.islink(path):

@@ -275,9 +275,18 @@ class ListUtils(object):
 
         return False
 
+#___________________________________________________________________________________________________ sortListByIndex
+    @classmethod
+    def sortListByIndex(cls, source, index, inPlace =False, reversed =False):
+        """ Sorts a list of lists and/or tuples by the specified index. """
+        if inPlace:
+            source.sort(key=lambda x:x[index], reverse=reversed)
+            return source
+        return sorted(source, key=lambda x:x[index], reverse=reversed)
+
 #___________________________________________________________________________________________________ sortDictionaryList
-    @staticmethod
-    def sortDictionaryList(source, key, inPlace =False, reversed =False):
+    @classmethod
+    def sortDictionaryList(cls, source, key, inPlace =False, reversed =False):
         """Sorts a list of dictionaries by the specified key."""
         if inPlace:
             source.sort(key=itemgetter(key), reverse=reversed)
@@ -285,8 +294,8 @@ class ListUtils(object):
         return sorted(source, key=itemgetter(key), reverse=reversed)
 
 #___________________________________________________________________________________________________ sortObjectList
-    @staticmethod
-    def sortObjectList(source, property, inPlace = False, reversed =False):
+    @classmethod
+    def sortObjectList(src, source, property, inPlace = False, reversed =False):
         """ Sorts the specified source list of object instances (i.e. new type class instances) by
             the specified property and returns the sorted source list.
         """
