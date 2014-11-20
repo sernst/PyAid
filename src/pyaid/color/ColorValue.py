@@ -728,7 +728,7 @@ class ColorValue(object):
         out = colors[0]
 
         for c in colors[1:]:
-            if c.brightness < out.brightness:
+            if c.luma < out.luma:
                 out = c
         return out
 
@@ -741,7 +741,7 @@ class ColorValue(object):
         out = colors[0]
 
         for c in colors[1:]:
-            if c.brightness > out.brightness:
+            if c.luma > out.luma:
                 out = c
         return out
 
