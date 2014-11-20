@@ -147,6 +147,14 @@ class ConfigsDict(object):
 
         return (source, hierarchy) if includeHierarchy else source
 
+#___________________________________________________________________________________________________ swap
+    def swap(self, key, value, defaultValue =None, includeHierarchy =False):
+        """ Swaps the currently stored value with the new specified value and returns the old
+            value, allowing you to get and set in a single operation. """
+        out = self.get(key, defaultValue=defaultValue, includeHierarchy=includeHierarchy)
+        self.set(key, value, defaultValue=defaultValue)
+        return out
+
 #===================================================================================================
 #                                                                               P R O T E C T E D
 

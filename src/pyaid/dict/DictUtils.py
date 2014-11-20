@@ -114,30 +114,32 @@ class DictUtils(object):
     @classmethod
     def lowerDictKeys(cls, source):
         out = dict()
-        for key, value in DictUtils.iter(source):
+        for key, value in cls.iter(source):
             out[key.lower()] = value
         return out
 
 #___________________________________________________________________________________________________ compare
     @classmethod
-    def compare(cls, a, b):
+    def compare(cls, a, b, onlyCommonKeys =False):
         if a == b:
             return True
 
         if a is None or b is None:
+            return onlyCommonKeys
+
+        if not onlyCommonKeys and len(a.keys()) != len(b.keys()):
             return False
 
-        if len(a.keys()) != len(b.keys()):
-            return False
-
-        for name, value in DictUtils.iter(a):
+        for name, value in cls.iter(a):
             if name not in b:
+                if onlyCommonKeys:
+                    continue
                 return False
 
             # Compare dict values
             if isinstance(value, dict):
                 if isinstance(b[name], dict):
-                    if not cls.compare(value, b[name]):
+                    if not cls.compare(value, b[name], onlyCommonKeys=onlyCommonKeys):
                         return False
 
             # Compare list and tuples
@@ -159,7 +161,7 @@ class DictUtils(object):
 
         from pyaid.list.ListUtils import ListUtils
         out = []
-        for n,v in DictUtils.iter(source):
+        for n,v in cls.iter(source):
             n = StringUtils.toUnicode(n)
 
             if isinstance(v, dict):

@@ -68,7 +68,7 @@ class ColorValue(object):
 #___________________________________________________________________________________________________ GS: intRgba
     @property
     def intRgba(self):
-        return (self._rawColor << 8) & self.intAlpha
+        return (self._rawColor << 8) | self.intAlpha
     @intRgba.setter
     def intRgba(self, value):
         value          = int(value)
@@ -90,7 +90,7 @@ class ColorValue(object):
         return hex(self._rawColor)
     @hexRgb.setter
     def hexRgb(self, value):
-        self.intRgb = int(value, 8)
+        self.intRgb = int(value, 16)
 
 #___________________________________________________________________________________________________ GS: hexRgba
     @property
@@ -98,7 +98,7 @@ class ColorValue(object):
         return hex(self.intRgba)
     @hexRgba.setter
     def hexRgba(self, value):
-        self.intRgba = int(value, 8)
+        self.intRgba = int(value, 16)
 
 #___________________________________________________________________________________________________ GS: hexAlpha
     @property
@@ -106,7 +106,7 @@ class ColorValue(object):
         return hex(self.intAlpha)
     @hexAlpha.setter
     def hexAlpha(self, value):
-        self.intAlpha = int(value, 8)
+        self.intAlpha = int(value, 16)
         self._unCache()
 
 #___________________________________________________________________________________________________ GS: bareHex
@@ -710,9 +710,40 @@ class ColorValue(object):
             bend = abs(bend)
             self.burnShift(float(bend)*0.25, 10*bend)
 
+#___________________________________________________________________________________________________ matches
+    def matches(self, comparison):
+        """matches doc..."""
+        return comparison and self.intRgba == comparison.intRgba
+
 #___________________________________________________________________________________________________ clone
     def clone(self):
         return self.__class__(self._rawColor)
+
+#___________________________________________________________________________________________________ compareDarker
+    @classmethod
+    def compareDarker(cls, *colors):
+        """compareDarker doc..."""
+        if not colors:
+            return None
+        out = colors[0]
+
+        for c in colors[1:]:
+            if c.brightness < out.brightness:
+                out = c
+        return out
+
+#___________________________________________________________________________________________________ compareLighter
+    @classmethod
+    def compareLighter(cls, *colors):
+        """compareLighter doc..."""
+        if not colors:
+            return None
+        out = colors[0]
+
+        for c in colors[1:]:
+            if c.brightness > out.brightness:
+                out = c
+        return out
 
 #___________________________________________________________________________________________________ hsvToRgb
     @classmethod
