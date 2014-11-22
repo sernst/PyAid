@@ -114,6 +114,11 @@ class ColorValue(object):
     def bareHex(self):
         return self._getWebValue(False).replace('#','')
 
+#___________________________________________________________________________________________________ GS: functionalRgba
+    @property
+    def functionalRgba(self):
+        return u'rgba(%s, %s, %s, %s)' % (self.red, self.green, self.blue, self.opacity)
+
 #___________________________________________________________________________________________________ GS: webRgbOpacity
     @property
     def webRgbOpacity(self):

@@ -165,8 +165,8 @@ class FileUtils(object):
 
 #___________________________________________________________________________________________________ getDirectoryOf
     @classmethod
-    def getDirectoryOf(cls, path, createIfMissing =False):
-        path = os.path.dirname(os.path.abspath(path))
+    def getDirectoryOf(cls, path, createIfMissing =False, noTail =False):
+        path = cls.cleanupPath(os.path.dirname(os.path.abspath(path)), noTail=noTail)
         if createIfMissing and not os.path.exists(path):
             os.makedirs(path)
         return path
