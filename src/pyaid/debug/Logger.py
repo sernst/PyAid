@@ -9,10 +9,12 @@ import os
 import datetime
 import traceback
 import unicodedata
+import codecs
 
 # WHEN AVAILABLE: import pytz
 
 from pyaid.ArgsUtils import ArgsUtils
+from pyaid.OsUtils import OsUtils
 from pyaid.file.FileLock import FileLock
 from pyaid.file.FileUtils import FileUtils
 from pyaid.string.StringUtils import StringUtils
@@ -196,7 +198,7 @@ class Logger(object):
             traceStack=traceStack,
             shaveStackTrace=shaveStackTrace,
             htmlEscape=self._htmlEscape if htmlEscape is None else htmlEscape,
-            prefix=self.getPrefix() if self.headerless else None)
+            prefix=self.getPrefix() if not self.headerless else None)
 
         if self._traceLogs:
             self.traceLogMessage(out, self._printCallbacks, self)
@@ -211,7 +213,7 @@ class Logger(object):
         out = self.createLogMessage(
             s, traceStack, shaveStackTrace,
             self._htmlEscape if htmlEscape is None else htmlEscape,
-            prefix=self.getPrefix() if self.headerless else None)
+            prefix=self.getPrefix() if not self.headerless else None)
 
         if self._traceLogs:
             self.traceLogMessage(out, self._printCallbacks, self)
@@ -262,14 +264,15 @@ class Logger(object):
 
         elif self._logFile:
             try:
+                out = StringUtils.toStr2('\n').join(items)
                 exists = os.path.exists(self._logFile)
                 with FileLock(self._logFile, 'a') as lock:
-                    lock.file.write('\n'.join(items))
+                    lock.file.write(out)
                     lock.release()
 
                 try:
-                    if not exists:
-                        os.system('chmod 775 ' + StringUtils.toUnicode(self._logFile))
+                    if not exists and not OsUtils.isWindows():
+                        os.system('chmod 775 %s' % self._logFile)
                 except Exception:
                     pass
 

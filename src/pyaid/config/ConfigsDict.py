@@ -62,6 +62,17 @@ class ConfigsDict(object):
     def add(self, key, value, defaultValue =None):
         return self.set(key, value, defaultValue=defaultValue)
 
+#___________________________________________________________________________________________________ increment
+    def increment(self, key, delta):
+        """increment doc..."""
+        if not self.has(key):
+            self.set(key, delta)
+            return delta
+        value = self.get(key)
+        value += delta
+        self.set(key, value)
+        return value
+
 #___________________________________________________________________________________________________ set
     def set(self, key, value, defaultValue =None):
         if not key:

@@ -402,6 +402,21 @@ class StringUtils(object):
 
         return source[:maxLength] + ('...' if addEllipsis else '')
 
+#___________________________________________________________________________________________________ extendToLength
+    @classmethod
+    def extendToLength(cls, value, length, char =' ', clip =False):
+        """ Extends the length of the string to the specified length using the specified character """
+        if not value:
+            return length*char
+
+        vLen = len(value)
+        if vLen == length:
+            return value
+        elif vLen > length:
+            return value[:length] if clip else value
+
+        return value + char*(length - vLen)
+
 #___________________________________________________________________________________________________ checkIsEmailAddress
     @classmethod
     def checkIsEmailAddress(cls, value):
