@@ -47,8 +47,12 @@ class StringUtils(object):
 #___________________________________________________________________________________________________ dedent
     @classmethod
     def dedent(cls, source, collapse =True):
-        """dedent doc..."""
-        return textwrap.dedent(source.strip()).replace('\r', '').replace('\n', '')
+        """ Removes indentation from the source string. If collapse is true then line breaks are
+            also removed. """
+        out = textwrap.dedent(source.strip()).replace('\r', '')
+        if collapse:
+            return out.replace('\n', '')
+        return out
 
 #___________________________________________________________________________________________________ unichr
     @classmethod
@@ -56,6 +60,7 @@ class StringUtils(object):
         """unichr doc..."""
         if sys.version > '3':
             return chr(source)
+        # noinspection PyUnresolvedReferences
         return unichr(source)
 
 #___________________________________________________________________________________________________ isStringType
@@ -72,7 +77,7 @@ class StringUtils(object):
         """capitalizeWords doc..."""
         try:
             return source.title()
-        except Exception as err:
+        except Exception:
             return text_type(source).title()
 
 #___________________________________________________________________________________________________ source
