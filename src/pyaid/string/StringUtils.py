@@ -49,9 +49,9 @@ class StringUtils(object):
     def dedent(cls, source, collapse =True):
         """ Removes indentation from the source string. If collapse is true then line breaks are
             also removed. """
-        out = textwrap.dedent(source.strip()).replace('\r', '')
+        out = textwrap.dedent(source.strip('\r\n')).replace('\r', '').strip()
         if collapse:
-            return out.replace('\n', '')
+            return out.replace('\n', ' ')
         return out
 
 #___________________________________________________________________________________________________ unichr

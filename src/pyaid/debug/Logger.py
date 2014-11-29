@@ -9,7 +9,6 @@ import os
 import datetime
 import traceback
 import unicodedata
-import codecs
 
 # WHEN AVAILABLE: import pytz
 
