@@ -411,6 +411,12 @@ class StringUtils(object):
     @classmethod
     def extendToLength(cls, value, length, char =' ', clip =False):
         """ Extends the length of the string to the specified length using the specified character """
+        if value is None:
+            return None
+
+        if not cls.isStringType(value):
+            value = StringUtils.toText(value)
+
         if not value:
             return length*char
 
