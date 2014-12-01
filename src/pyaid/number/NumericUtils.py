@@ -6,9 +6,16 @@ from __future__ import print_function, absolute_import, unicode_literals, divisi
 
 import math
 import sys
+from collections import namedtuple
+from pyaid.string.StringUtils import StringUtils
 
 if sys.version > '3':
     long = int
+
+try:
+    import numpy as np
+except Exception:
+    np = None
 
 #___________________________________________________________________________________________________ NumericUtils
 class NumericUtils(object):
@@ -16,6 +23,8 @@ class NumericUtils(object):
 
 #===================================================================================================
 #                                                                                       C L A S S
+
+    VALUE_UNCERTAINTY = namedtuple('VALUE_UNCERTAINTY', ['value', 'uncertainty', 'label'])
 
 #___________________________________________________________________________________________________ equivalent
     @classmethod
@@ -68,7 +77,7 @@ class NumericUtils(object):
                 magnitude = math.pow(10, -om)
                 test = float(value)*magnitude
                 if long(test) != test:
-                    return om
+                    return om - 1
             return 0
 
         while om < 10000:
@@ -78,6 +87,27 @@ class NumericUtils(object):
             if cls.equivalent(test, int(test)):
                 return om
         return 0
+
+#___________________________________________________________________________________________________ getMeanAndDeviation
+    @classmethod
+    def getMeanAndDeviation(cls, values):
+        """getMeanAndDeviation doc..."""
+        if np is None:
+            raise ImportError('NumericUtils.getMeanAndDeviation() requires Numpy')
+
+        mean    = np.mean(values, dtype=np.float64)
+        std     = np.std(values, dtype=np.float64)
+        return cls.toValueUncertainty(mean, std)
+
+#___________________________________________________________________________________________________ toValueUncertainty
+    @classmethod
+    def toValueUncertainty(cls, value, uncertainty):
+        """toValueUncertaintyString doc..."""
+        uncertainty = cls.roundToSigFigs(uncertainty, 1)
+        order       = cls.orderOfLeastSigFig(uncertainty)
+        value       = cls.roundToOrder(value, order)
+        return cls.VALUE_UNCERTAINTY(
+            value, uncertainty, '%s %s %s' % (value, StringUtils.unichr(0x00B1), uncertainty))
 
 #___________________________________________________________________________________________________ isNumber
     @classmethod

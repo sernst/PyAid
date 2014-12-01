@@ -18,6 +18,9 @@ from pyaid.string.StringUtils import StringUtils
 class TimeUtils(object):
     """A class for time utilities."""
 
+#===================================================================================================
+#                                                                                       C L A S S
+
     YEARS           = 'years'
     MONTHS          = 'months'
     WEEKS           = 'weeks'
@@ -35,6 +38,20 @@ class TimeUtils(object):
 
     ZULU_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
     _ZULU_PRECISE_FORMAT = '%Y-%m-%dT%H:%M:%S'
+
+#___________________________________________________________________________________________________ getElapsedSeconds
+    @classmethod
+    def getElapsedTime(cls, startDateTime, endDateTime, toUnit =SECONDS):
+        """ Calculates the time elapsed between two datetime objects and returns the value as a
+            floating point number in the specified unit. """
+        s = startDateTime
+        e = endDateTime
+        delta = endDateTime - startDateTime
+
+        seconds = delta.total_seconds()
+        if toUnit == cls.SECONDS:
+            return seconds
+        return cls.fromSeconds(seconds, toUnit)
 
 #___________________________________________________________________________________________________ toSeconds
     @classmethod

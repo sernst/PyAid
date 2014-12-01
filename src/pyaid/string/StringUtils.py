@@ -44,6 +44,18 @@ class StringUtils(object):
 
     _SOLO_BACKSLASH_PATTERN = re.compile('(?<!\\\)\\\(?!\\\)')
 
+#___________________________________________________________________________________________________ isTextType
+    @classmethod
+    def isTextType(cls, source):
+        """isTextType doc..."""
+        return isinstance(source, text_type)
+
+#___________________________________________________________________________________________________ isBinaryType
+    @classmethod
+    def isBinaryType(cls):
+        """isBinaryType doc..."""
+        return isinstance(source, binary_type)
+
 #___________________________________________________________________________________________________ dedent
     @classmethod
     def dedent(cls, source, collapse =True):
