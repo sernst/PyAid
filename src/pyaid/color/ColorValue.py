@@ -966,6 +966,13 @@ class ColorValue(object):
     def fromIntRgb(cls, value, alpha =1.0):
         return cls.createDict(color=int(value), alpha=alpha)
 
+#___________________________________________________________________________________________________ fromName
+    @classmethod
+    def fromName(cls, name, alpha =1.0):
+        """fromNamedColor doc..."""
+        c = cls._parseUnknownColorString(name)
+        cls.createDict(alpha=alpha)
+
 #___________________________________________________________________________________________________ fromIntRgb
     @classmethod
     def fromIntRgba(cls, value):
@@ -1117,9 +1124,10 @@ class ColorValue(object):
         return c[index]
 
 #___________________________________________________________________________________________________ _parseUnknownColorString
-    def _parseUnknownColorString(self, value):
+    @classmethod
+    def _parseUnknownColorString(cls, value):
         from pyaid.color.ColorNames import ColorNames
-        value = value.strip().lower().replace(' ', '')
+        value = value.strip().lower().replace(' ', '').replace('-', '').replace('_', '')
         if value in ColorNames.CLEAN_NAMES:
             return ColorNames.CLEAN_NAMES[value]
         return None
