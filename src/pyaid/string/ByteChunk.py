@@ -4,6 +4,7 @@
 
 from __future__ import print_function, absolute_import, unicode_literals, division
 
+from array import array
 import math
 import struct
 import zlib
@@ -151,6 +152,13 @@ class ByteChunk(object):
         self.writeByte(value & 0xFF00)
         self.writeByte(value & 0xFF0000)
 
+#___________________________________________________________________________________________________ writeArrayChunk
+    def writeArrayChunk(self, value):
+        """writeArray doc..."""
+        v = value.tostring()
+        self.writeUint32(len(v))
+        self.writeBytes(v)
+
 #___________________________________________________________________________________________________ writeInt32
     def writeInt32(self, value):
         self.writeBytes(self.pack('i', int(value)))
@@ -217,8 +225,18 @@ class ByteChunk(object):
     def readFourCCAsString(self):
         return ByteUtils.decodeFourCC(self.read(4), self.isLittleEndian)
 
+#___________________________________________________________________________________________________ readArrayChunk
+    def readArrayChunk(self, arrayType ='d'):
+        """writeArray doc..."""
+        length = self.readUint32()
+        data   = self.read(length, decode=False)
+        data   = StringUtils.toBytes(data)
+        a = array(arrayType)
+        a.fromstring(data)
+        return a
+
 #___________________________________________________________________________________________________ read
-    def read(self, length = -1):
+    def read(self, length = -1, decode =True):
         if not length:
             return ''
         start = self.position
@@ -226,7 +244,10 @@ class ByteChunk(object):
             self.position = self.length + length + 1
         else:
             self.position += length
-        return self._data[start:self.position].decode('utf-8')
+        out = self._data[start:self.position]
+        if decode:
+            return out.decode('utf-8')
+        return out
 
 #___________________________________________________________________________________________________ seek
     def seek(self, position):
