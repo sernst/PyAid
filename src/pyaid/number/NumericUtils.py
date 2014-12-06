@@ -24,7 +24,7 @@ class NumericUtils(object):
 #===================================================================================================
 #                                                                                       C L A S S
 
-    VALUE_UNCERTAINTY = namedtuple('VALUE_UNCERTAINTY', ['value', 'uncertainty', 'label'])
+    VALUE_UNCERTAINTY = namedtuple('VALUE_UNCERTAINTY', ['value', 'uncertainty', 'raw', 'label'])
 
 #___________________________________________________________________________________________________ equivalent
     @classmethod
@@ -103,11 +103,13 @@ class NumericUtils(object):
     @classmethod
     def toValueUncertainty(cls, value, uncertainty):
         """toValueUncertaintyString doc..."""
+        raw         = value
         uncertainty = cls.roundToSigFigs(uncertainty, 1)
         order       = cls.orderOfLeastSigFig(uncertainty)
         value       = cls.roundToOrder(value, order)
         return cls.VALUE_UNCERTAINTY(
-            value, uncertainty, '%s %s %s' % (value, StringUtils.unichr(0x00B1), uncertainty))
+            value, uncertainty, raw,
+            '%s %s %s' % (value, StringUtils.unichr(0x00B1), uncertainty))
 
 #___________________________________________________________________________________________________ isNumber
     @classmethod
