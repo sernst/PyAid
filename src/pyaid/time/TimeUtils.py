@@ -1,9 +1,10 @@
 # TimeUtils.py
-# (C)2011-2014
+# (C)2011-2015
 # Scott Ernst and Eric David Wills
 
 from __future__ import print_function, absolute_import, unicode_literals, division
 
+import math
 import time
 import calendar
 from datetime import datetime, timedelta
@@ -38,6 +39,18 @@ class TimeUtils(object):
 
     ZULU_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
     _ZULU_PRECISE_FORMAT = '%Y-%m-%dT%H:%M:%S'
+
+#___________________________________________________________________________________________________ getHttpRfc1132Timestamp
+    @classmethod
+    def getHttpHeaderTimestamp(cls, dt):
+        """ Return a string representation of a date according to RFC 1123 (HTTP/1.1). The supplied
+            date is assumed to be utc. """
+
+        weekday = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][dt.weekday()]
+        month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
+                 "Oct", "Nov", "Dec"][dt.month - 1]
+        return "%s, %02d %s %04d %02d:%02d:%02d GMT" % (weekday, dt.day, month,
+            dt.year, dt.hour, dt.minute, dt.second)
 
 #___________________________________________________________________________________________________ getElapsedSeconds
     @classmethod
@@ -369,6 +382,9 @@ class TimeUtils(object):
             @@@return int
         """
 
+        # delta = dt - datetime.fromtimestamp(0)
+        # return math.floor(delta.total_seconds())
+
         return calendar.timegm(dt.utctimetuple())
 
 #___________________________________________________________________________________________________ timecodeToDatetime
@@ -378,6 +394,28 @@ class TimeUtils(object):
             base time, which by default is 0.
         """
         return cls.secondsToDatetime(Base64.from64(timeCode) + baseTime)
+
+#___________________________________________________________________________________________________ secondsToTimeDelta
+    @classmethod
+    def secondsToTimeDelta(cls, seconds):
+        """ Returns a timedelta object for the specified number of elapsed seconds using methods
+            that prevent overflows of the constructor values for the timedelta object. """
+
+        days = math.floor(seconds/(3600.0*24.0))
+        seconds -= days*3600.0*24.0
+
+        hours = math.floor(seconds/3600.0)
+        seconds -= hours*3600.0
+
+        minutes = math.floor(seconds/60.0)
+        seconds -= minutes*60.0
+
+        microseconds = 1.0e6*(seconds - math.floor(seconds))
+
+        seconds = math.floor(seconds)
+
+        return timedelta(
+            days=days, hours=hours, minutes=minutes, seconds=seconds, microseconds=microseconds)
 
 #___________________________________________________________________________________________________ datetimeToTimecode
     @classmethod

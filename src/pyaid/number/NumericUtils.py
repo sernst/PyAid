@@ -26,6 +26,34 @@ class NumericUtils(object):
 
     VALUE_UNCERTAINTY = namedtuple('VALUE_UNCERTAINTY', ['value', 'uncertainty', 'raw', 'label'])
 
+#___________________________________________________________________________________________________ weightedAverage
+    @classmethod
+    def weightedAverage(cls, *values):
+        """ Calculates the uncertainty weighted average of the provided values, where each value
+            is a VALUE_UNCERTAINTY instance. For mathematical formulation of the weighted average
+            see "An Introduction to Error Analysis, 2nd Edition" by John R. Taylor, Chapter 7.2. """
+
+        wxs = 0.0
+        ws  = 0.0
+        for v in values:
+            w = 1.0/(v.uncertainty*v.uncertainty)
+            wxs += w*v.value
+            ws  += w
+
+        ave = wxs/ws
+        unc =  1.0/math.sqrt(ws)
+
+        return cls.toValueUncertainty(value=ave, uncertainty=unc)
+
+#___________________________________________________________________________________________________ sqrtSumOfSquares
+    @classmethod
+    def sqrtSumOfSquares(cls, *args):
+        """sqrtSumOfSquares doc..."""
+        out = 0.0
+        for arg in args:
+            out += float(arg)*float(arg)
+        return math.sqrt(out)
+
 #___________________________________________________________________________________________________ equivalent
     @classmethod
     def equivalent(cls, a, b, epsilon =None):
@@ -36,16 +64,18 @@ class NumericUtils(object):
 
 #___________________________________________________________________________________________________ roundToOrder
     @classmethod
-    def roundToOrder(cls, value, orderOfMagnitude, roundOp =None):
+    def roundToOrder(cls, value, orderOfMagnitude, roundOp =None, asInt =False):
         """roundToOrder doc..."""
-        if orderOfMagnitude == 0:
-            return int(value)
-
         if roundOp is None:
             roundOp = round
 
+        if orderOfMagnitude == 0:
+            value = round(float(value))
+            return int(value) if asInt else value
+
         scale = math.pow(10, orderOfMagnitude)
-        return scale*roundOp(float(value)/scale)
+        value = scale*roundOp(float(value)/scale)
+        return int(value) if asInt else value
 
 #___________________________________________________________________________________________________ roundToSigFigs
     @classmethod

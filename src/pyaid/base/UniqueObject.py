@@ -9,7 +9,8 @@ from pyaid.time.TimeUtils import TimeUtils
 
 #___________________________________________________________________________________________________ UniqueObject
 class UniqueObject(object):
-    """A class for..."""
+    """ A simple extension to the object class that adds an instanceUid attribute, which is
+        unique to any given runtime. This value is transient. """
 
 #===================================================================================================
 #                                                                                       C L A S S
@@ -31,6 +32,7 @@ class UniqueObject(object):
 #___________________________________________________________________________________________________ GS: instanceUid
     @property
     def instanceUid(self):
+        """ The unique ID for this instance, which was assigned at instantiation time. """
         return self._instanceUid
 
 #===================================================================================================

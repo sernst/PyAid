@@ -4,6 +4,8 @@
 
 from __future__ import print_function, absolute_import, unicode_literals, division
 
+import sys
+
 from operator import itemgetter
 from operator import attrgetter
 
@@ -18,6 +20,14 @@ class ListUtils(object):
 
 #===================================================================================================
 #                                                                                      C L A S S
+
+#___________________________________________________________________________________________________ range
+    @classmethod
+    def range(cls, *args, **kwargs):
+        """ Returns the generator form of the range, which differs between Python 2 and 3. """
+        if sys.version < '3':
+            return xrange(*args, **kwargs)
+        return range(*args, **kwargs)
 
 #___________________________________________________________________________________________________ prettyPrintBullets
     @classmethod
