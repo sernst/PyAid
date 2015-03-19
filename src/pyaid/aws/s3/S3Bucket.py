@@ -1,5 +1,5 @@
 # S3Bucket.py
-# (C)2013-2014
+# (C)2013-2015
 # Scott Ernst
 
 from __future__ import print_function, absolute_import, unicode_literals, division
@@ -8,6 +8,7 @@ import os
 import gzip
 import tempfile
 
+import boto
 from boto import s3
 from boto.s3.connection import Location
 from boto.s3.connection import S3Connection
@@ -53,9 +54,16 @@ class S3Bucket(object):
         self._awsSecret  = awsSecret
 
         if location:
-            self._conn = s3.connect_to_region(location, )
+            self._conn = s3.connect_to_region(
+                region_name=location,
+                aws_access_key_id=self._awsId,
+                aws_secret_access_key=self._awsSecret,
+                calling_format=boto.s3.connection.OrdinaryCallingFormat())
+        else:
+            self._conn = S3Connection(
+                aws_access_key_id=self._awsId,
+                aws_secret_access_key=self._awsSecret)
 
-        self._conn   = S3Connection(self._awsId, self._awsSecret)
         self._bucket = Bucket(self._conn, bucketName)
 
 

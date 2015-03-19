@@ -25,9 +25,13 @@ class ListUtils(object):
     @classmethod
     def range(cls, *args, **kwargs):
         """ Returns the generator form of the range, which differs between Python 2 and 3. """
-        if sys.version < '3':
-            return xrange(*args, **kwargs)
-        return range(*args, **kwargs)
+        return cls._createRange(*args, **kwargs)
+
+#___________________________________________________________________________________________________ rangeOnIter
+    @classmethod
+    def rangeOn(cls, target, offset = 0):
+        """rangeOnIter doc..."""
+        return cls._createRange(offset, offset + len(target))
 
 #___________________________________________________________________________________________________ prettyPrintBullets
     @classmethod
@@ -341,3 +345,14 @@ class ListUtils(object):
 
             if a[i] != b[i]:
                 return False
+
+#===================================================================================================
+#                                                                               P R O T E C T E D
+
+#___________________________________________________________________________________________________ _createRange
+    @classmethod
+    def _createRange(cls, *args, **kwargs):
+        """_createRange doc..."""
+        if sys.version < '3':
+            return xrange(*args, **kwargs)
+        return range(*args, **kwargs)
