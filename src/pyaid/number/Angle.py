@@ -34,7 +34,7 @@ class Angle(object):
         return self._angle
     @radians.setter
     def radians(self, value):
-        self._angle = value
+        self._angle = float(value)
 
 #___________________________________________________________________________________________________ GS: degrees
     @property
@@ -42,17 +42,35 @@ class Angle(object):
         return 180.0/math.pi*self._angle
     @degrees.setter
     def degrees(self, value):
-        self._angle = math.pi/180.0*value
+        self._angle = math.pi/180.0*float(value)
 
 #===================================================================================================
 #                                                                                     P U B L I C
 
 #___________________________________________________________________________________________________ constrainToRevolution
     def constrainToRevolution(self):
-        """revolvePositive doc..."""
-        while self._angle < 0:
-            self._angle += 2.0*math.pi
-        self.degrees %= 360.0
+        """ Constrains the angle to within the bounds [0, 360] by removing revolutions. """
+        self.radians = self.constrainAngleToRevolution(self.radians)
+
+#___________________________________________________________________________________________________ differenceBetween
+    def differenceBetween(self, angle):
+        """ Returns a new Angle instance that is the smallest difference between this angle the
+            one specified in the arguments. """
+
+        a = self.constrainAngleToRevolution(self.radians)
+        b = self.constrainAngleToRevolution(angle.radians)
+
+        result = 180.0/math.pi*(a - b)
+        return Angle(degrees=((result + 180.0) % 360.0) - 180.0)
+
+#___________________________________________________________________________________________________ constrainAngleToRevolution
+    @classmethod
+    def constrainAngleToRevolution(cls, radians):
+        """constrainAngleToRevolution doc..."""
+        while radians < 0:
+            radians += 2.0*math.pi
+        degrees = (180.0/math.pi*radians) % 360.0
+        return math.pi/180.0*degrees
 
 #===================================================================================================
 #                                                                               I N T R I N S I C

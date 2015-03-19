@@ -58,6 +58,20 @@ class Test_Angle(unittest.TestCase):
             self.assertLessEqual(a.degrees, 360.0)
             self.assertGreaterEqual(a.degrees, 0.0)
 
+#___________________________________________________________________________________________________ test_differenceBetween
+    def test_differenceBetween(self):
+        """test_differenceBetween doc..."""
+
+        for i in range(1000):
+            value = random.uniform(-2000.0, 5000.0)
+            a = Angle(degrees=value)
+            a.constrainToRevolution()
+
+            value = random.uniform(-2000.0, 5000.0)
+            b = Angle(degrees=value)
+            b.constrainToRevolution()
+            self.assertLessEqual(abs(a.differenceBetween(b)), 180.0)
+
 ####################################################################################################
 ####################################################################################################
 
