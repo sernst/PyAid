@@ -102,6 +102,13 @@ class ConfigsDict(object):
         source[addKey] = value
         return True
 
+#___________________________________________________________________________________________________ extract
+    def extract(self, key, defaultValue =None, includeHierarchy =False):
+        """ Retrieves and removes the specified key value in a single operation. """
+        value = self.get(key=key, defaultValue=defaultValue, includeHierarchy=includeHierarchy)
+        self.remove(key)
+        return value
+
 #___________________________________________________________________________________________________ remove
     def remove(self, key):
         if not key:

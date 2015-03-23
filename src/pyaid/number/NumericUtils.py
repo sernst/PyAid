@@ -33,6 +33,12 @@ class NumericUtils(object):
             is a VALUE_UNCERTAINTY instance. For mathematical formulation of the weighted average
             see "An Introduction to Error Analysis, 2nd Edition" by John R. Taylor, Chapter 7.2. """
 
+        if not values:
+            return None
+
+        if not isinstance(values[0], cls.VALUE_UNCERTAINTY):
+            values = values[0]
+
         wxs = 0.0
         ws  = 0.0
         for v in values:
