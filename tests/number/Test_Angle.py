@@ -70,7 +70,7 @@ class Test_Angle(unittest.TestCase):
             value = random.uniform(-2000.0, 5000.0)
             b = Angle(degrees=value)
             b.constrainToRevolution()
-            self.assertLessEqual(abs(a.differenceBetween(b)), 180.0)
+            self.assertLessEqual(abs(a.differenceBetween(b).degrees), 180.0)
 
 ####################################################################################################
 ####################################################################################################

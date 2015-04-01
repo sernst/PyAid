@@ -4,6 +4,7 @@
 
 from __future__ import print_function, absolute_import, unicode_literals, division
 
+import random
 import unittest
 import math
 
@@ -59,6 +60,18 @@ class Test_NumericUtils(unittest.TestCase):
         self.assertAlmostEqual(123, NumericUtils.roundToOrder(123.345, 0))
         self.assertAlmostEqual(120, NumericUtils.roundToOrder(123.345, 1))
         self.assertAlmostEqual(100, NumericUtils.roundToOrder(123.345, 2))
+
+#___________________________________________________________________________________________________ test_orderOfMagnitude
+    def test_orderOfMagnitude(self):
+        """test_orderOfMagnitude doc..."""
+        testOrder = -9
+        while testOrder < 10:
+            for i in range(25):
+                value  = random.uniform(1.0, 9.9)*math.pow(10.0, testOrder)
+                result = NumericUtils.orderOfMagnitude(value)
+                msg    = 'Invalid Order %s != %s (%s)' % (result, testOrder, value)
+                self.assertEqual(testOrder, result,  msg)
+            testOrder += 1
 
 #___________________________________________________________________________________________________ test_equivalent
     def test_equivalent(self):

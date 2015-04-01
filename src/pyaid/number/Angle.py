@@ -7,6 +7,7 @@ from __future__ import print_function, absolute_import, unicode_literals, divisi
 import math
 
 from pyaid.number.NumericUtils import NumericUtils
+from pyaid.string.StringUtils import StringUtils
 
 #*************************************************************************************************** Angle
 class Angle(object):
@@ -39,10 +40,15 @@ class Angle(object):
 #___________________________________________________________________________________________________ GS: degrees
     @property
     def degrees(self):
-        return 180.0/math.pi*self._angle
+        return math.degrees(self._angle)
     @degrees.setter
     def degrees(self, value):
-        self._angle = math.pi/180.0*float(value)
+        self._angle = math.radians(float(value))
+
+#___________________________________________________________________________________________________ GS: prettyPrint
+    @property
+    def prettyPrint(self):
+        return StringUtils.toText(NumericUtils.roundToSigFigs(self.degrees, 3))
 
 #===================================================================================================
 #                                                                                     P U B L I C
@@ -60,7 +66,7 @@ class Angle(object):
         a = self.constrainAngleToRevolution(self.radians)
         b = self.constrainAngleToRevolution(angle.radians)
 
-        result = 180.0/math.pi*(a - b)
+        result = math.degrees(a - b)
         return Angle(degrees=((result + 180.0) % 360.0) - 180.0)
 
 #___________________________________________________________________________________________________ constrainAngleToRevolution
@@ -69,8 +75,8 @@ class Angle(object):
         """constrainAngleToRevolution doc..."""
         while radians < 0:
             radians += 2.0*math.pi
-        degrees = (180.0/math.pi*radians) % 360.0
-        return math.pi/180.0*degrees
+        degrees = math.degrees(radians) % 360.0
+        return math.radians(degrees)
 
 #===================================================================================================
 #                                                                               I N T R I N S I C

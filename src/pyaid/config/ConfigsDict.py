@@ -4,7 +4,6 @@
 
 from __future__ import print_function, absolute_import, unicode_literals, division
 
-from pyaid.ArgsUtils import ArgsUtils
 from pyaid.NullUtils import NullUtils
 from pyaid.string.StringUtils import StringUtils
 
@@ -20,9 +19,9 @@ class ConfigsDict(object):
 #___________________________________________________________________________________________________ __init__
     def __init__(self, data =None, *args, **kwargs):
         """Creates a new instance of ConfigsDict."""
-        self.isCaseSensitive = ArgsUtils.get('isCaseSensitive', False, kwargs)
+        self.isCaseSensitive = kwargs.get('isCaseSensitive', False)
         self._data = data if data else dict()
-        self._null = ArgsUtils.get('null', self.NULL, kwargs, args, 0)
+        self._null = kwargs.get('null', args[0] if len(args) > 0 else self.NULL)
 
 #===================================================================================================
 #                                                                                   G E T / S E T
@@ -135,12 +134,27 @@ class ConfigsDict(object):
         return True
 
 #___________________________________________________________________________________________________ has
-    def has(self, key, allowFalse =True):
-        out     = self.get(key, self.null)
+    def has(self, key, allowFalse =True, includeHierarchy =False):
+        out     = self.get(key, self.null, includeHierarchy=includeHierarchy)
         result  = out != self.null
         if allowFalse:
             return result
         return out and result
+
+#___________________________________________________________________________________________________ getOrAssign
+    def getOrAssign(self, key, assignmentValue =None, includeHierarchy =False):
+        """ Gets the existing value of the key, or if it does not exist assigns the specified value
+            to the key and returns that value. Convenience for setting a value if a key is not set
+            and returning that value in a single line. """
+
+        out = self.get(key, self.null, includeHierarchy=includeHierarchy)
+
+        if out == self.null:
+            if assignmentValue is not None:
+                self.set(key, assignmentValue)
+            return assignmentValue
+
+        return out
 
 #___________________________________________________________________________________________________ get
     def get(self, key, defaultValue =None, includeHierarchy =False):

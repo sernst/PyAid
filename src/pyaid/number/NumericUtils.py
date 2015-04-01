@@ -51,6 +51,16 @@ class NumericUtils(object):
 
         return cls.toValueUncertainty(value=ave, uncertainty=unc)
 
+#___________________________________________________________________________________________________ orderOfMagnitude
+    @classmethod
+    def orderOfMagnitude(cls, value):
+        """ Returns the order of magnitude of the most significant digit of the specified number.
+            A value of zero signifies the ones digit, as would be the case in [Number]*10^[Order]. """
+
+        x = abs(float(value))
+        offset = 0 if x >= 1.0 else -1
+        return int(math.log10(x) + offset)
+
 #___________________________________________________________________________________________________ sqrtSumOfSquares
     @classmethod
     def sqrtSumOfSquares(cls, *args):
@@ -140,7 +150,7 @@ class NumericUtils(object):
     def toValueUncertainty(cls, value, uncertainty):
         """toValueUncertaintyString doc..."""
         raw         = value
-        uncertainty = cls.roundToSigFigs(uncertainty, 1)
+        uncertainty = cls.roundToSigFigs(abs(uncertainty), 1)
         order       = cls.orderOfLeastSigFig(uncertainty)
         value       = cls.roundToOrder(value, order)
         return cls.VALUE_UNCERTAINTY(
