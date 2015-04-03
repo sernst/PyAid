@@ -147,7 +147,7 @@ class NumericUtils(object):
 
 #___________________________________________________________________________________________________ toValueUncertainty
     @classmethod
-    def toValueUncertainty(cls, value, uncertainty):
+    def toValueUncertainty(cls, value, uncertainty, asciiLabel =False):
         """toValueUncertaintyString doc..."""
         raw         = value
         uncertainty = cls.roundToSigFigs(abs(uncertainty), 1)
@@ -155,7 +155,7 @@ class NumericUtils(object):
         value       = cls.roundToOrder(value, order)
         return cls.VALUE_UNCERTAINTY(
             value, uncertainty, raw,
-            '%s %s %s' % (value, StringUtils.unichr(0x00B1), uncertainty))
+            '%s %s %s' % (value, '+/-' if asciiLabel else StringUtils.unichr(0x00B1), uncertainty))
 
 #___________________________________________________________________________________________________ isNumber
     @classmethod
