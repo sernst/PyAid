@@ -6,8 +6,8 @@ from __future__ import print_function, absolute_import, unicode_literals, divisi
 
 import math
 import sys
-from collections import namedtuple
-from pyaid.string.StringUtils import StringUtils
+
+# AS NEEDED: from pyaid.number.ValueUncertainty import ValueUncertainty
 
 if sys.version > '3':
     long = int
@@ -24,19 +24,17 @@ class NumericUtils(object):
 #===================================================================================================
 #                                                                                       C L A S S
 
-    VALUE_UNCERTAINTY = namedtuple('VALUE_UNCERTAINTY', ['value', 'uncertainty', 'raw', 'label'])
-
 #___________________________________________________________________________________________________ weightedAverage
     @classmethod
     def weightedAverage(cls, *values):
         """ Calculates the uncertainty weighted average of the provided values, where each value
-            is a VALUE_UNCERTAINTY instance. For mathematical formulation of the weighted average
+            is a ValueUncertainty instance. For mathematical formulation of the weighted average
             see "An Introduction to Error Analysis, 2nd Edition" by John R. Taylor, Chapter 7.2. """
 
         if not values:
             return None
 
-        if not isinstance(values[0], cls.VALUE_UNCERTAINTY):
+        if isinstance(values[0], list) or isinstance(values[0], tuple):
             values = values[0]
 
         wxs = 0.0
@@ -149,13 +147,8 @@ class NumericUtils(object):
     @classmethod
     def toValueUncertainty(cls, value, uncertainty, asciiLabel =False):
         """toValueUncertaintyString doc..."""
-        raw         = value
-        uncertainty = cls.roundToSigFigs(abs(uncertainty), 1)
-        order       = cls.orderOfLeastSigFig(uncertainty)
-        value       = cls.roundToOrder(value, order)
-        return cls.VALUE_UNCERTAINTY(
-            value, uncertainty, raw,
-            '%s %s %s' % (value, '+/-' if asciiLabel else StringUtils.unichr(0x00B1), uncertainty))
+        from pyaid.number.ValueUncertainty import ValueUncertainty
+        return ValueUncertainty(value=value, uncertainty=uncertainty, asciiLabels=asciiLabel)
 
 #___________________________________________________________________________________________________ isNumber
     @classmethod
