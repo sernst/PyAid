@@ -493,7 +493,7 @@ class StringUtils(object):
 #___________________________________________________________________________________________________ zeroFill
     @classmethod
     def zeroFill(cls, source, length):
-        return source.zfill(length)
+        return cls.toText(source).zfill(length)
 
 #___________________________________________________________________________________________________ toUnicode
     @classmethod
