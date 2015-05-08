@@ -20,6 +20,12 @@ class Angle(object):
     def __init__(self, **kwargs):
         """Creates a new instance of Angle."""
         self._angle = 0.0
+        self._unc = 1.0
+
+        if 'uncertainty' in kwargs:
+            self.uncertainty = kwargs.get('uncertainty')
+        elif 'uncertaintyDegrees' in kwargs:
+            self.uncertaintyDegrees = kwargs.get('uncertaintyDegrees')
 
         if 'degrees' in kwargs:
             self.degrees = kwargs.get('degrees')
@@ -28,6 +34,32 @@ class Angle(object):
 
 #===================================================================================================
 #                                                                                   G E T / S E T
+
+#___________________________________________________________________________________________________ GS: value
+    @property
+    def value(self):
+        return NumericUtils.toValueUncertainty(self.radians, self.uncertainty)
+
+#___________________________________________________________________________________________________ GS: valueDegrees
+    @property
+    def valueDegrees(self):
+        return NumericUtils.toValueUncertainty(self.degrees, self.uncertaintyDegrees)
+
+#___________________________________________________________________________________________________ GS: uncertainty
+    @property
+    def uncertainty(self):
+        return self._unc
+    @uncertainty.setter
+    def uncertainty(self, value):
+        self._unc = value
+
+#___________________________________________________________________________________________________ GS: uncertaintyDegrees
+    @property
+    def uncertaintyDegrees(self):
+        return math.degrees(self._unc)
+    @uncertaintyDegrees.setter
+    def uncertaintyDegrees(self, value):
+        self._unc = math.radians(value)
 
 #___________________________________________________________________________________________________ GS: radians
     @property

@@ -61,10 +61,25 @@ class ValueUncertainty(object):
             return self.asciiLabel
         return '%s %s %s' % (self.value, StringUtils.unichr(0x00B1), self.uncertainty)
 
+#___________________________________________________________________________________________________ GS: label
+    @property
+    def rawLabel(self):
+        if self._asciiLabels:
+            return self.asciiRawLabel
+        return '%s %s %s' % (
+            NumericUtils.roundToSigFigs(self.raw, 6),
+            StringUtils.unichr(0x00B1),
+            self.uncertainty)
+
 #___________________________________________________________________________________________________ GS: asciiLabel
     @property
     def asciiLabel(self):
         return '%s +/- %s' % (self.value, self.uncertainty)
+
+#___________________________________________________________________________________________________ GS: asciiLabel
+    @property
+    def asciiRawLabel(self):
+        return '%s +/- %s' % (NumericUtils.roundToSigFigs(self.raw, 6), self.uncertainty)
 
 #===================================================================================================
 #                                                                               I N T R I N S I C
