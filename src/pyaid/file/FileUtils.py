@@ -17,15 +17,32 @@ from pyaid.ArgsUtils import ArgsUtils
 from pyaid.OsUtils import OsUtils
 from pyaid.file.FileList import FileList
 from pyaid.string.StringUtils import StringUtils
+from pyaid.system.SystemUtils import SystemUtils
 
 #___________________________________________________________________________________________________ FileUtils
 class FileUtils(object):
     """A class for..."""
 
-    WALK_DATA_NT = namedtuple('WALK_DATA_NT', ['rootPath', 'folder', 'names', 'data', 'files', 'folders'])
+    WALK_DATA_NT = namedtuple('WALK_DATA_NT', [
+        'rootPath', 'folder', 'names', 'data', 'files', 'folders'])
 
 #===================================================================================================
 #                                                                                     P U B L I C
+
+#___________________________________________________________________________________________________ emptyFolder
+    @classmethod
+    def emptyFolder(cls, folderPath):
+        """ Recursively empties all elements within a folder, and returns a bolean specifying
+            whether the operation succeeded. """
+
+        folderPath = cls.cleanupPath(folderPath, isDir=True)
+        if not os.path.exists(folderPath):
+            return False
+
+        result = True
+        for path in os.listdir(folderPath[:-1]):
+            result = SystemUtils.remove(folderPath + path) and result
+        return result
 
 #___________________________________________________________________________________________________ checkPathIsValid
     @classmethod
