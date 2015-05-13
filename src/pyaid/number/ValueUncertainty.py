@@ -19,8 +19,8 @@ class ValueUncertainty(object):
 #___________________________________________________________________________________________________ __init__
     def __init__(self, value =0.0, uncertainty =1.0, **kwargs):
         """Creates a new instance of ValueUncertainty."""
-        self._raw            = value
-        self._rawUncertainty = uncertainty
+        self._raw            = float(value)
+        self._rawUncertainty = float(uncertainty)
         self._asciiLabels    = kwargs.get('asciiLabels', False)
 
 #===================================================================================================
@@ -30,7 +30,6 @@ class ValueUncertainty(object):
     @property
     def asciiLabels(self):
         return self._asciiLabels
-
 
 #___________________________________________________________________________________________________ GS: raw
     @property
@@ -80,6 +79,19 @@ class ValueUncertainty(object):
     @property
     def asciiRawLabel(self):
         return '%s +/- %s' % (NumericUtils.roundToSigFigs(self.raw, 6), self.uncertainty)
+
+#===================================================================================================
+#                                                                                     P U B L I C
+
+#___________________________________________________________________________________________________ update
+    def update(self, value =None, uncertainty =None):
+        """update doc..."""
+
+        if value is not None:
+            self._raw = value
+
+        if uncertainty is not None:
+            self._rawUncertainty = uncertainty
 
 #===================================================================================================
 #                                                                               I N T R I N S I C

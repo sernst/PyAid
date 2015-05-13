@@ -189,7 +189,7 @@ class Logger(object):
             os.remove(StringUtils.toUnicode(self._logFile))
 
 #___________________________________________________________________________________________________ add
-    def add(self, s, traceStack =False, shaveStackTrace =0, htmlEscape =None):
+    def add(self, s, traceStack =False, shaveStackTrace =0, htmlEscape =None, **kwargs):
         """Prints s to standard output and a log file."""
 
         out = self.createLogMessage(
@@ -197,7 +197,7 @@ class Logger(object):
             traceStack=traceStack,
             shaveStackTrace=shaveStackTrace,
             htmlEscape=self._htmlEscape if htmlEscape is None else htmlEscape,
-            prefix=self.getPrefix() if not self.headerless else None)
+            prefix=self.getPrefix() if not self.headerless else None, **kwargs)
 
         if self._traceLogs:
             self.traceLogMessage(out, self._printCallbacks, self)
@@ -208,34 +208,36 @@ class Logger(object):
         return out['log']
 
 #___________________________________________________________________________________________________ echo
-    def echo(self, s, traceStack =False, shaveStackTrace =0, htmlEscape =None):
+    def echo(self, s, traceStack =False, shaveStackTrace =0, htmlEscape =None, **kwargs):
         out = self.createLogMessage(
             s, traceStack, shaveStackTrace,
             self._htmlEscape if htmlEscape is None else htmlEscape,
-            prefix=self.getPrefix() if not self.headerless else None)
+            prefix=self.getPrefix() if not self.headerless else None, **kwargs)
 
         if self._traceLogs:
             self.traceLogMessage(out, self._printCallbacks, self)
         return out['log'] + '\n' + out['stack']
 
 #___________________________________________________________________________________________________ echoError
-    def echoError(self, s, err, htmlEscape =False):
-        return self.echo(self.createErrorMessage(s, err), traceStack=True, htmlEscape=htmlEscape)
+    def echoError(self, s, err, htmlEscape =False, **kwargs):
+        ArgsUtils.addIfMissing('traceStack', True, kwargs)
+        return self.echo(self.createErrorMessage(s, err), htmlEscape=htmlEscape, **kwargs)
 
 #___________________________________________________________________________________________________ addError
-    def addError(self, s, err, htmlEscape =False):
+    def addError(self, s, err, htmlEscape =False, **kwargs):
         self._hasError = True
-        return self.add(self.createErrorMessage(s, err), traceStack=True, htmlEscape=htmlEscape)
+        ArgsUtils.addIfMissing('traceStack', True, kwargs)
+        return self.add(self.createErrorMessage(s, err), htmlEscape=htmlEscape, **kwargs)
 
 #___________________________________________________________________________________________________ write
-    def write(self, s, traceStack =False, shaveStackTrace =0, htmlEscape =False):
+    def write(self, s, traceStack =False, shaveStackTrace =0, htmlEscape =False, **kwargs):
         """Adds the log item and flushes the buffer to the log file."""
-        result = self.add(s, traceStack, shaveStackTrace, htmlEscape=htmlEscape)
+        result = self.add(s, traceStack, shaveStackTrace, htmlEscape=htmlEscape, **kwargs)
         self.flush()
         return result
 
 #___________________________________________________________________________________________________ writeError
-    def writeError(self, s, err, htmlEscape =False):
+    def writeError(self, s, err, htmlEscape =False, **kwargs):
         result = self.addError(s, err, htmlEscape=htmlEscape)
         self.flush()
         return result
@@ -438,8 +440,7 @@ class Logger(object):
     def formatAsString(cls, src, indentLevel =0):
         indents = '    '*indentLevel
         if isinstance(src, (list, tuple)):
-            out = [StringUtils.toUnicode('%s%s%s' % (
-                indents, src[0], '' if src[0].endswith(':') else ':'))]
+            out = [StringUtils.toUnicode('%s%s' % (indents, src[0]))]
 
             indents += '    '
             lines    = []
@@ -485,12 +486,24 @@ class Logger(object):
 
 #___________________________________________________________________________________________________ createLogMessage
     @classmethod
-    def createLogMessage(cls, logValue, traceStack, shaveStackTrace, htmlEscape, prefix =None):
-        logValue = cls.formatAsString(logValue)
+    def createLogMessage(
+            cls, logValue, traceStack, shaveStackTrace, htmlEscape, prefix =None, **kwargs
+    ):
+        """ Formats log message data into a string for output """
+        doIndent = kwargs.get('indent', True)
+
+        if doIndent:
+            logValue = cls.formatAsString(logValue)
+        elif isinstance(logValue, (list, tuple)):
+            logValue = '\n'.join(logValue)
+
         if htmlEscape:
             logValue = StringUtils.htmlEscape(logValue)
 
-        logValue = StringUtils.strToUnicode(logValue.replace('\n', '\n    '))
+        if doIndent:
+            logValue = logValue.replace('\n', '\n    ')
+        logValue = StringUtils.strToUnicode(logValue)
+
         if not StringUtils.isStringType(logValue):
             logValue = 'FAILED TO LOG RESPONSE'
 
