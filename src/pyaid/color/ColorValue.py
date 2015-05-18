@@ -182,7 +182,7 @@ class ColorValue(object):
     @redNorm.setter
     def redNorm(self, value):
         rgb = self.asRgb()
-        rgb['r'] = round(255*value)
+        rgb['r'] = round(255.0*value)
         self._setColor(rgb)
 
 #___________________________________________________________________________________________________ GS: greenNorm
@@ -192,7 +192,7 @@ class ColorValue(object):
     @greenNorm.setter
     def greenNorm(self, value):
         rgb = self.asRgb()
-        rgb['g'] = round(255*value)
+        rgb['g'] = round(255.0*value)
         self._setColor(rgb)
 
 #___________________________________________________________________________________________________ GS: blueNorm
@@ -202,7 +202,7 @@ class ColorValue(object):
     @blueNorm.setter
     def blueNorm(self, value):
         rgb = self.asRgb()
-        rgb['b'] = round(255*value)
+        rgb['b'] = round(255.0*value)
         self._setColor(rgb)
 
 #___________________________________________________________________________________________________ GS: hue

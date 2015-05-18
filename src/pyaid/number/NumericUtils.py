@@ -70,10 +70,10 @@ class NumericUtils(object):
 
 #___________________________________________________________________________________________________ equivalent
     @classmethod
-    def equivalent(cls, a, b, epsilon =None):
+    def equivalent(cls, a, b, epsilon =None, machineEpsilonFactor =10.0):
         """equivalent doc..."""
         if epsilon is None:
-            epsilon = 10.0*sys.float_info.epsilon
+            epsilon = machineEpsilonFactor*sys.float_info.epsilon
         return abs(float(a) - float(b)) < epsilon
 
 #___________________________________________________________________________________________________ roundToOrder
