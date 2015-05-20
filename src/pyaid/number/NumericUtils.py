@@ -70,7 +70,7 @@ class NumericUtils(object):
 
 #___________________________________________________________________________________________________ equivalent
     @classmethod
-    def equivalent(cls, a, b, epsilon =None, machineEpsilonFactor =10.0):
+    def equivalent(cls, a, b, epsilon =None, machineEpsilonFactor =100.0):
         """equivalent doc..."""
         if epsilon is None:
             epsilon = machineEpsilonFactor*sys.float_info.epsilon
