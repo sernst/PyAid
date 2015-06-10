@@ -143,24 +143,38 @@ class SystemUtils(object):
 
 #___________________________________________________________________________________________________ copy
     @classmethod
-    def copy(cls, source, destination, echo =False):
+    def copy(cls, source, destination, echo =False, exceptions =False):
+        if source == destination:
+            msg = 'FAILED TO COPY: Source and destination are identical'
+            if echo:
+                print(msg)
+            if exceptions:
+                raise RuntimeError(msg)
+            return False
+
         if os.path.isdir(source):
             try:
                 shutil.copytree(source, destination)
-            except Exception:
+            except Exception as err:
                 try:
                     shutil.copy2(source, destination)
                 except Exception:
-                    print('FAILED TO COPY:\n    FROM: %s\n      TO: %s' % (source, destination))
+                    if echo:
+                        print('FAILED TO COPY:\n    FROM: %s\n      TO: %s' % (source, destination))
+                    if exceptions:
+                        raise err
                     return False
         else:
             try:
                 shutil.copy2(source, destination)
-            except Exception:
+            except Exception as err:
                 try:
                     shutil.copytree(source, destination)
                 except Exception:
-                    print('FAILED TO COPY:\n    FROM: %s\n      TO: %s' % (source, destination))
+                    if echo:
+                        print('FAILED TO COPY:\n    FROM: %s\n      TO: %s' % (source, destination))
+                    if exceptions:
+                        raise err
                     return False
 
         if echo:

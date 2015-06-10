@@ -201,9 +201,13 @@ class FileUtils(object):
                 When true the listing will contain entries for the root path and all sub directories
                 on that path.
 
-            @@@param listDirs:boolean
+            @@@param listFiles:boolean > True
+                When true files get their own entry in the result. When false on directories are
+                listed. Defaults to true.
+
+            @@@param listDirs:boolean > False
                 When true directories get their own entry in the result. When false only files are
-                listed.
+                listed. Defaults to false.
 
             @@@param skipSVN:boolean
                 When true entries for the .svn files are skipped.
@@ -536,6 +540,7 @@ class FileUtils(object):
         allowDots       = ArgsUtils.get('allowDots', True, kwargs)
         rootPath        = cls.cleanupPath(rootPath, isDir=True)
         topPath         = ArgsUtils.extract('topPath', rootPath, kwargs)
+        listFiles       = kwargs.get('listFiles', True)
         listDirs        = ArgsUtils.get('listDirs', False, kwargs)
         skipSVN         = ArgsUtils.get('skipSVN', True, kwargs)
         skips           = ArgsUtils.get('skips', None, kwargs)
@@ -551,18 +556,19 @@ class FileUtils(object):
 
             if (skipSVN and item == '.svn') or (skips and item in skips):
                 continue
+
             absItem = os.path.join(rootPath, item)
             if os.path.isdir(absItem):
-                path = (absItem + os.sep)
+                path = absItem + os.sep
                 if listDirs:
-                    out.append(path)
+                    out.append(path if absolute else item)
                 absItem = None
 
                 if recursive:
                     out += cls._listPath(path, recursive, topPath=topPath, **kwargs)
 
             elif os.path.isfile(absItem):
-                if skipExtensions and StringUtils.ends(item, skipExtensions):
+                if not listFiles or (skipExtensions and StringUtils.ends(item, skipExtensions)):
                     continue
 
                 if allowExtensions and not StringUtils.ends(item, allowExtensions):
@@ -572,7 +578,7 @@ class FileUtils(object):
                 continue
 
             if not pieces and not absolute:
-                out.append(absItem)
+                out.append(item)
                 continue
 
             relativeItem = absItem[len(topPath):].strip(os.sep).split(os.sep)
