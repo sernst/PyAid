@@ -20,7 +20,7 @@ class ValueUncertainty(object):
     def __init__(self, value =0.0, uncertainty =1.0, **kwargs):
         """Creates a new instance of ValueUncertainty."""
         self._raw            = float(value)
-        self._rawUncertainty = float(uncertainty)
+        self._rawUncertainty = abs(float(uncertainty))
         self._asciiLabels    = kwargs.get('asciiLabels', False)
 
 #===================================================================================================
@@ -82,6 +82,14 @@ class ValueUncertainty(object):
 
 #===================================================================================================
 #                                                                                     P U B L I C
+
+#___________________________________________________________________________________________________ clone
+    def clone(self):
+        """clone doc..."""
+        return ValueUncertainty(
+            value=self._raw,
+            uncertainty=self._rawUncertainty,
+            asciiLabels=self._asciiLabels)
 
 #___________________________________________________________________________________________________ update
     def update(self, value =None, uncertainty =None):

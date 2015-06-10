@@ -495,6 +495,14 @@ class StringUtils(object):
     def zeroFill(cls, source, length):
         return cls.toText(source).zfill(length)
 
+#___________________________________________________________________________________________________ leftPad
+    @classmethod
+    def leftPad(cls, source, padChar):
+        """leftPad doc..."""
+        while len(source) < padChar:
+            source = padChar + source
+        return source
+
 #___________________________________________________________________________________________________ toUnicode
     @classmethod
     def toUnicode(cls, value):

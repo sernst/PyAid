@@ -85,6 +85,11 @@ class Angle(object):
 #===================================================================================================
 #                                                                                     P U B L I C
 
+#___________________________________________________________________________________________________ clone
+    def clone(self):
+        """clone doc..."""
+        return Angle(radians=self._angle, uncertainty=self._unc)
+
 #___________________________________________________________________________________________________ constrainToRevolution
     def constrainToRevolution(self):
         """ Constrains the angle to within the bounds [0, 360] by removing revolutions. """

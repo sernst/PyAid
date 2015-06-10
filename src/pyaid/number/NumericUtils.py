@@ -34,7 +34,7 @@ class NumericUtils(object):
         if not values:
             return None
 
-        if isinstance(values[0], list) or isinstance(values[0], tuple):
+        if isinstance(values[0], (list, tuple)):
             values = values[0]
 
         wxs = 0.0
