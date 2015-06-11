@@ -34,7 +34,7 @@ class Logger(object):
         self.headerless          = kwargs.get('headerless', False)
         self.logFileExtension    = kwargs.get('extension', 'log').lstrip('.')
         self.timestampFileSuffix = kwargs.get('timestampFileSuffix', True)
-        self.removeIfExists      = kwargs.get('removeIfExists', False)
+        self.removeIfExists      = kwargs.get('removeIfExists', kwargs.get('reset', False))
 
         self._time              = self.getTime()
         self._timeCode          = self._time.strftime('%y-%U')

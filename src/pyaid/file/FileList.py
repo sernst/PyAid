@@ -1,5 +1,5 @@
 # FileList.py
-# (C)2012
+# (C)2012-2015
 # Scott Ernst
 
 from __future__ import print_function, absolute_import, unicode_literals, division
@@ -45,7 +45,7 @@ class FileList(object):
 #                                                                                     P U B L I C
 
 #___________________________________________________________________________________________________ removeAll
-    def removeAll(self, flags, files =True, directories =True):
+    def removeAll(self, files =True, directories =True):
         return self.removeFiltered(None, files=files, directories=directories)
 
 #___________________________________________________________________________________________________ removeFiltered
