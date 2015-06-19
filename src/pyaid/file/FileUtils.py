@@ -347,11 +347,11 @@ class FileUtils(object):
                 src.append(item)
         out = os.path.join(*src)
 
-        noTail = ArgsUtils.get('noTail', False, kwargs)
-        if ArgsUtils.get('isFile', False, kwargs):
+        noTail = kwargs.get('noTail', False)
+        if kwargs.get('isFile', False):
             return cls._getAbsolutePath(out, noTail=False, isDir=False)
 
-        if ArgsUtils.get('isDir', False, kwargs) or out.endswith(os.sep):
+        if kwargs.get('isDir', False) or out.endswith(os.sep):
             return cls._getAbsolutePath(out, noTail=noTail, isDir=True)
 
         if os.path.exists(out):
@@ -380,7 +380,7 @@ class FileUtils(object):
         if not path:
             return path
 
-        noTail = ArgsUtils.get('noTail', False, kwargs)
+        noTail = kwargs.get('noTail', False)
         path = cls._getAbsolutePath(path)
 
         if os.path.exists(path):
@@ -390,11 +390,11 @@ class FileUtils(object):
                 return path + ('' if path.endswith(os.sep) else os.sep)
             return path
 
-        if ArgsUtils.get('isFile', False, kwargs):
+        if kwargs.get('isFile', False):
             if path.endswith(os.sep):
                 return path[:-1]
             return path
-        elif ArgsUtils.get('isDir', False, kwargs):
+        elif kwargs.get('isDir', False):
             if noTail:
                 if path.endswith(os.sep):
                     path = path[:-1]
@@ -537,17 +537,18 @@ class FileUtils(object):
 #___________________________________________________________________________________________________ _listPath
     @classmethod
     def _listPath(cls, rootPath, recursive, **kwargs):
-        allowDots       = ArgsUtils.get('allowDots', True, kwargs)
+        allowDots       = kwargs.get('allowDots', True)
         rootPath        = cls.cleanupPath(rootPath, isDir=True)
-        topPath         = ArgsUtils.extract('topPath', rootPath, kwargs)
         listFiles       = kwargs.get('listFiles', True)
-        listDirs        = ArgsUtils.get('listDirs', False, kwargs)
-        skipSVN         = ArgsUtils.get('skipSVN', True, kwargs)
-        skips           = ArgsUtils.get('skips', None, kwargs)
+        listDirs        = kwargs.get('listDirs', False)
+        skipSVN         = kwargs.get('skipSVN', True)
+        skips           = kwargs.get('skips', None)
+        absolute        = kwargs.get('absolute', True)
+        pieces          = kwargs.get('pieces', False)
+
+        topPath         = ArgsUtils.extract('topPath', rootPath, kwargs)
         allowExtensions = ArgsUtils.getAsList('allowExtensions', kwargs)
         skipExtensions  = ArgsUtils.getAsList('skipExtensions', kwargs)
-        absolute        = ArgsUtils.get('absolute', True, kwargs)
-        pieces          = ArgsUtils.get('pieces', False, kwargs)
 
         out = []
         for item in os.listdir(rootPath):
