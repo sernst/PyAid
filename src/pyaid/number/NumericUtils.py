@@ -8,6 +8,7 @@ import math
 import sys
 
 # AS NEEDED: from pyaid.number.ValueUncertainty import ValueUncertainty
+from pyaid.list.ListUtils import ListUtils
 
 if sys.version > '3':
     long = int
@@ -24,6 +25,27 @@ class NumericUtils(object):
 #===================================================================================================
 #                                                                                       C L A S S
 
+#___________________________________________________________________________________________________ divideValueUncertainties
+    @classmethod
+    def divideValueUncertainties(cls, numeratorValue, denominatorValue):
+        """ Divides two ValueUncertainty instances to produce a new one with error propagation. """
+
+        n = numeratorValue
+        d = denominatorValue
+
+        val = n.raw/d.raw
+        unc = val*math.sqrt((n.rawUncertainty/n.raw)**2 + (d.rawUncertainty/d.raw)**2)
+        return cls.toValueUncertainty(val, unc)
+
+#___________________________________________________________________________________________________ multiplyValueUncertainties
+    @classmethod
+    def multiplyValueUncertainties(cls, a, b):
+        """ Divides two ValueUncertainty instances to produce a new one with error propagation. """
+
+        val = n.raw*d.raw
+        unc = val*math.sqrt((n.rawUncertainty/n.raw)**2 + (d.rawUncertainty/d.raw)**2)
+        return cls.toValueUncertainty(val, unc)
+
 #___________________________________________________________________________________________________ weightedAverage
     @classmethod
     def weightedAverage(cls, *values):
@@ -32,10 +54,12 @@ class NumericUtils(object):
             see "An Introduction to Error Analysis, 2nd Edition" by John R. Taylor, Chapter 7.2. """
 
         if not values:
-            return None
+            return cls.toValueUncertainty(0.0, 0.0)
 
         if isinstance(values[0], (list, tuple)):
             values = values[0]
+            if not values:
+                return cls.toValueUncertainty(0.0, 0.0)
 
         wxs = 0.0
         ws  = 0.0
@@ -139,9 +163,54 @@ class NumericUtils(object):
         if np is None:
             raise ImportError('NumericUtils.getMeanAndDeviation() requires Numpy')
 
+        if not values:
+            return cls.toValueUncertainty(0.0, 0.0)
+
         mean    = np.mean(values, dtype=np.float64)
         std     = np.std(values, dtype=np.float64)
         return cls.toValueUncertainty(mean, std)
+
+#___________________________________________________________________________________________________ getWeightedMeanAndDeviation
+    @classmethod
+    def getWeightedMeanAndDeviation(cls, *values):
+        """ Returns the mean and standard deviation of a weighted set of values. For further info
+            see: http://stats.stackexchange.com/questions/6534/
+                 how-do-i-calculate-a-weighted-standard-deviation-in-excel """
+
+        if np is None:
+            raise ImportError('NumericUtils.getMeanAndDeviation() requires Numpy')
+
+        if not values:
+            return cls.toValueUncertainty(0.0, 0.0)
+
+        if isinstance(values[0], (list, tuple)):
+            values = values[0]
+            if not values:
+                return cls.toValueUncertainty(0.0, 0.0)
+
+        if len(values) == 1:
+            return values[0].clone()
+
+        wxs = 0.0
+        ws  = 0.0
+        weights = []
+
+        for v in values:
+            w = 1.0/(v.uncertainty*v.uncertainty)
+            weights.append(w)
+            wxs += w*v.value
+            ws  += w
+
+        ave = wxs/ws
+        dev = 0.0
+        N = len(values)
+        for i in ListUtils.range(N):
+            dev += weights[i]*(values[i].value - ave)**2
+
+        denom = ws*(N - 1.0)/N
+        dev = math.sqrt(dev/denom)
+
+        return cls.toValueUncertainty(value=ave, uncertainty=dev)
 
 #___________________________________________________________________________________________________ toValueUncertainty
     @classmethod
