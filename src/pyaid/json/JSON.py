@@ -75,9 +75,10 @@ class JSON(object):
             res = StringUtils.toStr2(cls.asString(value, pretty=pretty))
             if gzipped:
                 f = gzip.open(path, 'wb')
+                f.write(StringUtils.toBytes(res))
             else:
                 f = open(path, 'w+')
-            f.write(res)
+                f.write(res)
             f.close()
             return True
         except Exception as err:

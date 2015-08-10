@@ -10,6 +10,7 @@ import os
 import shutil
 import datetime
 import subprocess
+from collections import namedtuple
 
 # AS NEEDED: import urllib2
 # AS NEEDED: import requests
@@ -31,9 +32,15 @@ class SystemUtils(object):
 #===================================================================================================
 #                                                                                      C L A S S
 
+    CMD_RESULT_NT = namedtuple('CMD_RESULT_NT', [
+        'code', 'success', 'output', 'error', 'command'])
+
 #___________________________________________________________________________________________________ executeCommand
     @classmethod
-    def executeCommand(cls, cmd, remote =False, shell =True, wait =False, background =False):
+    def executeCommand(
+            cls, cmd, remote =False, shell =True, wait =False,
+            background =False, resultObj =False
+    ):
         if shell and not StringUtils.isStringType(cmd):
             from pyaid.list.ListUtils import ListUtils
             cmd = ' '.join(ListUtils.itemsToString(cmd))
@@ -63,12 +70,20 @@ class SystemUtils(object):
         if wait:
             pipe.wait()
         out, error = pipe.communicate()
-        result = {
+
+        if resultObj:
+            return cls.CMD_RESULT_NT(
+                error=StringUtils.toUnicode(error),
+                output=StringUtils.toUnicode(out),
+                code=pipe.returncode,
+                success=pipe.returncode == 0,
+                command=cmd)
+
+        return {
             'error':StringUtils.toUnicode(error),
             'out':StringUtils.toUnicode(out),
             'code':pipe.returncode,
             'command':cmd}
-        return result
 
 #___________________________________________________________________________________________________ executeForOutput
     @classmethod

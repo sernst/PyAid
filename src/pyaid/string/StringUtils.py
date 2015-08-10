@@ -52,7 +52,7 @@ class StringUtils(object):
 
 #___________________________________________________________________________________________________ isBinaryType
     @classmethod
-    def isBinaryType(cls):
+    def isBinaryType(cls, source):
         """isBinaryType doc..."""
         return isinstance(source, binary_type)
 

@@ -543,6 +543,7 @@ class FileUtils(object):
         listDirs        = kwargs.get('listDirs', False)
         skipSVN         = kwargs.get('skipSVN', True)
         skips           = kwargs.get('skips', None)
+
         absolute        = kwargs.get('absolute', True)
         pieces          = kwargs.get('pieces', False)
 

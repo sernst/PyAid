@@ -233,12 +233,27 @@ class S3Bucket(object):
             acl=StringUtils.toUnicode('private'),
             max_content_length=maxSizeBytes)
 
+#_______________________________________________________________________________ generateHeaders
+    @classmethod
+    def generateHeaders(
+            cls, keyName, expires =None, eTag =None, maxAge =-1, gzipped =False
+    ):
+        """generateHeader doc..."""
+        return cls._generateHeaders(
+            keyName=keyName,
+            expires=expires,
+            eTag=eTag,
+            maxAge=maxAge,
+            gzipped=gzipped)
+
 #===================================================================================================
 #                                                                               P R O T E C T E D
 
 #___________________________________________________________________________________________________ _generateHeaders
     @classmethod
-    def _generateHeaders(cls, keyName, expires =None, eTag =None, maxAge =-1):
+    def _generateHeaders(
+            cls, keyName, expires =None, eTag =None, maxAge =-1, gzipped =False
+    ):
         """Doc..."""
         headers = dict()
 
@@ -267,6 +282,9 @@ class S3Bucket(object):
             headers['Content-Type'] = contentType + '; charset=UTF-8'
         else:
             headers['Content-Type'] = contentType
+
+        if gzipped:
+            headers['Content-Encoding'] = 'gzip'
 
         return headers
 
