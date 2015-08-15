@@ -29,6 +29,20 @@ class FileUtils(object):
 #===================================================================================================
 #                                                                                     P U B L I C
 
+#_______________________________________________________________________________ makePathFromFile
+    @classmethod
+    def makePathFromFile(cls, filePath, *args, **kwargs):
+        """makePathFromFile doc..."""
+        return cls.createPath(cls.getDirectoryOf(filePath), *args, **kwargs)
+
+#_______________________________________________________________________________ addToSysPath
+    @classmethod
+    def addToSysPath(cls, *args, **kwargs):
+        """addToSysPath doc..."""
+        path = cls.makeFolderPath(*args)
+        if path not in sys.path:
+            sys.path.append(path)
+
 #___________________________________________________________________________________________________ emptyFolder
     @classmethod
     def emptyFolder(cls, folderPath):

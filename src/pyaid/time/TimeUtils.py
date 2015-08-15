@@ -36,6 +36,7 @@ class TimeUtils(object):
     ISO_8601_WEEK = '%Y-W%W'
     ISO_8601_WEEK_DATE = '%Y-W%W-%d'
     ISO_8601_ORDINAL_DATE = '%Y-%j'
+    ORDINAL_DATE_SHORT = '%y-%j'
 
     ZULU_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
     _ZULU_PRECISE_FORMAT = '%Y-%m-%dT%H:%M:%S'
