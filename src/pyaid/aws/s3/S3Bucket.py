@@ -259,16 +259,18 @@ class S3Bucket(object):
 
         if expires:
             if StringUtils.isStringType(expires):
-                headers['Expires'] = StringUtils.toStr2(expires)
-            elif isinstance(expires, str):
+                headers['Expires'] = StringUtils.toBytes(expires)
+            elif StringUtils.isBinaryType(expires):
                 headers['Expires'] = expires
             else:
-                headers['Expires'] = TimeUtils.dateTimeToWebTimestamp(expires)
+                headers['Expires'] = StringUtils.toBytes(
+                    TimeUtils.dateTimeToWebTimestamp(expires))
         elif eTag:
-            headers['ETag'] = StringUtils.toUnicode(eTag)
+            headers['ETag'] = StringUtils.toBytes(eTag)
 
         if maxAge > -1:
-            headers['Cache-Control'] = 'public, max-age=' + StringUtils.toUnicode(maxAge)
+            headers['Cache-Control'] = StringUtils.toBytes(
+                'max-age=%s; public' % maxAge)
 
         if keyName.endswith('.jpg'):
             contentType = MIME_TYPES.JPEG_IMAGE
@@ -279,9 +281,8 @@ class S3Bucket(object):
         else:
             contentType = FileUtils.getMimeType(keyName)
         if StringUtils.begins(contentType, ('text/', 'application/')):
-            headers['Content-Type'] = contentType + '; charset=UTF-8'
-        else:
-            headers['Content-Type'] = contentType
+            contentType = '%s; charset=UTF-8' % contentType
+        headers['Content-Type'] = contentType
 
         if gzipped:
             headers['Content-Encoding'] = 'gzip'
