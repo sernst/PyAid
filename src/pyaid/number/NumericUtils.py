@@ -46,6 +46,27 @@ class NumericUtils(object):
         unc = val*math.sqrt((n.rawUncertainty/n.raw)**2 + (d.rawUncertainty/d.raw)**2)
         return cls.toValueUncertainty(val, unc)
 
+#_______________________________________________________________________________ unweigthedAverage
+    @classmethod
+    def unweigthedAverage(cls, *values):
+        """unweigthedAverage doc..."""
+
+        if not values:
+            return cls.toValueUncertainty(0.0, 0.0)
+
+        if isinstance(values[0], (list, tuple)):
+            values = values[0]
+            if not values:
+                return cls.toValueUncertainty(0.0, 0.0)
+
+        vals = []
+        for v in values:
+            vals.append(v.value)
+
+        return cls.toValueUncertainty(
+            value=np.mean(vals),
+            uncertainty=np.std(vals))
+
 #___________________________________________________________________________________________________ weightedAverage
     @classmethod
     def weightedAverage(cls, *values):
@@ -158,7 +179,7 @@ class NumericUtils(object):
 
 #___________________________________________________________________________________________________ getMeanAndDeviation
     @classmethod
-    def getMeanAndDeviation(cls, values):
+    def getMeanAndDeviation(cls, *values):
         """getMeanAndDeviation doc..."""
         if np is None:
             raise ImportError('NumericUtils.getMeanAndDeviation() requires Numpy')
@@ -166,9 +187,26 @@ class NumericUtils(object):
         if not values:
             return cls.toValueUncertainty(0.0, 0.0)
 
-        mean    = np.mean(values, dtype=np.float64)
-        std     = np.std(values, dtype=np.float64)
-        return cls.toValueUncertainty(mean, std)
+        if isinstance(values[0], (list, tuple)):
+            values = values[0]
+            if not values:
+                return cls.toValueUncertainty(0.0, 0.0)
+
+        vals = []
+        for value in values:
+            try:
+                vals.append(value.value)
+            except Exception:
+                vals.append(value)
+
+        try:
+            mean    = np.mean(vals, dtype=np.float64)
+            std     = np.std(vals, dtype=np.float64)
+            return cls.toValueUncertainty(mean, std)
+        except Exception as err:
+            print(vals)
+            raise
+        return cls.toValueUncertainty(0.0, 0.0)
 
 #___________________________________________________________________________________________________ getWeightedMeanAndDeviation
     @classmethod
