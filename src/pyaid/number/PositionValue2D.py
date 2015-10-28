@@ -13,12 +13,12 @@ from pyaid.number.Angle import Angle
 from pyaid.number.NumericUtils import NumericUtils
 from pyaid.string.StringUtils import StringUtils
 
-#*************************************************************************************************** PositionValue2D
+#*******************************************************************************
 class PositionValue2D(object):
     """A class for..."""
 
 #===============================================================================
-#                                                                                       C L A S S
+#                                                                     C L A S S
 
 #_______________________________________________________________________________
     def __init__(self, x = 0.0, y = 0.0, xUnc = 0.0, yUnc = 0.0):
@@ -29,7 +29,7 @@ class PositionValue2D(object):
         self.yUnc = float(yUnc)
 
 #===============================================================================
-#                                                                                   G E T / S E T
+#                                                                 G E T / S E T
 
 #_______________________________________________________________________________
     @property
@@ -52,7 +52,7 @@ class PositionValue2D(object):
         return self.xValue.value != 0.0 or self.yValue.value != 0.0
 
 #===============================================================================
-#                                                                                     P U B L I C
+#                                                                   P U B L I C
 
 #_______________________________________________________________________________
     def update(self, x =None, y =None, xUnc =None, yUnc =None):
@@ -78,7 +78,8 @@ class PositionValue2D(object):
 
 #_______________________________________________________________________________
     def invert(self):
-        """ Switches the sign of the x and y values so that x = -x and y = -y. """
+        """ Switches the sign of the x and y values so that x = -x and y = -y.
+        """
         self.x = -self.x
         self.y = -self.y
 
@@ -100,10 +101,12 @@ class PositionValue2D(object):
 
 #_______________________________________________________________________________
     def rotate(self, angle, origin =None):
-        """ Rotates the position value by the specified angle using a standard 2D rotation matrix
-            formulation. If an origin Position2D instance is not specified the rotation will
-            occur around the origin. Also, if an origin is specified, the uncertainty in that
-            origin value will be propagated through to the uncertainty of the rotated result. """
+        """ Rotates the position value by the specified angle using a standard
+            2D rotation matrix formulation. If an origin Position2D instance is
+            not specified the rotation will occur around the origin. Also, if
+            an origin is specified, the uncertainty in that origin value will
+            be propagated through to the uncertainty of the rotated result.
+        """
 
         if origin is None:
             origin = PositionValue2D()

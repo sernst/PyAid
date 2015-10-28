@@ -547,3 +547,12 @@ class StringUtils(object):
         if sys.version > '3':
             return cls.strToUnicode(value, force=force)
         return cls.unicodeToStr(value, force=force)
+
+#_______________________________________________________________________________
+    @classmethod
+    def createPassword(cls, length =12):
+        chars = string.ascii_letters + string.digits + '!@#$%^&*()'
+        random.seed = (os.urandom(1024))
+
+        return ''.join(random.choice(chars) for i in range(length))
+
