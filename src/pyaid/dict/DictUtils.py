@@ -82,13 +82,12 @@ class DictUtils(object):
         """
 
         vi = sys.version_info
-        if force or (vi[0] < 3 and (vi[1] < 7 or vi[2] < 5)):
-            out = dict()
-            for n,v in cls.iter(source):
-                out[StringUtils.toStr2(n, True)] = v
-        else:
+        if not force and (vi[0] >= 3 or (vi[1] >= 7 and vi[2] >= 5)):
             return source
 
+        out = dict()
+        for n,v in cls.iter(source):
+            out[StringUtils.toStr2(n, True)] = v
         return out
 
 #___________________________________________________________________________________________________ cleanBytesToText
