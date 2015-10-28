@@ -85,7 +85,7 @@ class DictUtils(object):
         if force or (vi[0] < 3 and (vi[1] < 7 or vi[2] < 5)):
             out = dict()
             for n,v in cls.iter(source):
-                out[str(n)] = v
+                out[StringUtils.toStr2(n, True)] = v
         else:
             return source
 
